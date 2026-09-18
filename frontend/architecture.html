@@ -1,0 +1,596 @@
+﻿<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;background-image:linear-gradient(to right,rgba(148,163,184,0.12) 1px,transparent 1px),linear-gradient(to bottom,rgba(148,163,184,0.12) 1px,transparent 1px);background-size:24px 24px;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"tertiary-fixed-dim":"#ffb4ab","on-primary-container":"#fdfcff","error-container":"#ffdad6","on-primary-fixed-variant":"#004b73","on-secondary-fixed-variant":"#2f2ebe","on-background":"#131b2e","primary-fixed-dim":"#93ccff","error":"#ba1a1a","secondary-fixed-dim":"#c0c1ff","tertiary":"#bb0112","on-tertiary-fixed-variant":"#93000b","outline":"#707881","secondary":"#4648d4","primary-fixed":"#cce5ff","surface-container-high":"#e2e7ff","on-tertiary":"#ffffff","surface-dim":"#d2d9f4","surface-bright":"#faf8ff","surface-container":"#eaedff","on-secondary-fixed":"#07006c","on-secondary":"#ffffff","on-secondary-container":"#fffbff","secondary-fixed":"#e1e0ff","primary":"#006194","on-surface":"#131b2e","on-primary-fixed":"#001d31","surface-container-highest":"#dae2fd","inverse-surface":"#283044","tertiary-container":"#e02928","surface-tint":"#006398","primary-container":"#007bb9","tertiary-fixed":"#ffdad6","surface":"#faf8ff","inverse-primary":"#93ccff","on-primary":"#ffffff","surface-container-low":"#f2f3ff","on-surface-variant":"#3f4850","on-tertiary-container":"#fffbff","secondary-container":"#6063ee","outline-variant":"#bfc7d2","surface-variant":"#dae2fd","inverse-on-surface":"#eef0ff","surface-container-lowest":"#ffffff","on-error":"#ffffff","on-error-container":"#93000a","background":"#faf8ff","on-tertiary-fixed":"#410002"},borderRadius:{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},spacing:{"space-lg":"1.5rem","space-sm":"0.5rem","space-xl":"2.25rem","space-xs":"0.25rem","margin-md":"1.5rem","space-md":"1rem","gutter-lg":"1.5rem","margin":"1rem","margin-lg":"2.5rem","gutter":"1rem"},fontFamily:{"headline-lg":["Space Grotesk"],"label-md":["JetBrains Mono"],"display-lg":["Space Grotesk"],"label-sm":["JetBrains Mono"],"body-sm":["Inter"],"headline-lg-mobile":["Space Grotesk"],"display-lg-mobile":["Space Grotesk"],"body-lg":["Inter"],"label-lg":["JetBrains Mono"],"headline-sm":["Space Grotesk"],"headline-md":["Space Grotesk"],"body-md":["Inter"]},fontSize:{"headline-lg":["32px",{lineHeight:"40px",letterSpacing:"-0.02em",fontWeight:"600"}],"label-md":["11px",{lineHeight:"16px",letterSpacing:"0.04em",fontWeight:"500"}],"display-lg":["48px",{lineHeight:"56px",letterSpacing:"-0.03em",fontWeight:"600"}],"label-sm":["10px",{lineHeight:"14px",letterSpacing:"0.06em",fontWeight:"500"}],"body-sm":["12px",{lineHeight:"18px",fontWeight:"400"}],"headline-lg-mobile":["24px",{lineHeight:"32px",letterSpacing:"-0.01em",fontWeight:"600"}],"display-lg-mobile":["32px",{lineHeight:"40px",letterSpacing:"-0.02em",fontWeight:"600"}],"body-lg":["16px",{lineHeight:"24px",fontWeight:"400"}],"label-lg":["13px",{lineHeight:"18px",letterSpacing:"0.02em",fontWeight:"500"}],"headline-sm":["18px",{lineHeight:"26px",letterSpacing:"-0.01em",fontWeight:"500"}],"headline-md":["24px",{lineHeight:"32px",letterSpacing:"-0.015em",fontWeight:"500"}],"body-md":["14px",{lineHeight:"20px",fontWeight:"400"}]}}}};</script></head><body class="bg-background font-body-md text-on-surface min-h-screen flex flex-col justify-between antialiased selection:bg-primary-fixed selection:text-on-primary-fixed"><header class="fixed top-0 left-0 w-full z-50 bg-surface-container-lowest/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-20 w-full px-margin-lg flex items-center justify-between gap-gutter"><div class="flex items-center gap-space-md"><img alt="Cerberus Geometric Triad Emblem" class="h-8 w-auto object-contain" src="/static/emblem.svg"/><div class="flex flex-col"><div class="flex items-center gap-space-sm"><span class="font-headline-sm text-headline-sm uppercase text-on-surface tracking-wider font-bold">CERBERUS</span><span class="font-label-sm text-label-sm uppercase bg-surface-container-high text-primary px-space-xs py-0.5 rounded">RUNTIME DEFENSE</span></div><span class="font-label-sm text-label-sm text-outline tracking-widest">EXECUTE â€¢ OBSERVE â€¢ CONTAIN</span></div></div><div class="hidden xl:flex items-center"><nav class="flex items-center gap-space-xs p-1 bg-surface-container/70 rounded-full backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.03)]" data-active-classes="bg-primary-container text-on-primary-container font-semibold shadow-[0_2px_8px_rgba(0,97,148,0.18)]"><a class="font-label-sm text-label-sm uppercase px-space-md py-1.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="analyze" href="/">ANALYZE</a><a class="font-label-sm text-label-sm uppercase px-space-md py-1.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="timeline-and-history" href="/timeline.html">TIMELINE &amp; HISTORY</a><a class="font-label-sm text-label-sm uppercase px-space-md py-1.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="deep-report" href="/report.html">DEEP REPORT</a><a aria-current="page" class="uppercase px-space-md py-1.5 rounded-full transition-all bg-primary-container text-on-primary-container font-semibold shadow-[0_2px_8px_rgba(0,97,148,0.18)]" data-path="architecture-and-system" href="/architecture.html">ARCHITECTURE &amp; SYSTEM</a></nav></div><div class="flex items-center gap-space-md"><div class="hidden lg:flex items-center gap-space-md px-space-md py-1.5 rounded-full bg-surface-container-low/90 backdrop-blur-md text-on-surface-variant shadow-[0_1px_6px_rgba(0,0,0,0.03)]"><div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span><span class="font-label-sm text-label-sm font-medium">SANDBOX: <span class="text-primary font-bold">ACTIVE</span></span></div><div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-outline-variant"></span><span class="font-label-sm text-label-sm">PROBES: <span class="text-on-surface font-semibold">READY</span></span></div><div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-outline-variant"></span><span class="font-label-sm text-label-sm text-outline">ISOLATION: TMPFS</span></div></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-sm"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div><div class="xl:hidden flex items-center justify-center pb-2 px-margin"><nav class="flex items-center gap-space-xs p-1 bg-surface-container/80 rounded-full backdrop-blur-md overflow-x-auto max-w-full" data-active-classes="bg-primary-container text-on-primary-container font-semibold shadow-[0_2px_8px_rgba(0,97,148,0.18)]"><a class="font-label-sm text-label-sm uppercase px-space-sm py-1 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all whitespace-nowrap" data-path="analyze" href="/">ANALYZE</a><a class="font-label-sm text-label-sm uppercase px-space-sm py-1 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all whitespace-nowrap" data-path="timeline-and-history" href="/timeline.html">TIMELINE</a><a class="font-label-sm text-label-sm uppercase px-space-sm py-1 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all whitespace-nowrap" data-path="deep-report" href="/report.html">DEEP REPORT</a><a aria-current="page" class="uppercase px-space-sm py-1 rounded-full transition-all whitespace-nowrap bg-primary-container text-on-primary-container font-semibold shadow-[0_2px_8px_rgba(0,97,148,0.18)]" data-path="architecture-and-system" href="/architecture.html">SYSTEM</a></nav></div></header><main class="w-full pt-20 bg-transparent flex-1"><div class="flex flex-col w-full">
+<!-- Interactive Canvas & Inspector Viewport Grid -->
+<div class="w-full px-margin-lg py-space-md flex flex-col gap-space-lg">
+<!-- Top System Architecture Header Matrix -->
+<div class="w-full flex flex-col lg:flex-row lg:items-end justify-between gap-space-md bg-surface-container-lowest/80 backdrop-blur-xl p-space-lg rounded-xl shadow-sm">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-sm">
+<span class="font-label-md text-label-md uppercase px-space-xs py-0.5 rounded bg-primary text-on-primary font-semibold">KERNEL SUBSTRATE SPEC</span>
+<span class="font-label-sm text-label-sm text-outline font-medium tracking-widest">LINUX 6.8.0-31-GENERIC â€¢ X86_64</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">3D Spatial Subsystem &amp; Kernel Hook Topology</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">
+          Multi-planar orthographic projection of the sandboxed execution lifecycle. Each architectural stratum functions as an immutable isolation, telemetry, or policy interception boundary.
+        </p>
+</div>
+<!-- Quick Control Segment -->
+<div class="flex items-center gap-space-sm bg-surface-container p-1 rounded-full shadow-inner">
+<button class="px-space-md py-1 rounded-full font-label-sm text-label-sm uppercase bg-primary-container text-on-primary-container font-semibold transition-all" id="btn-explode" onclick="toggleExplode()">
+          Exploded Strata
+        </button>
+<button class="px-space-md py-1 rounded-full font-label-sm text-label-sm uppercase text-on-surface-variant hover:text-on-surface transition-all" id="btn-compact" onclick="toggleCompact()">
+          Planar Stack
+        </button>
+<div class="w-px h-4 bg-outline-variant mx-1"></div>
+<button class="flex items-center gap-1 px-space-sm py-1 rounded-full font-label-sm text-label-sm text-primary hover:bg-surface-container-high transition-all" onclick="resetTelemetrySimulation()">
+<span class="material-symbols-outlined text-[14px]">refresh</span>
+<span>FLUSH PROBES</span>
+</button>
+</div>
+</div>
+<!-- Main Spatial Stage + Inspector Split -->
+<div class="w-full grid grid-cols-1 xl:grid-cols-12 gap-space-lg min-h-[640px]">
+<!-- 3D Spatial Canvas (Col 1-7) -->
+<div class="xl:col-span-7 bg-surface-container-lowest/80 backdrop-blur-xl rounded-xl p-space-lg shadow-sm flex flex-col relative overflow-hidden select-none">
+<!-- Viewport Metadata HUD Overlay -->
+<div class="flex items-center justify-between w-full pb-space-sm z-20">
+<div class="flex items-center gap-space-sm">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="font-label-sm text-label-sm uppercase font-semibold text-on-surface">ORTHO-ISOMETRIC PROJECTION [SYS::K_STRATUM]</span>
+</div>
+<div class="flex items-center gap-space-md">
+<span class="font-label-sm text-label-sm text-outline">INTERPOLATION: <span class="text-primary font-medium">AFFINE 3D</span></span>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-surface-container text-primary font-bold">ALPHA: 0.94</span>
+</div>
+</div>
+<!-- 3D Transform Stage Container -->
+<div class="relative flex-1 w-full flex items-center justify-center py-10" style="perspective: 1200px;">
+<!-- Background Axis Grid Projection in Stage -->
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-40">
+<svg class="w-full h-full max-w-lg" fill="none" viewbox="0 0 500 500">
+<circle class="text-outline-variant" cx="250" cy="250" r="180" stroke="currentColor" stroke-dasharray="4 4" stroke-width="1"></circle>
+<circle class="text-outline-variant" cx="250" cy="250" r="120" stroke="currentColor" stroke-dasharray="2 4" stroke-width="1"></circle>
+<path class="text-outline-variant/60" d="M 250,50 L 250,450 M 50,250 L 450,250" stroke="currentColor" stroke-width="1"></path>
+</svg>
+</div>
+<!-- Exploded Stack Assembly: dynamic transform controlled via JS -->
+<div class="relative w-72 sm:w-80 md:w-96 transition-all duration-700 ease-out" id="spatial-assembly" style="transform-style: preserve-3d; transform: rotateX(56deg) rotateZ(-34deg);">
+<!-- Layer 0 (Top): UNTRUSTED USER CODE -->
+<div class="layer-plane group cursor-pointer absolute inset-x-0 h-28 rounded-lg bg-surface-bright/95 backdrop-blur-md p-space-sm transition-all duration-300 shadow-md hover:scale-[1.02]" id="card-layer-0" onclick="inspectLayer(0)" style="transform: translateZ(260px);">
+<div class="w-full h-full flex flex-col justify-between rounded p-2 bg-gradient-to-r from-tertiary-fixed/40 to-surface-bright">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-ping"></span>
+<span class="font-label-sm text-label-sm uppercase font-bold text-tertiary">STRATUM 05 // UNTRUSTED USER CODE</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-mono">PID: 40912</span>
+</div>
+<div class="flex items-center gap-space-sm font-label-sm text-label-sm text-on-surface">
+<span class="px-1.5 py-0.5 rounded bg-surface-container font-mono text-[10px]">worker.py</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container font-mono text-[10px]">libpayload.so</span>
+<span class="text-tertiary font-bold ml-auto flex items-center gap-1"><span class="material-symbols-outlined text-[13px]">warning</span> DIRTY MEMORY</span>
+</div>
+</div>
+</div>
+<!-- Layer 1: EPHEMERAL ISOLATION (tmpfs & Namespaces) -->
+<div class="layer-plane group cursor-pointer absolute inset-x-0 h-28 rounded-lg bg-surface-bright/90 backdrop-blur-md p-space-sm transition-all duration-300 shadow-md hover:scale-[1.02]" id="card-layer-1" onclick="inspectLayer(1)" style="transform: translateZ(195px);">
+<div class="w-full h-full flex flex-col justify-between rounded p-2 bg-surface-container-high/40 group-hover:bg-surface-container-high/70">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-label-sm text-label-sm uppercase font-bold text-on-surface">STRATUM 04 // EPHEMERAL ISOLATION</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary font-mono">TMPFS RAM + NS</span>
+</div>
+<div class="grid grid-cols-3 gap-1 font-label-sm text-label-sm">
+<span class="px-1 py-0.5 rounded bg-surface text-center font-mono text-[9px] text-on-surface-variant">CLONE_NEWPID</span>
+<span class="px-1 py-0.5 rounded bg-surface text-center font-mono text-[9px] text-on-surface-variant">CLONE_NEWNET</span>
+<span class="px-1 py-0.5 rounded bg-surface text-center font-mono text-[9px] text-on-surface-variant">CLONE_NEWNS</span>
+</div>
+</div>
+</div>
+<!-- Layer 2: HARDWARE & RESOURCE QUOTA (cgroups v2) -->
+<div class="layer-plane group cursor-pointer absolute inset-x-0 h-28 rounded-lg bg-surface-bright/90 backdrop-blur-md p-space-sm transition-all duration-300 shadow-md hover:scale-[1.02]" id="card-layer-2" onclick="inspectLayer(2)" style="transform: translateZ(130px);">
+<div class="w-full h-full flex flex-col justify-between rounded p-2 bg-surface-container/60 group-hover:bg-surface-container">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="font-label-sm text-label-sm uppercase font-bold text-on-surface">STRATUM 03 // RESOURCE ENVELOPE</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary font-mono">CGROUPS V2</span>
+</div>
+<div class="flex items-center justify-between font-label-sm text-label-sm text-on-surface-variant">
+<span>mem.max: 256MB</span>
+<span>cpu.max: 50000 100000</span>
+<span>pids.max: 32</span>
+</div>
+</div>
+</div>
+<!-- Layer 3: KERNEL INTERCEPTION & OBSERVABILITY (eBPF Probes) -->
+<div class="layer-plane group cursor-pointer absolute inset-x-0 h-28 rounded-lg bg-surface-bright/90 backdrop-blur-md p-space-sm transition-all duration-300 shadow-md hover:scale-[1.02]" id="card-layer-3" onclick="inspectLayer(3)" style="transform: translateZ(65px);">
+<div class="w-full h-full flex flex-col justify-between rounded p-2 bg-primary-fixed/30 group-hover:bg-primary-fixed/50">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="font-label-sm text-label-sm uppercase font-bold text-primary">STRATUM 02 // eBPF TELEMETRY RING</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary font-mono">TRACEPOINTS (8)</span>
+</div>
+<div class="flex items-center gap-2 font-label-sm text-label-sm text-on-surface">
+<span class="font-mono text-[10px] bg-surface px-1.5 py-0.5 rounded">kprobe/sys_execve</span>
+<span class="font-mono text-[10px] bg-surface px-1.5 py-0.5 rounded">tp/sys_enter_connect</span>
+</div>
+</div>
+</div>
+<!-- Layer 4: POLICY & CONTAINMENT (seccomp-bpf) -->
+<div class="layer-plane group cursor-pointer absolute inset-x-0 h-28 rounded-lg bg-surface-bright/90 backdrop-blur-md p-space-sm transition-all duration-300 shadow-md hover:scale-[1.02]" id="card-layer-4" onclick="inspectLayer(4)" style="transform: translateZ(0px);">
+<div class="w-full h-full flex flex-col justify-between rounded p-2 bg-surface-container-high/50 group-hover:bg-surface-container-high">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-secondary-container"></span>
+<span class="font-label-sm text-label-sm uppercase font-bold text-on-surface">STRATUM 01 // SECCOMP-BPF BARRIER</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary-container font-mono">FILTER: DENY-RAW</span>
+</div>
+<div class="flex items-center justify-between font-label-sm text-label-sm text-on-surface-variant">
+<span>SECCOMP_RET_USER_NOTIF</span>
+<span class="font-mono text-[10px] text-tertiary">SIGKILL ON ESCAPE</span>
+</div>
+</div>
+</div>
+<!-- Foundation: LINUX KERNEL CORE -->
+<div class="layer-plane group cursor-pointer absolute inset-x-0 h-28 rounded-lg bg-surface-container-highest/90 backdrop-blur-md p-space-sm transition-all duration-300 shadow-md hover:scale-[1.02]" id="card-layer-5" onclick="inspectLayer(5)" style="transform: translateZ(-65px);">
+<div class="w-full h-full flex flex-col justify-between rounded p-2 bg-surface-dim/40 group-hover:bg-surface-dim/80">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-on-surface"></span>
+<span class="font-label-sm text-label-sm uppercase font-bold text-on-surface">BASE // LINUX KERNEL SUBSYSTEM</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline font-mono">RING-0 VIRTUAL DISPATCH</span>
+</div>
+<div class="flex items-center justify-between font-label-sm text-label-sm text-on-surface-variant font-mono text-[10px]">
+<span>VFS â€¢ SCHED_DEADLINE</span>
+<span>NET_CORE â€¢ CRYPTO</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Dynamic Visual Status Footer Inside Canvas -->
+<div class="w-full pt-space-sm flex flex-wrap items-center justify-between gap-space-sm z-20">
+<div class="flex items-center gap-space-xs font-label-sm text-label-sm text-outline">
+<span class="material-symbols-outlined text-[15px] text-primary">touch_app</span>
+<span>CLICK ANY SPATIAL LAYER TO BIND INSPECTOR PROBE</span>
+</div>
+<div class="flex items-center gap-space-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant">CONTAINMENT VECTOR:</span>
+<span class="px-2 py-0.5 rounded bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm font-semibold">TMPFS RAM &gt; SECCOMP &gt; eBPF</span>
+</div>
+</div>
+</div>
+<!-- Interactive Layer Inspector Sidecar (Col 8-12) -->
+<div class="xl:col-span-5 flex flex-col gap-space-md">
+<!-- Inspector Card -->
+<div class="bg-surface-container-lowest/80 backdrop-blur-xl rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md flex-1">
+<div class="flex items-center justify-between pb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="font-label-sm text-label-sm uppercase font-mono text-outline">HOOK INSPECTOR</span>
+<span class="font-label-sm text-label-sm text-outline">â€¢</span>
+<span class="font-label-sm text-label-sm font-mono text-primary font-bold" id="inspector-layer-tag">LAYER 03: eBPF OBSERVATION</span>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-primary text-on-primary font-semibold" id="inspector-status-badge">VERIFIED</span>
+</div>
+<!-- Dynamic Title & Description -->
+<div class="flex flex-col gap-1">
+<h2 class="font-headline-md text-headline-md text-on-surface" id="inspector-title">Kernel Interception &amp; Syscall Probes</h2>
+<p class="font-body-md text-body-md text-on-surface-variant" id="inspector-desc">
+              High-throughput in-kernel telemetry tapping system calls in Ring-0 without userland context switching penalties. Ring buffer emits immutable execution traces directly to the Cerberus analysis core.
+            </p>
+</div>
+<!-- Low-level Kernel Hooks & Mechanics Array -->
+<div class="flex flex-col gap-space-xs bg-surface-container-low p-space-md rounded-lg">
+<span class="font-label-sm text-label-sm text-outline uppercase font-semibold">KERNEL ATTACH POINTS &amp; MECHANICS</span>
+<div class="grid grid-cols-1 gap-space-xs pt-1" id="inspector-mechanics">
+<!-- Rendered via JavaScript dynamically based on selected layer -->
+<div class="flex items-center justify-between p-2 rounded bg-surface font-label-sm text-label-sm">
+<span class="font-mono text-on-surface font-medium">kprobe:sys_execve</span>
+<span class="text-primary font-mono">Attached (PID Filter)</span>
+</div>
+<div class="flex items-center justify-between p-2 rounded bg-surface font-label-sm text-label-sm">
+<span class="font-mono text-on-surface font-medium">tracepoint:syscalls:sys_enter_connect</span>
+<span class="text-primary font-mono">Active (Deny-list)</span>
+</div>
+<div class="flex items-center justify-between p-2 rounded bg-surface font-label-sm text-label-sm">
+<span class="font-mono text-on-surface font-medium">BPF_MAP_TYPE_RINGBUF</span>
+<span class="text-secondary font-mono">Allocated (64MB)</span>
+</div>
+</div>
+</div>
+<!-- Role in Workflow Box (Isolate -> Observe -> Contain) -->
+<div class="flex flex-col gap-1.5 p-space-md rounded-lg bg-surface-container">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[18px]" id="inspector-phase-icon">visibility</span>
+<span class="font-label-md text-label-md font-bold text-on-surface uppercase" id="inspector-phase-title">ROLE IN RUNTIME WORKFLOW: OBSERVE</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant" id="inspector-phase-desc">
+              Continuously decodes execution intent by parsing arguments to file open, memory mapping, network connections, and child process forks before execution completes.
+            </p>
+</div>
+<!-- Direct Probe Code Sample Preview -->
+<div class="flex flex-col gap-1">
+<span class="font-label-sm text-label-sm text-outline uppercase font-semibold">ACTIVE BPF / KERNEL DEFINITION</span>
+<div class="bg-inverse-surface text-inverse-on-surface p-space-sm rounded-lg overflow-x-auto font-label-sm text-label-sm font-mono leading-relaxed">
+<pre class="text-slate-300" id="inspector-code">SEC("kprobe/__x64_sys_execve")
+int BPF_KPROBE(trace_execve, const char *filename) {
+    u32 pid = bpf_get_current_pid_tgid() &gt;&gt; 32;
+    if (pid != target_sandbox_pid) return 0;
+    struct event *ev = bpf_ringbuf_reserve(&amp;events, sizeof(*ev), 0);
+    if (!ev) return 0;
+    ev-&gt;pid = pid;
+    bpf_probe_read_user_str(ev-&gt;comm, sizeof(ev-&gt;comm), filename);
+    bpf_ringbuf_submit(ev, 0);
+    return 0;
+}</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Five-Pillar Subsystem Glass Modules -->
+<div class="w-full flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[18px]">memory</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">Subsystem Health &amp; Active Probes</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline font-mono">ALL SUBSYSTEMS NOMINAL (POLL RATE: 100Hz)</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-space-md">
+<!-- Module 1: eBPF Subsystem -->
+<div class="bg-surface-container-lowest/80 backdrop-blur-xl p-space-md rounded-xl shadow-sm flex flex-col justify-between gap-space-md hover:bg-surface-container-lowest transition-all">
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm font-bold text-outline uppercase">eBPF SUBSYSTEM</span>
+<span class="flex items-center gap-1 font-label-sm text-label-sm text-primary font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span> READY
+              </span>
+</div>
+<span class="font-body-md text-body-md font-semibold text-on-surface">Syscall Ring Buffer</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Verifier approved 8 bytecode probes. Zero rejected verifier runs.</span>
+</div>
+<div class="pt-2 flex items-center justify-between font-label-sm text-label-sm text-outline bg-surface-container-low px-2 py-1.5 rounded">
+<span>MEM CONSUMPTION</span>
+<span class="font-mono text-on-surface font-semibold">1.4 MB / 64 MB</span>
+</div>
+</div>
+<!-- Module 2: seccomp-bpf Filter -->
+<div class="bg-surface-container-lowest/80 backdrop-blur-xl p-space-md rounded-xl shadow-sm flex flex-col justify-between gap-space-md hover:bg-surface-container-lowest transition-all">
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm font-bold text-outline uppercase">SECCOMP-BPF</span>
+<span class="flex items-center gap-1 font-label-sm text-label-sm text-primary font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span> ACTIVE
+              </span>
+</div>
+<span class="font-body-md text-body-md font-semibold text-on-surface">Strict Default Deny</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Intercepts raw socket creation, ptrace invocation, and bpf() calls.</span>
+</div>
+<div class="pt-2 flex items-center justify-between font-label-sm text-label-sm text-outline bg-surface-container-low px-2 py-1.5 rounded">
+<span>DISALLOWED SYSCALLS</span>
+<span class="font-mono text-tertiary font-semibold">248 BLOCKED</span>
+</div>
+</div>
+<!-- Module 3: cgroups v2 Controller -->
+<div class="bg-surface-container-lowest/80 backdrop-blur-xl p-space-md rounded-xl shadow-sm flex flex-col justify-between gap-space-md hover:bg-surface-container-lowest transition-all">
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm font-bold text-outline uppercase">CGROUPS V2</span>
+<span class="flex items-center gap-1 font-label-sm text-label-sm text-primary font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span> ACTIVE
+              </span>
+</div>
+<span class="font-body-md text-body-md font-semibold text-on-surface">Enclave Freezer</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Mounted at /sys/fs/cgroup/cerberus with sub-millisecond freeze stasis.</span>
+</div>
+<div class="pt-2 flex items-center justify-between font-label-sm text-label-sm text-outline bg-surface-container-low px-2 py-1.5 rounded">
+<span>QUOTA VIOLATIONS</span>
+<span class="font-mono text-on-surface font-semibold">0 (NOMINAL)</span>
+</div>
+</div>
+<!-- Module 4: Linux Namespaces Engine -->
+<div class="bg-surface-container-lowest/80 backdrop-blur-xl p-space-md rounded-xl shadow-sm flex flex-col justify-between gap-space-md hover:bg-surface-container-lowest transition-all">
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm font-bold text-outline uppercase">NAMESPACES ENGINE</span>
+<span class="flex items-center gap-1 font-label-sm text-label-sm text-primary font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span> READY
+              </span>
+</div>
+<span class="font-body-md text-body-md font-semibold text-on-surface">Unprivileged Clone3</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">CLONE_NEWUSER, CLONE_NEWPID, CLONE_NEWNET initialized per instance.</span>
+</div>
+<div class="pt-2 flex items-center justify-between font-label-sm text-label-sm text-outline bg-surface-container-low px-2 py-1.5 rounded">
+<span>ISOLATION ROOTS</span>
+<span class="font-mono text-on-surface font-semibold">6 ISOLATED NS</span>
+</div>
+</div>
+<!-- Module 5: tmpfs Ephemeral Pool -->
+<div class="bg-surface-container-lowest/80 backdrop-blur-xl p-space-md rounded-xl shadow-sm flex flex-col justify-between gap-space-md hover:bg-surface-container-lowest transition-all">
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm font-bold text-outline uppercase">TMPFS EPHEMERAL POOL</span>
+<span class="flex items-center gap-1 font-label-sm text-label-sm text-primary font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span> READY
+              </span>
+</div>
+<span class="font-body-md text-body-md font-semibold text-on-surface">RAM-Backed Root</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Wipe-on-containment active. Host storage drives completely unmounted.</span>
+</div>
+<div class="pt-2 flex items-center justify-between font-label-sm text-label-sm text-outline bg-surface-container-low px-2 py-1.5 rounded">
+<span>RESIDENT POOL</span>
+<span class="font-mono text-on-surface font-semibold">128 MB ALLOCATED</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Technical Architecture Workflow Timeline -->
+<div class="w-full bg-surface-container-lowest/80 backdrop-blur-xl rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-xs">
+<div>
+<span class="font-label-sm text-label-sm text-outline uppercase font-mono">LIFECYCLE PIPELINE ENFORCEMENT</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Cerberus Triad Execution Workflow</h3>
+</div>
+<div class="flex items-center gap-space-sm font-label-sm text-label-sm text-outline">
+<span>LATENCY OVERHEAD: <span class="font-semibold text-primary">&lt; 0.12ms</span></span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span>DISPATCH: <span class="font-semibold text-on-surface">IN-KERNEL FAST PATH</span></span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-md pt-space-xs">
+<!-- Step 1: ISOLATE -->
+<div class="p-space-md rounded-lg bg-surface-container-low flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md font-bold text-secondary uppercase">PHASE 01 // ISOLATE</span>
+<span class="font-label-sm text-label-sm px-1.5 py-0.5 rounded bg-surface font-mono text-outline">T = 0.0ms</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface">Ephemeral Construction</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            A blank tmpfs filesystem is mounted. Linux clone3 flags construct isolated PID, network, and mount tables. Memory limits are pinned in cgroups v2.
+          </p>
+</div>
+<!-- Step 2: OBSERVE -->
+<div class="p-space-md rounded-lg bg-primary-fixed/20 flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md font-bold text-primary uppercase">PHASE 02 // OBSERVE</span>
+<span class="font-label-sm text-label-sm px-1.5 py-0.5 rounded bg-surface font-mono text-outline">CONTINUOUS</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface">eBPF Telemetry Ingestion</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Kernel tracepoints stream argument blocks to the Cerberus ring buffer. System calls are dynamically verified against behavioral baseline invariants.
+          </p>
+</div>
+<!-- Step 3: CONTAIN -->
+<div class="p-space-md rounded-lg bg-error-container/40 flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md font-bold text-tertiary uppercase">PHASE 03 // CONTAIN</span>
+<span class="font-label-sm text-label-sm px-1.5 py-0.5 rounded bg-surface font-mono text-outline">TRIGGERED</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface">Deterministic Severance</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            seccomp-bpf intercepts offending calls. cgroups freezer halts process threads instantly, followed by SIGKILL dispatch and atomic tmpfs pool wiping.
+          </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Interactive State Engine for 3D Layer Exploration -->
+<script>
+    const strataData = [
+      {
+        tag: "LAYER 05: UNTRUSTED USER CODE",
+        title: "Untrusted Code Execution Enclave",
+        badge: "MONITORED",
+        badgeClass: "bg-tertiary text-on-tertiary",
+        desc: "The executing binary payload (.py script, compiled ELF binary, or shell commands) running strictly within the unprivileged user namespace with reduced capabilities.",
+        phaseIcon: "code",
+        phaseTitle: "ROLE IN WORKFLOW: TARGET WORKLOAD",
+        phaseDesc: "Generates syscalls and memory interactions that are scrutinized in real-time. Zero access to root filesystems or raw networking.",
+        mechanics: [
+          { name: "Unprivileged UID / GID", status: "Mapped: 1000 -> 0 (Inside NS)" },
+          { name: "Capabilities CapDrop", status: "CAP_SYS_ADMIN, CAP_NET_RAW dropped" },
+          { name: "Binary Execution Shell", status: "chroot to ephemeral tmpfs mount" }
+        ],
+        code: `// Process spawning configuration
+int pid = clone(child_fn, stack_top,
+    CLONE_NEWUSER | CLONE_NEWPID | CLONE_NEWNS | CLONE_NEWNET | SIGCHLD,
+    NULL);
+// Ephemeral execution begins in restricted namespace`
+      },
+      {
+        tag: "LAYER 04: EPHEMERAL ISOLATION",
+        title: "Namespaces & Ephemeral tmpfs RAM FS",
+        badge: "SANDBOXED",
+        badgeClass: "bg-secondary text-on-secondary",
+        desc: "Linux kernel namespaces partition system resources so the target process observes a completely synthetic system state, coupled with RAM-backed storage.",
+        phaseIcon: "lock",
+        phaseTitle: "ROLE IN WORKFLOW: ISOLATE",
+        phaseDesc: "Guarantees zero persistent storage contamination. If the workload attempts ransomware encryption or persistence attacks, files vanish upon teardown.",
+        mechanics: [
+          { name: "tmpfs RAM Mount", status: "Mounted at /mnt/sandbox (No disk sync)" },
+          { name: "CLONE_NEWNET", status: "Isolated loopback, 0 external routes" },
+          { name: "CLONE_NEWPID", status: "Payload assigned PID 1 in sub-tree" }
+        ],
+        code: `// Temporary ephemeral RAM root setup
+mount("none", "/mnt/sandbox", "tmpfs", MS_NODEV | MS_NOSUID, "size=128m");
+pivot_root("/mnt/sandbox", "/mnt/sandbox/.old_root");
+umount2("/.old_root", MNT_DETACH);`
+      },
+      {
+        tag: "LAYER 03: RESOURCE ENVELOPE",
+        title: "Hardware Quota & cgroups v2 Limits",
+        badge: "THROTTLED",
+        badgeClass: "bg-primary-container text-on-primary-container",
+        desc: "Unified control group hierarchy enforcing deterministic hardware budgets. Prevents CPU exhaustion, memory-based denial of service, and fork-bomb cascades.",
+        phaseIcon: "speed",
+        phaseTitle: "ROLE IN WORKFLOW: CONTAINMENT PREPARATION",
+        phaseDesc: "Acts as physical bounds. Provides the instant freezer interface used by Cerberus to suspend memory execution instantaneously when anomalies spike.",
+        mechanics: [
+          { name: "memory.max", status: "Strict limit: 256MB hard ceiling" },
+          { name: "cpu.max", status: "Quota: 50000us per 100000us window" },
+          { name: "cgroup.freeze", status: "Target hookable for immediate stasis" }
+        ],
+        code: `// Writing cgroup v2 constraints
+echo "268435456" > /sys/fs/cgroup/cerberus/memory.max
+echo "32" > /sys/fs/cgroup/cerberus/pids.max
+// Attaching PID to group
+echo "40912" > /sys/fs/cgroup/cerberus/cgroup.procs`
+      },
+      {
+        tag: "LAYER 02: eBPF OBSERVABILITY",
+        title: "Kernel Interception & Syscall Probes",
+        badge: "VERIFIED",
+        badgeClass: "bg-primary text-on-primary",
+        desc: "High-throughput in-kernel telemetry tapping system calls in Ring-0 without userland context switching penalties. Ring buffer emits immutable execution traces directly to the Cerberus analysis core.",
+        phaseIcon: "visibility",
+        phaseTitle: "ROLE IN WORKFLOW: OBSERVE",
+        phaseDesc: "Continuously decodes execution intent by parsing arguments to file open, memory mapping, network connections, and child process forks before execution completes.",
+        mechanics: [
+          { name: "kprobe:sys_execve", status: "Attached (PID Filter)" },
+          { name: "tracepoint:syscalls:sys_enter_connect", status: "Active (Deny-list)" },
+          { name: "BPF_MAP_TYPE_RINGBUF", status: "Allocated (64MB buffer)" }
+        ],
+        code: `SEC("kprobe/__x64_sys_execve")
+int BPF_KPROBE(trace_execve, const char *filename) {
+    u32 pid = bpf_get_current_pid_tgid() >> 32;
+    if (pid != target_sandbox_pid) return 0;
+    struct event *ev = bpf_ringbuf_reserve(&events, sizeof(*ev), 0);
+    if (!ev) return 0;
+    ev->pid = pid;
+    bpf_probe_read_user_str(ev->comm, sizeof(ev->comm), filename);
+    bpf_ringbuf_submit(ev, 0);
+    return 0;
+}`
+      },
+      {
+        tag: "LAYER 01: POLICY BARRIER",
+        title: "seccomp-bpf System Call Filter",
+        badge: "ENFORCING",
+        badgeClass: "bg-secondary text-on-secondary",
+        desc: "Deterministic in-kernel BPF filter operating prior to syscall execution. Returns SECCOMP_RET_ERRNO, SECCOMP_RET_USER_NOTIF, or triggers SIGKILL immediately upon unpermitted instructions.",
+        phaseIcon: "shield",
+        phaseTitle: "ROLE IN WORKFLOW: CONTAIN",
+        phaseDesc: "Stops exploitation primitives dead in their tracks. Denies permission for raw sockets, unshare operations, and unauthorized ptrace requests.",
+        mechanics: [
+          { name: "SECCOMP_RET_KILL_PROCESS", status: "Armed on forbidden opcodes" },
+          { name: "SECCOMP_RET_USER_NOTIF", status: "Dispatches to Cerberus Core" },
+          { name: "Strict BPF Allowlist", status: "Permits only 42 verified calls" }
+        ],
+        code: `struct sock_filter filter[] = {
+    BPF_STMT(BPF_LD | BPF_W | BPF_ABS, offsetof(struct seccomp_data, nr)),
+    BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, __NR_socket, 0, 1),
+    BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_KILL_PROCESS),
+    BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_ALLOW),
+};`
+      },
+      {
+        tag: "BASE: KERNEL SUBSYSTEM",
+        title: "Linux Ring-0 Kernel Core",
+        badge: "IMMUTABLE",
+        badgeClass: "bg-on-surface text-surface",
+        desc: "The underlying Linux operating system kernel managing hardware interfaces, virtual memory page tables, and hardware interrupts.",
+        phaseIcon: "hub",
+        phaseTitle: "ROLE IN WORKFLOW: TRUST ROOT",
+        phaseDesc: "Cerberus leverages existing upstream Linux primitives without requiring out-of-tree kernel modules or patching upstream code.",
+        mechanics: [
+          { name: "x86_64 Page Table Isolation", status: "KPTI active" },
+          { name: "SMEP & SMAP Protection", status: "Hardware enforced" },
+          { name: "Direct Hardware Interface", status: "Ring-0 protected" }
+        ],
+        code: `// Linux Upstream Subsystem Core
+// System call entry point: entry_SYSCALL_64
+// eBPF Subsystem: kernel/bpf/core.c
+// cgroups Subsystem: kernel/cgroup/cgroup.c`
+      }
+    ];
+
+    let currentLayer = 3;
+    let isExploded = true;
+
+    function inspectLayer(index) {
+      currentLayer = index;
+      const data = strataData[index];
+      if (!data) return;
+
+      // Update Inspector Fields
+      document.getElementById('inspector-layer-tag').innerText = data.tag;
+      document.getElementById('inspector-title').innerText = data.title;
+      document.getElementById('inspector-desc').innerText = data.desc;
+      
+      const badge = document.getElementById('inspector-status-badge');
+      badge.innerText = data.badge;
+      badge.className = `font-label-sm text-label-sm px-2 py-0.5 rounded font-semibold ${data.badgeClass}`;
+
+      document.getElementById('inspector-phase-icon').innerText = data.phaseIcon;
+      document.getElementById('inspector-phase-title').innerText = data.phaseTitle;
+      document.getElementById('inspector-phase-desc').innerText = data.phaseDesc;
+      document.getElementById('inspector-code').innerText = data.code;
+
+      // Render mechanics array
+      const mechanicsContainer = document.getElementById('inspector-mechanics');
+      mechanicsContainer.innerHTML = data.mechanics.map(m => `
+        <div class="flex items-center justify-between p-2 rounded bg-surface font-label-sm text-label-sm">
+          <span class="font-mono text-on-surface font-medium">${m.name}</span>
+          <span class="text-primary font-mono">${m.status}</span>
+        </div>
+      `).join('');
+
+      // Visual highlight on planes
+      for (let i = 0; i <= 5; i++) {
+        const card = document.getElementById(`card-layer-${i}`);
+        if (card) {
+          if (i === index) {
+            card.classList.add('ring-2', 'ring-primary', 'shadow-xl');
+          } else {
+            card.classList.remove('ring-2', 'ring-primary', 'shadow-xl');
+          }
+        }
+      }
+    }
+
+    function toggleExplode() {
+      isExploded = true;
+      document.getElementById('btn-explode').className = 'px-space-md py-1 rounded-full font-label-sm text-label-sm uppercase bg-primary-container text-on-primary-container font-semibold transition-all';
+      document.getElementById('btn-compact').className = 'px-space-md py-1 rounded-full font-label-sm text-label-sm uppercase text-on-surface-variant hover:text-on-surface transition-all';
+
+      const zOffsets = [260, 195, 130, 65, 0, -65];
+      for (let i = 0; i <= 5; i++) {
+        const card = document.getElementById(`card-layer-${i}`);
+        if (card) card.style.transform = `translateZ(${zOffsets[i]}px)`;
+      }
+    }
+
+    function toggleCompact() {
+      isExploded = false;
+      document.getElementById('btn-compact').className = 'px-space-md py-1 rounded-full font-label-sm text-label-sm uppercase bg-primary-container text-on-primary-container font-semibold transition-all';
+      document.getElementById('btn-explode').className = 'px-space-md py-1 rounded-full font-label-sm text-label-sm uppercase text-on-surface-variant hover:text-on-surface transition-all';
+
+      const zOffsetsCompact = [50, 40, 30, 20, 10, 0];
+      for (let i = 0; i <= 5; i++) {
+        const card = document.getElementById(`card-layer-${i}`);
+        if (card) card.style.transform = `translateZ(${zOffsetsCompact[i]}px)`;
+      }
+    }
+
+    function resetTelemetrySimulation() {
+      inspectLayer(3);
+      toggleExplode();
+    }
+
+    // Initialize Default State
+    inspectLayer(3);
+  </script>
+</div></main><footer class="w-full bg-surface-container-lowest/80 backdrop-blur-xl shadow-[0_-1px_8px_rgba(0,0,0,0.03)] mt-auto z-40"><div class="w-full px-margin-lg py-space-sm flex flex-col md:flex-row items-center justify-between gap-space-sm"><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs font-label-sm text-label-sm text-outline"><span class="material-symbols-outlined text-[14px] text-primary">explore</span><span>AXIS X: <span class="text-on-surface font-medium">48.2Â°</span></span><span>Y: <span class="text-on-surface font-medium">-12.4Â°</span></span><span>Z: <span class="text-on-surface font-medium">104.1Â°</span></span></div><span class="hidden sm:inline-block w-1 h-1 rounded-full bg-outline-variant"></span><span class="hidden sm:inline-block font-label-sm text-label-sm text-outline-variant">ORTHO-ISOMETRIC PROJECTION</span></div><div class="flex items-center gap-space-lg"><span class="font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase bg-surface-container-high/60 px-space-sm py-0.5 rounded">PROTOTYPE LAB SPECIFICATION â€¢ DEMO ENVIRONMENT</span><div class="flex items-center gap-space-xs"><span class="font-label-sm text-label-sm text-outline">TELEMETRY:</span><span class="font-label-sm text-label-sm font-semibold text-primary">SYNCHRONIZED (0.4ms)</span></div></div></div></footer></body></html>
+

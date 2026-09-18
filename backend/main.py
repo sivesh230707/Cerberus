@@ -144,6 +144,21 @@ if FRONTEND_DIR.exists():
     async def serve_index():
         return FileResponse(FRONTEND_DIR / "index.html")
 
+    @app.get("/timeline")
+    @app.get("/timeline.html")
+    async def serve_timeline():
+        return FileResponse(FRONTEND_DIR / "timeline.html")
+
+    @app.get("/report")
+    @app.get("/report.html")
+    async def serve_report():
+        return FileResponse(FRONTEND_DIR / "report.html")
+
+    @app.get("/architecture")
+    @app.get("/architecture.html")
+    async def serve_architecture():
+        return FileResponse(FRONTEND_DIR / "architecture.html")
+
 
 if __name__ == "__main__":
     uvicorn.run("backend.main:app", host="127.0.0.1", port=8000, reload=True)

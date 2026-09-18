@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none">
+  <defs>
+    <linearGradient id="cerbGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284C7"/>
+      <stop offset="50%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#6366F1"/>
+    </linearGradient>
+    <linearGradient id="coreGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#0284C7" stop-opacity="0.3"/>
+    </linearGradient>
+  </defs>
+  <!-- Outer precision geometric guide ring -->
+  <circle cx="80" cy="80" r="72" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="3 4"/>
+  <circle cx="80" cy="80" r="56" stroke="#94A3B8" stroke-width="1" stroke-opacity="0.4"/>
+  <!-- Central Decision Nexus (Detect Core) -->
+  <polygon points="80,62 95,71 95,89 80,98 65,89 65,71" fill="url(#coreGlow)" stroke="#0284C7" stroke-width="2"/>
+  <circle cx="80" cy="80" r="4" fill="#0F172A"/>
+  <!-- Head 01: ISOLATE (Top Left Isometric Monolith) -->
+  <path d="M 50 32 L 68 42 L 68 64 L 50 54 Z" fill="#F8FAFC" stroke="#0284C7" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 32 42 L 50 32 L 50 54 L 32 64 Z" fill="#E2E8F0" stroke="#0284C7" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 32 42 L 50 52 L 68 42 L 50 32 Z" fill="#BAE6FD" stroke="#0284C7" stroke-width="2" stroke-linejoin="round"/>
+  <!-- Head 02: OBSERVE (Top Right Isometric Monolith) -->
+  <path d="M 110 32 L 128 42 L 128 64 L 110 54 Z" fill="#F8FAFC" stroke="#2563EB" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 92 42 L 110 32 L 110 54 L 92 64 Z" fill="#E2E8F0" stroke="#2563EB" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 92 42 L 110 52 L 128 42 L 110 32 Z" fill="#BFDBFE" stroke="#2563EB" stroke-width="2" stroke-linejoin="round"/>
+  <!-- Head 03: CONTAIN (Bottom Center Isometric Monolith) -->
+  <path d="M 80 106 L 98 116 L 98 138 L 80 128 Z" fill="#F8FAFC" stroke="#6366F1" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 62 116 L 80 106 L 80 128 L 62 138 Z" fill="#E2E8F0" stroke="#6366F1" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 62 116 L 80 126 L 98 116 L 80 106 Z" fill="#DDD6FE" stroke="#6366F1" stroke-width="2" stroke-linejoin="round"/>
+  <!-- Triadic Spatial Connection Vectors -->
+  <line x1="68" y1="58" x2="74" y2="68" stroke="#0284C7" stroke-width="2" stroke-dasharray="2 2"/>
+  <line x1="92" y1="58" x2="86" y2="68" stroke="#2563EB" stroke-width="2" stroke-dasharray="2 2"/>
+  <line x1="80" y1="106" x2="80" y2="98" stroke="#6366F1" stroke-width="2" stroke-dasharray="2 2"/>
+  <!-- Triad Vector Points -->
+  <circle cx="50" cy="32" r="2.5" fill="#0284C7"/>
+  <circle cx="110" cy="32" r="2.5" fill="#2563EB"/>
+  <circle cx="80" cy="138" r="2.5" fill="#6366F1"/>
+</svg>

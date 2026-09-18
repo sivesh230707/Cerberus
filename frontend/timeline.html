@@ -1,0 +1,724 @@
+﻿<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;background-image:linear-gradient(to right,rgba(148,163,184,0.12) 1px,transparent 1px),linear-gradient(to bottom,rgba(148,163,184,0.12) 1px,transparent 1px);background-size:24px 24px;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"tertiary-fixed-dim":"#ffb4ab","on-primary-container":"#fdfcff","error-container":"#ffdad6","on-primary-fixed-variant":"#004b73","on-secondary-fixed-variant":"#2f2ebe","on-background":"#131b2e","primary-fixed-dim":"#93ccff","error":"#ba1a1a","secondary-fixed-dim":"#c0c1ff","tertiary":"#bb0112","on-tertiary-fixed-variant":"#93000b","outline":"#707881","secondary":"#4648d4","primary-fixed":"#cce5ff","surface-container-high":"#e2e7ff","on-tertiary":"#ffffff","surface-dim":"#d2d9f4","surface-bright":"#faf8ff","surface-container":"#eaedff","on-secondary-fixed":"#07006c","on-secondary":"#ffffff","on-secondary-container":"#fffbff","secondary-fixed":"#e1e0ff","primary":"#006194","on-surface":"#131b2e","on-primary-fixed":"#001d31","surface-container-highest":"#dae2fd","inverse-surface":"#283044","tertiary-container":"#e02928","surface-tint":"#006398","primary-container":"#007bb9","tertiary-fixed":"#ffdad6","surface":"#faf8ff","inverse-primary":"#93ccff","on-primary":"#ffffff","surface-container-low":"#f2f3ff","on-surface-variant":"#3f4850","on-tertiary-container":"#fffbff","secondary-container":"#6063ee","outline-variant":"#bfc7d2","surface-variant":"#dae2fd","inverse-on-surface":"#eef0ff","surface-container-lowest":"#ffffff","on-error":"#ffffff","on-error-container":"#93000a","background":"#faf8ff","on-tertiary-fixed":"#410002"},borderRadius:{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},spacing:{"space-lg":"1.5rem","space-sm":"0.5rem","space-xl":"2.25rem","space-xs":"0.25rem","margin-md":"1.5rem","space-md":"1rem","gutter-lg":"1.5rem","margin":"1rem","margin-lg":"2.5rem","gutter":"1rem"},fontFamily:{"headline-lg":["Space Grotesk"],"label-md":["JetBrains Mono"],"display-lg":["Space Grotesk"],"label-sm":["JetBrains Mono"],"body-sm":["Inter"],"headline-lg-mobile":["Space Grotesk"],"display-lg-mobile":["Space Grotesk"],"body-lg":["Inter"],"label-lg":["JetBrains Mono"],"headline-sm":["Space Grotesk"],"headline-md":["Space Grotesk"],"body-md":["Inter"]},fontSize:{"headline-lg":["32px",{lineHeight:"40px",letterSpacing:"-0.02em",fontWeight:"600"}],"label-md":["11px",{lineHeight:"16px",letterSpacing:"0.04em",fontWeight:"500"}],"display-lg":["48px",{lineHeight:"56px",letterSpacing:"-0.03em",fontWeight:"600"}],"label-sm":["10px",{lineHeight:"14px",letterSpacing:"0.06em",fontWeight:"500"}],"body-sm":["12px",{lineHeight:"18px",fontWeight:"400"}],"headline-lg-mobile":["24px",{lineHeight:"32px",letterSpacing:"-0.01em",fontWeight:"600"}],"display-lg-mobile":["32px",{lineHeight:"40px",letterSpacing:"-0.02em",fontWeight:"600"}],"body-lg":["16px",{lineHeight:"24px",fontWeight:"400"}],"label-lg":["13px",{lineHeight:"18px",letterSpacing:"0.02em",fontWeight:"500"}],"headline-sm":["18px",{lineHeight:"26px",letterSpacing:"-0.01em",fontWeight:"500"}],"headline-md":["24px",{lineHeight:"32px",letterSpacing:"-0.015em",fontWeight:"500"}],"body-md":["14px",{lineHeight:"20px",fontWeight:"400"}]}}}};</script></head><body class="bg-background font-body-md text-on-surface min-h-screen flex flex-col justify-between antialiased selection:bg-primary-fixed selection:text-on-primary-fixed"><header class="fixed top-0 left-0 w-full z-50 bg-surface-container-lowest/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-20 w-full px-margin-lg flex items-center justify-between gap-gutter"><div class="flex items-center gap-space-md"><img alt="Cerberus Geometric Triad Emblem" class="h-8 w-auto object-contain" src="/static/emblem.svg"/><div class="flex flex-col"><div class="flex items-center gap-space-sm"><span class="font-headline-sm text-headline-sm uppercase text-on-surface tracking-wider font-bold">CERBERUS</span><span class="font-label-sm text-label-sm uppercase bg-surface-container-high text-primary px-space-xs py-0.5 rounded">RUNTIME DEFENSE</span></div><span class="font-label-sm text-label-sm text-outline tracking-widest">EXECUTE â€¢ OBSERVE â€¢ CONTAIN</span></div></div><div class="hidden xl:flex items-center"><nav class="flex items-center gap-space-xs p-1 bg-surface-container/70 rounded-full backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.03)]" data-active-classes="bg-primary-container text-on-primary-container font-semibold shadow-[0_2px_8px_rgba(0,97,148,0.18)]"><a class="font-label-sm text-label-sm uppercase px-space-md py-1.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="analyze" href="/">ANALYZE</a><a aria-current="page" class="uppercase px-space-md py-1.5 rounded-full transition-all bg-primary-container text-on-primary-container font-semibold shadow-[0_2px_8px_rgba(0,97,148,0.18)]" data-path="timeline-and-history" href="/timeline.html">TIMELINE &amp; HISTORY</a><a class="font-label-sm text-label-sm uppercase px-space-md py-1.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="deep-report" href="/report.html">DEEP REPORT</a><a class="font-label-sm text-label-sm uppercase px-space-md py-1.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="architecture-and-system" href="/architecture.html">ARCHITECTURE &amp; SYSTEM</a></nav></div><div class="flex items-center gap-space-md"><div class="hidden lg:flex items-center gap-space-md px-space-md py-1.5 rounded-full bg-surface-container-low/90 backdrop-blur-md text-on-surface-variant shadow-[0_1px_6px_rgba(0,0,0,0.03)]"><div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span><span class="font-label-sm text-label-sm font-medium">SANDBOX: <span class="text-primary font-bold">ACTIVE</span></span></div><div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-outline-variant"></span><span class="font-label-sm text-label-sm">PROBES: <span class="text-on-surface font-semibold">READY</span></span></div><div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-outline-variant"></span><span class="font-label-sm text-label-sm text-outline">ISOLATION: TMPFS</span></div></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-sm"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div><div class="xl:hidden flex items-center justify-center pb-2 px-margin"><nav class="flex items-center gap-space-xs p-1 bg-surface-container/80 rounded-full backdrop-blur-md overflow-x-auto max-w-full" data-active-classes="bg-primary-container text-on-primary-container font-semibold shadow-[0_2px_8px_rgba(0,97,148,0.18)]"><a class="font-label-sm text-label-sm uppercase px-space-sm py-1 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all whitespace-nowrap" data-path="analyze" href="/">ANALYZE</a><a aria-current="page" class="uppercase px-space-sm py-1 rounded-full transition-all whitespace-nowrap bg-primary-container text-on-primary-container font-semibold shadow-[0_2px_8px_rgba(0,97,148,0.18)]" data-path="timeline-and-history" href="/timeline.html">TIMELINE</a><a class="font-label-sm text-label-sm uppercase px-space-sm py-1 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all whitespace-nowrap" data-path="deep-report" href="/report.html">DEEP REPORT</a><a class="font-label-sm text-label-sm uppercase px-space-sm py-1 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all whitespace-nowrap" data-path="architecture-and-system" href="/architecture.html">SYSTEM</a></nav></div></header><main class="w-full pt-20 bg-transparent flex-1"><div class="flex flex-col w-full">
+<!-- Top Command & Spatial Horizon Viewport Header -->
+<div class="px-margin-lg py-space-md flex flex-col lg:flex-row lg:items-center justify-between gap-space-md">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="font-label-sm text-label-sm uppercase px-space-xs py-0.5 rounded bg-surface-container-high text-primary font-medium tracking-wider">CHRONO-SPATIAL TRAJECTORY</span>
+<span class="font-label-sm text-label-sm text-outline tracking-wider">â€¢ ISO-VECTOR VIEWPORT v4.2</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight mt-1">Spatial Runtime Timeline</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant max-w-xl">
+        Continuous execution events visualized along dynamic chronological vectors. Isolated sandbox enclaves, eBPF probe telemetry, and containment state manifolds.
+      </p>
+</div>
+<!-- Filter Pills & Horizon Controls -->
+<div class="flex flex-wrap items-center gap-space-xs">
+<div class="flex items-center bg-surface-container-high/60 rounded-full p-1 backdrop-blur-md shadow-sm">
+<button class="font-label-sm text-label-sm uppercase px-space-sm py-1 rounded-full bg-surface-container-lowest text-primary font-semibold shadow-sm transition-all" id="filter-all" onclick="setTimelineFilter('all')">
+          All Nodes (4)
+        </button>
+<button class="font-label-sm text-label-sm uppercase px-space-sm py-1 rounded-full text-on-surface-variant hover:text-tertiary transition-all" id="filter-contained" onclick="setTimelineFilter('contained')">
+          Contained (2)
+        </button>
+<button class="font-label-sm text-label-sm uppercase px-space-sm py-1 rounded-full text-on-surface-variant hover:text-primary transition-all" id="filter-clean" onclick="setTimelineFilter('clean')">
+          Clean (2)
+        </button>
+</div>
+<div class="hidden sm:flex items-center gap-space-xs bg-surface-container-low px-space-sm py-1 rounded-full text-outline font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">history_toggle_off</span>
+<span>TIME HORIZON: <strong class="text-on-surface font-medium">T-24H</strong></span>
+</div>
+<button class="flex items-center gap-1 font-label-sm text-label-sm uppercase bg-surface-container-high hover:bg-surface-container-highest px-space-sm py-1.5 rounded text-on-surface transition-all" onclick="resetCamera()">
+<span class="material-symbols-outlined text-[15px]">center_focus_strong</span>
+<span>Reset Vector</span>
+</button>
+</div>
+</div>
+<!-- Primary Spatial 3D Horizon Canvas Container -->
+<div class="px-margin-lg mb-space-md w-full">
+<div class="relative w-full rounded-xl overflow-hidden bg-surface-container-lowest shadow-[0_4px_30px_rgba(15,23,42,0.06)] min-h-[580px] flex flex-col justify-between p-space-md lg:p-space-lg">
+<!-- Coordinate Reticles & Horizon Grid Background -->
+<div class="absolute inset-0 pointer-events-none opacity-40 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary-fixed/20 via-transparent to-transparent"></div>
+<!-- Coordinate Micro-HUD in Canvas Top Corner -->
+<div class="relative z-10 flex flex-wrap items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm bg-surface-container-lowest/90 backdrop-blur-md px-space-sm py-1 rounded-full shadow-sm">
+<div class="w-2 h-2 rounded-full bg-primary animate-ping"></div>
+<span class="font-label-sm text-label-sm font-semibold text-on-surface">PLANE: ORTHO-Z 42.8Â°</span>
+<span class="font-label-sm text-label-sm text-outline">ENCLAVE CLUSTER: LOCAL-TMPFS</span>
+</div>
+<div class="flex items-center gap-space-xs font-label-sm text-label-sm text-on-surface-variant">
+<span class="px-2 py-0.5 rounded bg-surface-container-high font-semibold text-primary">LIVE BUFFER</span>
+<span class="text-outline">RING_BUFFER_DRAIN: 0.04ms</span>
+</div>
+</div>
+<!-- 3D Perspective Scene Container -->
+<div class="relative w-full my-auto py-10 flex items-center justify-center overflow-x-auto min-h-[360px]" style="perspective: 1200px;">
+<!-- Perspective Projection Track (Floor & Axis) -->
+<div class="relative w-full max-w-5xl transition-transform duration-700 ease-out" id="spatial-track" style="transform-style: preserve-3d; transform: rotateX(24deg) rotateY(-6deg) translateZ(0px);">
+<!-- Horizon Ground Guide Grid & Spline Path -->
+<svg class="absolute -top-12 left-0 w-full h-72 pointer-events-none stroke-current text-outline-variant/40" fill="none" preserveaspectratio="none" viewbox="0 0 1000 300">
+<!-- Perspective Convergence Guide Lines -->
+<line class="text-outline-variant/60" stroke-dasharray="4 6" stroke-width="1.5" x1="0" x2="1000" y1="260" y2="40"></line>
+<line class="text-outline-variant/20" stroke-width="1" x1="0" x2="1000" y1="280" y2="60"></line>
+<line class="text-outline-variant/20" stroke-width="1" x1="0" x2="1000" y1="240" y2="20"></line>
+<!-- Dynamic Spline Connecting Nodes -->
+<path d="M 80,240 C 260,220 380,180 540,150 C 700,120 820,70 940,40" fill="none" stroke="url(#splineGradient)" stroke-linecap="round" stroke-width="3"></path>
+<defs>
+<lineargradient id="splineGradient" x1="0%" x2="100%" y1="100%" y2="0%">
+<stop offset="0%" stop-color="#ba1a1a" stop-opacity="0.8"></stop>
+<stop offset="35%" stop-color="#006194" stop-opacity="0.9"></stop>
+<stop offset="70%" stop-color="#ba1a1a" stop-opacity="0.8"></stop>
+<stop offset="100%" stop-color="#006194" stop-opacity="1"></stop>
+</lineargradient>
+</defs>
+</svg>
+<!-- Chronological Axis Floating Anchor Markers -->
+<div class="absolute -bottom-8 left-12 flex items-center gap-1 text-outline font-label-sm text-label-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+<span>T-00:08m (LATEST)</span>
+</div>
+<div class="absolute -bottom-4 left-1/3 flex items-center gap-1 text-outline font-label-sm text-label-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+<span>T-02:14h</span>
+</div>
+<div class="absolute top-2 right-1/4 flex items-center gap-1 text-outline font-label-sm text-label-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+<span>T-18:42h (YESTERDAY)</span>
+</div>
+<div class="absolute -top-6 right-8 flex items-center gap-1 text-outline font-label-sm text-label-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+<span>T-23:59h</span>
+</div>
+<!-- Nodes Array Along 3D Perspective Plane -->
+<div class="relative w-full h-64 flex items-center justify-between px-6 z-20">
+<!-- NODE 1: payload_alpha.sh (Contained) -->
+<div class="timeline-node group relative flex flex-col items-center cursor-pointer transition-all duration-300 hover:scale-105" data-category="contained" id="node-1" onclick="selectNode(1)" style="transform: translateY(60px);">
+<!-- Containment Shockwave Ambient Glow -->
+<div class="absolute -inset-3 rounded-full bg-tertiary/10 blur-md group-hover:bg-tertiary/20 transition-all"></div>
+<!-- 3D Geometric Isometric Enclave Cube Node -->
+<div class="relative w-16 h-16 rounded-lg bg-surface-container-lowest shadow-[0_12px_24px_rgba(186,26,26,0.22)] flex items-center justify-center p-2 backdrop-blur-md">
+<div class="w-full h-full rounded bg-tertiary-container/15 flex flex-col items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-[26px]">fitbit_jumping_jacks</span>
+</div>
+<div class="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-tertiary flex items-center justify-center text-on-tertiary shadow-sm">
+<span class="material-symbols-outlined text-[10px]">lock</span>
+</div>
+</div>
+<!-- Node Card Label -->
+<div class="mt-3 bg-surface-container-lowest/95 backdrop-blur-md px-space-sm py-1.5 rounded-lg shadow-md flex flex-col items-center text-center max-w-[150px]">
+<span class="font-label-md text-label-md font-semibold text-on-surface truncate w-full">payload_alpha.sh</span>
+<span class="font-label-sm text-label-sm text-tertiary font-bold mt-0.5">CONTAINED</span>
+<span class="font-label-sm text-label-sm text-outline">eBPF Socket Block</span>
+</div>
+</div>
+<!-- NODE 2: transform_matrix.py (Safe) -->
+<div class="timeline-node group relative flex flex-col items-center cursor-pointer transition-all duration-300 hover:scale-105" data-category="clean" id="node-2" onclick="selectNode(2)" style="transform: translateY(20px);">
+<div class="absolute -inset-3 rounded-full bg-primary/10 blur-md group-hover:bg-primary/20 transition-all"></div>
+<div class="relative w-16 h-16 rounded-lg bg-surface-container-lowest shadow-[0_12px_24px_rgba(0,97,148,0.18)] flex items-center justify-center p-2 backdrop-blur-md">
+<div class="w-full h-full rounded bg-primary-fixed/30 flex flex-col items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[26px]">terminal</span>
+</div>
+<div class="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-primary flex items-center justify-center text-on-primary shadow-sm">
+<span class="material-symbols-outlined text-[10px]">check</span>
+</div>
+</div>
+<div class="mt-3 bg-surface-container-lowest/95 backdrop-blur-md px-space-sm py-1.5 rounded-lg shadow-md flex flex-col items-center text-center max-w-[150px]">
+<span class="font-label-md text-label-md font-semibold text-on-surface truncate w-full">transform_matrix.py</span>
+<span class="font-label-sm text-label-sm text-primary font-bold mt-0.5">SAFE EXEC</span>
+<span class="font-label-sm text-label-sm text-outline">cgroups v2 bounded</span>
+</div>
+</div>
+<!-- NODE 3: test_daemon.c (Contained) -->
+<div class="timeline-node group relative flex flex-col items-center cursor-pointer transition-all duration-300 hover:scale-105" data-category="contained" id="node-3" onclick="selectNode(3)" style="transform: translateY(-25px);">
+<div class="absolute -inset-3 rounded-full bg-tertiary/10 blur-md group-hover:bg-tertiary/20 transition-all"></div>
+<div class="relative w-16 h-16 rounded-lg bg-surface-container-lowest shadow-[0_12px_24px_rgba(186,26,26,0.22)] flex items-center justify-center p-2 backdrop-blur-md">
+<div class="w-full h-full rounded bg-tertiary-container/15 flex flex-col items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-[26px]">memory</span>
+</div>
+<div class="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-tertiary flex items-center justify-center text-on-tertiary shadow-sm">
+<span class="material-symbols-outlined text-[10px]">shield</span>
+</div>
+</div>
+<div class="mt-3 bg-surface-container-lowest/95 backdrop-blur-md px-space-sm py-1.5 rounded-lg shadow-md flex flex-col items-center text-center max-w-[150px]">
+<span class="font-label-md text-label-md font-semibold text-on-surface truncate w-full">test_daemon.c</span>
+<span class="font-label-sm text-label-sm text-tertiary font-bold mt-0.5">CONTAINED</span>
+<span class="font-label-sm text-label-sm text-outline">/etc/shadow Access</span>
+</div>
+</div>
+<!-- NODE 4: compile_artifact.cpp (Safe) -->
+<div class="timeline-node group relative flex flex-col items-center cursor-pointer transition-all duration-300 hover:scale-105" data-category="clean" id="node-4" onclick="selectNode(4)" style="transform: translateY(-65px);">
+<div class="absolute -inset-3 rounded-full bg-primary/10 blur-md group-hover:bg-primary/20 transition-all"></div>
+<div class="relative w-16 h-16 rounded-lg bg-surface-container-lowest shadow-[0_12px_24px_rgba(0,97,148,0.18)] flex items-center justify-center p-2 backdrop-blur-md">
+<div class="w-full h-full rounded bg-primary-fixed/30 flex flex-col items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[26px]">deployed_code</span>
+</div>
+<div class="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-primary flex items-center justify-center text-on-primary shadow-sm">
+<span class="material-symbols-outlined text-[10px]">verified</span>
+</div>
+</div>
+<div class="mt-3 bg-surface-container-lowest/95 backdrop-blur-md px-space-sm py-1.5 rounded-lg shadow-md flex flex-col items-center text-center max-w-[150px]">
+<span class="font-label-md text-label-md font-semibold text-on-surface truncate w-full">compile_artifact.cpp</span>
+<span class="font-label-sm text-label-sm text-primary font-bold mt-0.5">CLEAN EXIT</span>
+<span class="font-label-sm text-label-sm text-outline">tmpfs isolation</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Timeline Footer HUD -->
+<div class="relative z-10 flex flex-wrap items-center justify-between pt-space-sm text-outline font-label-sm text-label-sm">
+<div class="flex items-center gap-space-md">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary"></span>
+<span>Contained Violation</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-primary"></span>
+<span>Verified Nominal Execution</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span>PROJECTION: <strong class="text-on-surface">ISOMETRIC OBLIQUE</strong></span>
+<span>â€¢</span>
+<span class="text-primary font-medium">CLICK ANY NODE TO EXPLODE STAGE PIPELINE</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Selected Node Spatial Decomposition Pipeline Section -->
+<div class="px-margin-lg mb-space-md w-full">
+<div class="w-full rounded-xl bg-surface-container-lowest p-space-md lg:p-space-lg shadow-md" id="decomposition-panel">
+<!-- Decomposition Header -->
+<div class="flex flex-col md:flex-row md:items-center justify-between pb-space-md gap-space-sm">
+<div class="flex items-center gap-space-sm">
+<div class="w-9 h-9 rounded-lg bg-error-container text-tertiary flex items-center justify-center font-bold" id="decomp-status-badge">
+<span class="material-symbols-outlined text-[20px]">security</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm text-on-surface" id="decomp-title">payload_alpha.sh</span>
+<span class="font-label-sm text-label-sm uppercase px-2 py-0.5 rounded bg-tertiary-fixed text-on-tertiary-fixed font-semibold" id="decomp-pill">CONTAINED EXECUTION</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline" id="decomp-subtitle">SANDBOX ID: sb-enclave-9941a â€¢ DURATION: 101.2ms â€¢ SEVERITY: HIGH</span>
+</div>
+</div>
+<!-- Metric micro-badges -->
+<div class="flex items-center gap-space-sm font-label-sm text-label-sm">
+<div class="px-space-sm py-1 rounded bg-surface-container-low text-on-surface">
+<span class="text-outline">SYSCALLS:</span> <strong id="decomp-syscall-count">126 traced</strong>
+</div>
+<div class="px-space-sm py-1 rounded bg-surface-container-low text-on-surface">
+<span class="text-outline">INTERCEPT LATENCY:</span> <strong id="decomp-latency">1.2ms</strong>
+</div>
+<div class="px-space-sm py-1 rounded bg-surface-container-low text-on-surface">
+<span class="text-outline">SANDBOX:</span> <strong>tmpfs / seccomp v2</strong>
+</div>
+</div>
+</div>
+<!-- Exploded 3D Stage Flow Pipeline Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-space-sm my-space-md">
+<!-- Stage 1: UPLOAD -->
+<div class="bg-surface-container-low p-space-sm rounded-lg flex flex-col justify-between hover:bg-surface-container transition-all">
+<div>
+<div class="flex items-center justify-between mb-1">
+<span class="font-label-sm text-label-sm text-outline font-semibold">STAGE 01</span>
+<span class="font-label-sm text-label-sm text-primary font-medium">12ms</span>
+</div>
+<div class="font-headline-sm text-sm font-bold text-on-surface">UPLOAD</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+              SHA256 digest validation and payload ingest into memory cache.
+            </p>
+</div>
+<div class="mt-3 flex items-center gap-1 text-primary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+<span>VERIFIED</span>
+</div>
+</div>
+<!-- Stage 2: ISOLATE -->
+<div class="bg-surface-container-low p-space-sm rounded-lg flex flex-col justify-between hover:bg-surface-container transition-all">
+<div>
+<div class="flex items-center justify-between mb-1">
+<span class="font-label-sm text-label-sm text-outline font-semibold">STAGE 02</span>
+<span class="font-label-sm text-label-sm text-primary font-medium">4ms</span>
+</div>
+<div class="font-headline-sm text-sm font-bold text-on-surface">ISOLATE</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+              Linux namespaces (pid, mnt, net) provisioned. tmpfs root overlay established.
+            </p>
+</div>
+<div class="mt-3 flex items-center gap-1 text-primary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+<span>ENCLAVED</span>
+</div>
+</div>
+<!-- Stage 3: OBSERVE -->
+<div class="bg-surface-container-low p-space-sm rounded-lg flex flex-col justify-between hover:bg-surface-container transition-all">
+<div>
+<div class="flex items-center justify-between mb-1">
+<span class="font-label-sm text-label-sm text-outline font-semibold">STAGE 03</span>
+<span class="font-label-sm text-label-sm text-primary font-medium">84ms</span>
+</div>
+<div class="font-headline-sm text-sm font-bold text-on-surface">OBSERVE</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+              eBPF ringbuffer attaches to <code class="font-label-sm">sys_enter</code> and traces registers.
+            </p>
+</div>
+<div class="mt-3 flex items-center gap-1 text-primary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">search_insights</span>
+<span>126 CALLS</span>
+</div>
+</div>
+<!-- Stage 4: DETECT -->
+<div class="bg-tertiary-fixed/40 p-space-sm rounded-lg flex flex-col justify-between transition-all" id="stage-detect-card">
+<div>
+<div class="flex items-center justify-between mb-1">
+<span class="font-label-sm text-label-sm text-on-tertiary-fixed-variant font-semibold">STAGE 04</span>
+<span class="font-label-sm text-label-sm text-tertiary font-bold">ANOMALY</span>
+</div>
+<div class="font-headline-sm text-sm font-bold text-tertiary">DETECT</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1" id="stage-detect-desc">
+              Rule match: <span class="text-tertiary font-mono font-medium">socket_connect</span> attempted to 198.51.100.24:4444 (forbidden egress).
+            </p>
+</div>
+<div class="mt-3 flex items-center gap-1 text-tertiary font-label-sm text-label-sm font-bold" id="stage-detect-status">
+<span class="material-symbols-outlined text-[14px]">warning</span>
+<span>POLICY TRIP</span>
+</div>
+</div>
+<!-- Stage 5: CONTAIN -->
+<div class="bg-surface-container-low p-space-sm rounded-lg flex flex-col justify-between hover:bg-surface-container transition-all" id="stage-contain-card">
+<div>
+<div class="flex items-center justify-between mb-1">
+<span class="font-label-sm text-label-sm text-outline font-semibold">STAGE 05</span>
+<span class="font-label-sm text-label-sm text-tertiary font-bold">1.2ms</span>
+</div>
+<div class="font-headline-sm text-sm font-bold text-on-surface">CONTAIN</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1" id="stage-contain-desc">
+              Immediate <code class="font-label-sm">SIGKILL</code> dispatch via seccomp filter. cgroups freeze.
+            </p>
+</div>
+<div class="mt-3 flex items-center gap-1 text-tertiary font-label-sm text-label-sm font-bold" id="stage-contain-status">
+<span class="material-symbols-outlined text-[14px]">lock_clock</span>
+<span>INTERCEPTED</span>
+</div>
+</div>
+<!-- Stage 6: VERDICT -->
+<div class="bg-tertiary text-on-tertiary p-space-sm rounded-lg flex flex-col justify-between shadow-sm" id="stage-verdict-card">
+<div>
+<div class="flex items-center justify-between mb-1">
+<span class="font-label-sm text-label-sm text-white/80 font-semibold">STAGE 06</span>
+<span class="font-label-sm text-label-sm text-white/90 font-mono font-bold">FINAL</span>
+</div>
+<div class="font-headline-sm text-sm font-bold text-white" id="stage-verdict-title">CONTAINED</div>
+<p class="font-body-sm text-body-sm text-white/80 mt-1" id="stage-verdict-desc">
+              Threat suppressed before kernel state mutation or packet transmission.
+            </p>
+</div>
+<div class="mt-3 flex items-center gap-1 text-white font-label-sm text-label-sm font-bold">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+<span>ZERO EGRESS</span>
+</div>
+</div>
+</div>
+<!-- Quick Timeline Interactive Scrub Bar -->
+<div class="flex flex-col gap-1.5 pt-space-xs">
+<div class="flex items-center justify-between text-outline font-label-sm text-label-sm">
+<span>EXECUTION DURATION (TOTAL: 101.2ms)</span>
+<span>eBPF SAMPLE ACCURACY: 99.98%</span>
+</div>
+<div class="w-full h-2 rounded-full bg-surface-container flex overflow-hidden">
+<div class="h-full bg-primary" style="width: 12%;"></div>
+<div class="h-full bg-secondary" style="width: 4%;"></div>
+<div class="h-full bg-primary-container" style="width: 70%;"></div>
+<div class="h-full bg-tertiary" style="width: 14%;"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Inspection Drawer & Technical Lifecycle Telemetry -->
+<div class="px-margin-lg mb-space-xl w-full">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-space-md">
+<!-- eBPF Ringbuffer Traced Call Log -->
+<div class="lg:col-span-2 rounded-xl bg-surface-container-lowest p-space-md shadow-sm flex flex-col">
+<div class="flex items-center justify-between pb-space-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">reorder</span>
+<span class="font-headline-sm text-sm font-semibold text-on-surface">eBPF Ringbuffer Kernel Events</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-label-sm text-label-sm text-outline font-mono">RING_0 BUFFER (SECONLY)</span>
+<button class="px-2 py-1 rounded bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-label-sm flex items-center gap-1 transition-all" onclick="copyKernelDump()">
+<span class="material-symbols-outlined text-[13px]">content_copy</span>
+<span>Dump</span>
+</button>
+</div>
+</div>
+<!-- Terminal-like High Precision Stream (Light Mode Clinical) -->
+<div class="bg-surface-container-low rounded-lg p-space-sm font-label-sm text-label-sm space-y-1.5 overflow-x-auto max-h-56" id="kernel-events-list">
+<div class="flex items-center gap-3 text-outline">
+<span class="text-outline font-mono">00:00.001</span>
+<span class="text-primary font-semibold">[SYS_ENTER]</span>
+<span class="text-on-surface font-mono">execve("/tmp/payload_alpha.sh", ["./payload_alpha.sh"], [/* 18 vars */])</span>
+<span class="ml-auto text-primary">RET: 0</span>
+</div>
+<div class="flex items-center gap-3 text-outline">
+<span class="text-outline font-mono">00:00.012</span>
+<span class="text-primary font-semibold">[SYS_ENTER]</span>
+<span class="text-on-surface font-mono">mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0)</span>
+<span class="ml-auto text-primary">RET: 0x7f9a1b0</span>
+</div>
+<div class="flex items-center gap-3 text-outline">
+<span class="text-outline font-mono">00:00.045</span>
+<span class="text-primary font-semibold">[SYS_ENTER]</span>
+<span class="text-on-surface font-mono">openat(AT_FDCWD, "/proc/self/status", O_RDONLY|O_CLOEXEC)</span>
+<span class="ml-auto text-primary">FD: 3</span>
+</div>
+<div class="flex items-center gap-3 text-outline bg-tertiary-fixed/30 -mx-2 px-2 py-0.5 rounded">
+<span class="text-tertiary font-mono font-bold">00:00.098</span>
+<span class="text-tertiary font-semibold">[SECCOMP_VIOLATION]</span>
+<span class="text-on-surface font-mono font-semibold">connect(4, {sa_family=AF_INET, sin_port=htons(4444), sin_addr=inet_addr("198.51.100.24")}, 16)</span>
+<span class="ml-auto text-tertiary font-bold">ERR: EPERM (KILL)</span>
+</div>
+<div class="flex items-center gap-3 text-outline">
+<span class="text-outline font-mono">00:00.099</span>
+<span class="text-secondary font-semibold">[CONTAINMENT]</span>
+<span class="text-on-surface font-mono">cgroups_v2::freeze_and_kill(pid=419208, sig=SIGSTOP)</span>
+<span class="ml-auto text-secondary">ACK_ZERO_LATENCY</span>
+</div>
+</div>
+<div class="mt-space-sm pt-space-xs flex items-center justify-between text-outline font-label-sm text-label-sm">
+<span>PROBE ID: <strong class="text-on-surface">kprobe__sys_enter_connect</strong></span>
+<span>SANDBOX MEMORY CLEANED: <strong class="text-primary">100% DISK PURGED</strong></span>
+</div>
+</div>
+<!-- Lifecycle Verification Matrix & Integrity Audit -->
+<div class="rounded-xl bg-surface-container-lowest p-space-md shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-space-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">fact_check</span>
+<span class="font-headline-sm text-sm font-semibold text-on-surface">Lifecycle Verification</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary font-bold">DEMO BASELINE</span>
+</div>
+<div class="space-y-space-sm mt-1">
+<div class="flex items-start justify-between p-space-xs rounded bg-surface-container-low">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm font-semibold text-on-surface">Ephemeral tmpfs Mount</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Isolated in RAM overlay</span>
+</div>
+<span class="material-symbols-outlined text-primary text-[18px]">verified</span>
+</div>
+<div class="flex items-start justify-between p-space-xs rounded bg-surface-container-low">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm font-semibold text-on-surface">Seccomp Filter Trap</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">BPF JIT filter loaded at exec</span>
+</div>
+<span class="material-symbols-outlined text-primary text-[18px]">verified</span>
+</div>
+<div class="flex items-start justify-between p-space-xs rounded bg-surface-container-low">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm font-semibold text-on-surface">Host Zero-Leak Audit</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">No socket or filesystem escape</span>
+</div>
+<span class="material-symbols-outlined text-primary text-[18px]">verified</span>
+</div>
+</div>
+</div>
+<!-- Demonstration Notice Box -->
+<div class="mt-space-md p-space-sm rounded-lg bg-surface-container-high/60 flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[20px]">labs</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm font-bold text-on-surface">DEMONSTRATION BASELINE</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Synthesized live audit stream for Cerberus lab verification.</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Sample Data for Spatial Timeline Nodes
+  const timelineNodesData = {
+    1: {
+      title: "payload_alpha.sh",
+      pill: "CONTAINED EXECUTION",
+      pillClass: "bg-tertiary-fixed text-on-tertiary-fixed",
+      statusIcon: "security",
+      iconBg: "bg-error-container text-tertiary",
+      subtitle: "SANDBOX ID: sb-enclave-9941a â€¢ DURATION: 101.2ms â€¢ SEVERITY: HIGH",
+      syscalls: "126 traced",
+      latency: "1.2ms",
+      stageDetect: {
+        title: "DETECT",
+        desc: "Rule match: socket_connect attempted to 198.51.100.24:4444 (forbidden egress).",
+        status: "POLICY TRIP",
+        cardClass: "bg-tertiary-fixed/40",
+        textClass: "text-tertiary"
+      },
+      stageContain: {
+        title: "CONTAIN",
+        desc: "Immediate SIGKILL dispatch via seccomp filter. cgroups freeze.",
+        status: "INTERCEPTED",
+        textClass: "text-tertiary"
+      },
+      stageVerdict: {
+        title: "CONTAINED",
+        desc: "Threat suppressed before kernel state mutation or packet transmission.",
+        bgClass: "bg-tertiary text-on-tertiary",
+        status: "ZERO EGRESS"
+      },
+      kernelLogs: [
+        { time: "00:00.001", tag: "[SYS_ENTER]", call: 'execve("/tmp/payload_alpha.sh", ["./payload_alpha.sh"], [/* 18 vars */])', ret: "RET: 0", type: "nominal" },
+        { time: "00:00.012", tag: "[SYS_ENTER]", call: "mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0)", ret: "RET: 0x7f9a1b0", type: "nominal" },
+        { time: "00:00.045", tag: "[SYS_ENTER]", call: 'openat(AT_FDCWD, "/proc/self/status", O_RDONLY|O_CLOEXEC)', ret: "FD: 3", type: "nominal" },
+        { time: "00:00.098", tag: "[SECCOMP_VIOLATION]", call: 'connect(4, {sa_family=AF_INET, sin_port=htons(4444), sin_addr=inet_addr("198.51.100.24")}, 16)', ret: "ERR: EPERM (KILL)", type: "breach" },
+        { time: "00:00.099", tag: "[CONTAINMENT]", call: "cgroups_v2::freeze_and_kill(pid=419208, sig=SIGSTOP)", ret: "ACK_ZERO_LATENCY", type: "contained" }
+      ]
+    },
+    2: {
+      title: "transform_matrix.py",
+      pill: "CLEAN RUNTIME",
+      pillClass: "bg-primary-fixed text-on-primary-fixed",
+      statusIcon: "task_alt",
+      iconBg: "bg-primary-fixed text-primary",
+      subtitle: "SANDBOX ID: sb-enclave-8812c â€¢ DURATION: 412.0ms â€¢ SEVERITY: NONE",
+      syscalls: "842 traced",
+      latency: "0.0ms (Nominal)",
+      stageDetect: {
+        title: "PASS",
+        desc: "Zero policy anomalies detected. Memory, I/O, and CPU stayed within cgroups v2 quota.",
+        status: "POLICY CLEAR",
+        cardClass: "bg-surface-container-low",
+        textClass: "text-primary"
+      },
+      stageContain: {
+        title: "NO ACTION",
+        desc: "Process finished computation cleanly and issued graceful exit(0).",
+        status: "UNRESTRICTED",
+        textClass: "text-primary"
+      },
+      stageVerdict: {
+        title: "SAFE EXEC",
+        desc: "Execution concluded safely within bounds. tmpfs sandbox auto-reclaimed.",
+        bgClass: "bg-primary text-on-primary",
+        status: "VERIFIED NOMINAL"
+      },
+      kernelLogs: [
+        { time: "00:00.001", tag: "[SYS_ENTER]", call: 'execve("/usr/bin/python3", ["python3", "transform_matrix.py"], [/* 12 vars */])', ret: "RET: 0", type: "nominal" },
+        { time: "00:00.054", tag: "[SYS_ENTER]", call: "brk(0x2a3e000)", ret: "RET: 0x2a3e000", type: "nominal" },
+        { time: "00:00.210", tag: "[CPU_ACQUIRE]", call: "cgroups_v2::cpu.max_eval(threads=4, usage=82%)", ret: "WITHIN_LIMIT", type: "nominal" },
+        { time: "00:00.411", tag: "[SYS_EXIT]", call: "exit_group(0)", ret: "RET: 0", type: "nominal" },
+        { time: "00:00.412", tag: "[PURGE]", call: "tmpfs::unmount(/var/sandboxes/sb-enclave-8812c)", ret: "CLEAN", type: "nominal" }
+      ]
+    },
+    3: {
+      title: "test_daemon.c",
+      pill: "CONTAINED EXECUTION",
+      pillClass: "bg-tertiary-fixed text-on-tertiary-fixed",
+      statusIcon: "shield",
+      iconBg: "bg-error-container text-tertiary",
+      subtitle: "SANDBOX ID: sb-enclave-7109x â€¢ DURATION: 18.4ms â€¢ SEVERITY: CRITICAL",
+      syscalls: "42 traced",
+      latency: "0.8ms",
+      stageDetect: {
+        title: "DETECT",
+        desc: "Unauthorized filesystem access attempt: target path /etc/shadow outside permitted rootfs.",
+        status: "PRIVILEGE TRAP",
+        cardClass: "bg-tertiary-fixed/40",
+        textClass: "text-tertiary"
+      },
+      stageContain: {
+        title: "CONTAIN",
+        desc: "Instant sandbox isolation seal. System call trapped by Landlock LSM & eBPF.",
+        status: "LOCKED DOWN",
+        textClass: "text-tertiary"
+      },
+      stageVerdict: {
+        title: "CONTAINED",
+        desc: "Process terminated before read pointer could touch protected host inodes.",
+        bgClass: "bg-tertiary text-on-tertiary",
+        status: "ZERO DISK LEAK"
+      },
+      kernelLogs: [
+        { time: "00:00.002", tag: "[SYS_ENTER]", call: 'execve("./test_daemon", ["./test_daemon"], [/* 10 vars */])', ret: "RET: 0", type: "nominal" },
+        { time: "00:00.008", tag: "[LSM_AUDIT]", call: 'landlock_restrict_self(ruleset_fd=3, flags=0)', ret: "RET: 0", type: "nominal" },
+        { time: "00:00.017", tag: "[SECCOMP_VIOLATION]", call: 'openat(AT_FDCWD, "/etc/shadow", O_RDONLY)', ret: "ERR: EACCES (KILL)", type: "breach" },
+        { time: "00:00.018", tag: "[CONTAINMENT]", call: "kernel_sigaction(SIGKILL, target_pid=419302)", ret: "TERMINATED", type: "contained" }
+      ]
+    },
+    4: {
+      title: "compile_artifact.cpp",
+      pill: "CLEAN RUNTIME",
+      pillClass: "bg-primary-fixed text-on-primary-fixed",
+      statusIcon: "verified",
+      iconBg: "bg-primary-fixed text-primary",
+      subtitle: "SANDBOX ID: sb-enclave-6041f â€¢ DURATION: 640.8ms â€¢ SEVERITY: NONE",
+      syscalls: "1420 traced",
+      latency: "0.0ms (Nominal)",
+      stageDetect: {
+        title: "PASS",
+        desc: "Clang runtime compiler invocation strictly bound within RAM tmpfs mount point.",
+        status: "SANDBOX SECURE",
+        cardClass: "bg-surface-container-low",
+        textClass: "text-primary"
+      },
+      stageContain: {
+        title: "NO ACTION",
+        desc: "Binary compilation completed successfully without non-conforming syscall triggers.",
+        status: "NORMAL FLOW",
+        textClass: "text-primary"
+      },
+      stageVerdict: {
+        title: "CLEAN EXIT",
+        desc: "Artifact generated in sealed buffer. Host runtime integrity maintained.",
+        bgClass: "bg-primary text-on-primary",
+        status: "ALL GREEN"
+      },
+      kernelLogs: [
+        { time: "00:00.001", tag: "[SYS_ENTER]", call: 'execve("/usr/bin/clang++", ["clang++", "-O3", "artifact.cpp"], [/* 15 vars */])', ret: "RET: 0", type: "nominal" },
+        { time: "00:00.120", tag: "[MEM_ALLOC]", call: "mmap(NULL, 67108864, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0)", ret: "OK", type: "nominal" },
+        { time: "00:00.638", tag: "[SYS_ENTER]", call: 'unlinkat(AT_FDCWD, "artifact.o", 0)', ret: "RET: 0", type: "nominal" },
+        { time: "00:00.640", tag: "[SYS_EXIT]", call: "exit_group(0)", ret: "RET: 0", type: "nominal" }
+      ]
+    }
+  };
+
+  // Node Selection Handler
+  function selectNode(id) {
+    const data = timelineNodesData[id];
+    if (!data) return;
+
+    // Update active visual cues on nodes
+    document.querySelectorAll('.timeline-node').forEach(node => {
+      node.classList.remove('scale-110');
+      const innerCard = node.querySelector('.relative.w-16.h-16');
+      if (innerCard) {
+        innerCard.classList.remove('ring-4', 'ring-primary', 'ring-tertiary');
+      }
+    });
+
+    const activeNode = document.getElementById(`node-${id}`);
+    if (activeNode) {
+      activeNode.classList.add('scale-110');
+    }
+
+    // Update Stage Decomposition Panel
+    document.getElementById('decomp-title').textContent = data.title;
+    document.getElementById('decomp-pill').textContent = data.pill;
+    document.getElementById('decomp-pill').className = `font-label-sm text-label-sm uppercase px-2 py-0.5 rounded font-semibold ${data.pillClass}`;
+    document.getElementById('decomp-subtitle').textContent = data.subtitle;
+    document.getElementById('decomp-syscall-count').textContent = data.syscalls;
+    document.getElementById('decomp-latency').textContent = data.latency;
+
+    const badge = document.getElementById('decomp-status-badge');
+    badge.className = `w-9 h-9 rounded-lg flex items-center justify-center font-bold ${data.iconBg}`;
+    badge.innerHTML = `<span class="material-symbols-outlined text-[20px]">${data.statusIcon}</span>`;
+
+    // Stage 4: Detect
+    const detectCard = document.getElementById('stage-detect-card');
+    detectCard.className = `${data.stageDetect.cardClass} p-space-sm rounded-lg flex flex-col justify-between transition-all`;
+    document.getElementById('stage-detect-desc').textContent = data.stageDetect.desc;
+    document.getElementById('stage-detect-status').innerHTML = `
+      <span class="material-symbols-outlined text-[14px]">warning</span>
+      <span>${data.stageDetect.status}</span>
+    `;
+    document.getElementById('stage-detect-status').className = `mt-3 flex items-center gap-1 font-label-sm text-label-sm font-bold ${data.stageDetect.textClass}`;
+
+    // Stage 5: Contain
+    document.getElementById('stage-contain-desc').textContent = data.stageContain.desc;
+    document.getElementById('stage-contain-status').innerHTML = `
+      <span class="material-symbols-outlined text-[14px]">lock_clock</span>
+      <span>${data.stageContain.status}</span>
+    `;
+    document.getElementById('stage-contain-status').className = `mt-3 flex items-center gap-1 font-label-sm text-label-sm font-bold ${data.stageContain.textClass}`;
+
+    // Stage 6: Verdict
+    const verdictCard = document.getElementById('stage-verdict-card');
+    verdictCard.className = `${data.stageVerdict.bgClass} p-space-sm rounded-lg flex flex-col justify-between shadow-sm`;
+    document.getElementById('stage-verdict-title').textContent = data.stageVerdict.title;
+    document.getElementById('stage-verdict-desc').textContent = data.stageVerdict.desc;
+
+    // Populate Kernel Events List
+    const eventContainer = document.getElementById('kernel-events-list');
+    eventContainer.innerHTML = '';
+    data.kernelLogs.forEach(log => {
+      const row = document.createElement('div');
+      let extraClass = 'text-outline';
+      let tagClass = 'text-primary';
+      let retClass = 'text-primary';
+
+      if (log.type === 'breach') {
+        extraClass = 'bg-tertiary-fixed/30 -mx-2 px-2 py-0.5 rounded text-on-surface';
+        tagClass = 'text-tertiary font-bold';
+        retClass = 'text-tertiary font-bold';
+      } else if (log.type === 'contained') {
+        tagClass = 'text-secondary font-bold';
+        retClass = 'text-secondary';
+      }
+
+      row.className = `flex items-center gap-3 font-label-sm text-label-sm ${extraClass}`;
+      row.innerHTML = `
+        <span class="font-mono text-outline">${log.time}</span>
+        <span class="font-semibold ${tagClass}">${log.tag}</span>
+        <span class="font-mono font-normal truncate">${log.call}</span>
+        <span class="ml-auto font-mono ${retClass}">${log.ret}</span>
+      `;
+      eventContainer.appendChild(row);
+    });
+  }
+
+  // Filter Handler
+  function setTimelineFilter(type) {
+    // Button styling
+    const allBtn = document.getElementById('filter-all');
+    const containedBtn = document.getElementById('filter-contained');
+    const cleanBtn = document.getElementById('filter-clean');
+
+    const activeClasses = 'bg-surface-container-lowest text-primary font-semibold shadow-sm';
+    const inactiveClasses = 'text-on-surface-variant hover:text-on-surface';
+
+    [allBtn, containedBtn, cleanBtn].forEach(b => {
+      b.className = `font-label-sm text-label-sm uppercase px-space-sm py-1 rounded-full transition-all ${inactiveClasses}`;
+    });
+
+    if (type === 'all') allBtn.className = `font-label-sm text-label-sm uppercase px-space-sm py-1 rounded-full transition-all ${activeClasses}`;
+    if (type === 'contained') containedBtn.className = `font-label-sm text-label-sm uppercase px-space-sm py-1 rounded-full transition-all ${activeClasses}`;
+    if (type === 'clean') cleanBtn.className = `font-label-sm text-label-sm uppercase px-space-sm py-1 rounded-full transition-all ${activeClasses}`;
+
+    // Filter timeline nodes visibility
+    document.querySelectorAll('.timeline-node').forEach(node => {
+      const cat = node.getAttribute('data-category');
+      if (type === 'all' || cat === type) {
+        node.style.opacity = '1';
+        node.style.pointerEvents = 'auto';
+      } else {
+        node.style.opacity = '0.2';
+        node.style.pointerEvents = 'none';
+      }
+    });
+  }
+
+  // Camera Orbit Reset Micro-Interaction
+  function resetCamera() {
+    const track = document.getElementById('spatial-track');
+    track.style.transform = 'rotateX(0deg) rotateY(0deg) translateZ(0px)';
+    setTimeout(() => {
+      track.style.transform = 'rotateX(24deg) rotateY(-6deg) translateZ(0px)';
+    }, 280);
+  }
+
+  // Copy kernel log micro-feedback
+  function copyKernelDump() {
+    navigator.clipboard?.writeText(document.getElementById('kernel-events-list').innerText);
+    const alertTag = document.createElement('div');
+    alertTag.className = 'fixed bottom-12 right-12 z-50 bg-inverse-surface text-inverse-on-surface font-label-sm text-label-sm px-4 py-2 rounded-lg shadow-xl animate-fade';
+    alertTag.textContent = 'eBPF Ringbuffer Log Copied to Clipboard';
+    document.body.appendChild(alertTag);
+    setTimeout(() => alertTag.remove(), 2200);
+  }
+</script></main><footer class="w-full bg-surface-container-lowest/80 backdrop-blur-xl shadow-[0_-1px_8px_rgba(0,0,0,0.03)] mt-auto z-40"><div class="w-full px-margin-lg py-space-sm flex flex-col md:flex-row items-center justify-between gap-space-sm"><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs font-label-sm text-label-sm text-outline"><span class="material-symbols-outlined text-[14px] text-primary">explore</span><span>AXIS X: <span class="text-on-surface font-medium">48.2Â°</span></span><span>Y: <span class="text-on-surface font-medium">-12.4Â°</span></span><span>Z: <span class="text-on-surface font-medium">104.1Â°</span></span></div><span class="hidden sm:inline-block w-1 h-1 rounded-full bg-outline-variant"></span><span class="hidden sm:inline-block font-label-sm text-label-sm text-outline-variant">ORTHO-ISOMETRIC PROJECTION</span></div><div class="flex items-center gap-space-lg"><span class="font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase bg-surface-container-high/60 px-space-sm py-0.5 rounded">PROTOTYPE LAB SPECIFICATION â€¢ DEMO ENVIRONMENT</span><div class="flex items-center gap-space-xs"><span class="font-label-sm text-label-sm text-outline">TELEMETRY:</span><span class="font-label-sm text-label-sm font-semibold text-primary">SYNCHRONIZED (0.4ms)</span></div></div></div></footer></body></html>
+
