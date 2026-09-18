@@ -153,28 +153,7 @@ namespace Cerberus.WindowsAgent
             EmitRawEvent("PROCESS_START", "process", "info", "Target Process Started",
                 string.Format("Target process executing with PID {0}.", targetPid), targetPid, procMeta);
 
-            // 3. Pre-scan payload content for sensitive static markers to correlate with runtime
-            try
-            {
-                string scriptContent = File.ReadAllText(filePath);
-                string samMarker = "config" + Path.DirectorySeparatorChar + "SAM";
-                if (scriptContent.IndexOf(samMarker, StringComparison.OrdinalIgnoreCase) >= 0 ||
-                    scriptContent.IndexOf("CredentialHive", StringComparison.OrdinalIgnoreCase) >= 0)
-                {
-                    ThreadPool.QueueUserWorkItem(delegate
-                    {
-                        Thread.Sleep(900);
-                        if (!_contained)
-                        {
-                            string targetPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "config", "SAM");
-                            TriggerFileViolation(targetPid, targetPath);
-                        }
-                    });
-                }
-            }
-            catch { }
-
-            // 4. Initialize ETW / Telemetry Listener
+            // 3. Initialize Live ETW / Telemetry Listener (No static/canned triggers)
             EtwListener listener = new EtwListener(targetPid);
             ResponseAgent responder = new ResponseAgent();
 
@@ -241,23 +220,6 @@ namespace Cerberus.WindowsAgent
             return 0;
         }
 
-        private static void TriggerFileViolation(int pid, string path)
-        {
-            EtwTelemetryEvent evt = new EtwTelemetryEvent
-            {
-                EventType = "FILE_ACCESS_VIOLATION",
-                Category = "filesystem",
-                Severity = "violation",
-                Title = "Rule Violation: Sensitive Path Access",
-                Description = string.Format("Target attempted to read Windows Credential Store at {0}", path),
-                ProcessId = pid
-            };
-            evt.Metadata["path"] = path;
-            evt.Metadata["desired_access"] = "GENERIC_READ";
-
-            ResponseAgent responder = new ResponseAgent();
-            ExecuteContainment(pid, evt, responder, null);
-        }
 
         private static void ExecuteContainment(int targetPid, EtwTelemetryEvent violationEvt, ResponseAgent responder, EtwListener listener)
         {
