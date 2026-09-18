@@ -124,7 +124,6 @@ class MonitorBridge:
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE
             )
-        except OSError as e:
             # WinError 740: Elevation Required
             if getattr(e, "winerror", None) == 740 or "elevation" in str(e).lower():
                 logger.info("Elevation required. Spawning elevated CerberusAgent via PowerShell RunAs...")
@@ -133,8 +132,34 @@ class MonitorBridge:
                     "-Command",
                     f"Start-Process -FilePath '{self.agent_exe}' -ArgumentList 'launch --file \"{session.filepath.resolve()}\" --mem-mb {session.memory_limit_mb} --out-file \"{events_jsonl}\"' -Verb RunAs -Wait"
                 ]
-                # Start elevated process in background and stream from events_jsonl
-                asyncio.create_task(self._run_process_async(ps_cmd))
+                try:
+                    ps_proc = await asyncio.create_subprocess_exec(
+                        *ps_cmd,
+                        stdout=asyncio.subprocess.PIPE,
+                        stderr=asyncio.subprocess.PIPE
+                    )
+                    # Give RunAs a moment to trigger prompt or fail if non-interactive
+                    await asyncio.sleep(0.5)
+                    if ps_proc.returncode is not None and ps_proc.returncode != 0:
+                        stderr_bytes = await ps_proc.stderr.read()
+                        err_msg = stderr_bytes.decode("utf-8", errors="replace").strip()
+                        yield {
+                            "type": "ERROR",
+                            "category": "system",
+                            "severity": "critical",
+                            "title": "UAC Elevation Required",
+                            "description": (
+                                "CerberusAgent.exe requires Administrator elevation (requireAdministrator). "
+                                f"UAC prompt could not be displayed: {err_msg}. "
+                                "Please launch the backend or terminal as Administrator."
+                            ),
+                            "details": {"agent_path": str(self.agent_exe), "error": err_msg},
+                            "session_id": session.session_id,
+                        }
+                        return
+                except Exception as runas_err:
+                    logger.warning("PowerShell RunAs spawn error: %s", runas_err)
+
                 async for evt in self._tail_events_file(events_jsonl, session):
                     yield evt
                 return
