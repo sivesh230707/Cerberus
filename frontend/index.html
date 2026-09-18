@@ -116,7 +116,7 @@
 </head>
 <body class="bg-background font-body-md text-on-surface min-h-screen flex flex-col justify-between antialiased selection:bg-primary-fixed selection:text-on-primary-fixed">
 
-  <!-- Header -->
+  <!-- Persistent Clinical Header -->
   <header class="fixed top-0 left-0 w-full z-50 bg-surface-container-lowest/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
     <div class="h-20 w-full px-margin-lg flex items-center justify-between gap-gutter">
       <!-- Brand & Triad Emblem -->
@@ -177,30 +177,34 @@
   <!-- Hidden Native File Input -->
   <input type="file" id="file-input" style="display:none" />
 
-  <!-- Main Content Cockpit -->
+  <!-- Main Multi-State Stage Container -->
   <main class="w-full pt-20 bg-transparent flex-1">
-    <div class="flex flex-col w-full">
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 1: FRONT PAGE (STANDBY DASHBOARD from stitch_remix_1)                -->
+    <!-- ========================================================================= -->
+    <div id="view-standby" class="flex flex-col w-full transition-opacity duration-300">
 
       <!-- Spatial Stage Toolbar & Pipeline Stepper -->
       <div class="w-full px-margin-lg py-space-md flex flex-col xl:flex-row items-center justify-between gap-space-md z-30">
         <!-- Ephemeral Target File Dropper & State Meta -->
         <div class="flex items-center gap-space-md w-full xl:w-auto">
-          <div class="group relative flex items-center gap-space-sm px-space-md py-2.5 bg-surface-container-lowest/90 backdrop-blur-xl rounded-full shadow-[0_4px_20px_rgba(0,97,148,0.08)] cursor-pointer hover:shadow-[0_8px_28px_rgba(0,97,148,0.16)] transition-all duration-300" id="fileUploadBtn" title="Click or drop executable / script to analyze">
+          <div class="group relative flex items-center gap-space-sm px-space-md py-2.5 bg-surface-container-lowest/90 backdrop-blur-xl rounded-full shadow-[0_4px_20px_rgba(0,97,148,0.08)] cursor-pointer hover:shadow-[0_8px_28px_rgba(0,97,148,0.16)] transition-all duration-300" id="fileUploadBtn" title="Click or drop executable / script to launch sandbox">
             <span class="w-2.5 h-2.5 rounded-full bg-primary animate-ping"></span>
             <span class="material-symbols-outlined text-primary text-[20px]">cloud_upload</span>
             <div class="flex flex-col">
               <span class="font-label-sm text-label-sm font-semibold tracking-wider text-on-surface uppercase">SANDBOX WORKLOAD:</span>
               <span class="font-label-md text-label-md text-primary font-bold" id="activeWorkloadLabel">Click or drop payload script...</span>
             </div>
-            <span class="font-label-sm text-label-sm bg-surface-container px-2 py-0.5 rounded text-outline uppercase ml-space-xs" id="activeWorkloadBadge">DROPZONE</span>
+            <span class="font-label-sm text-label-sm bg-surface-container px-2 py-0.5 rounded text-outline uppercase ml-space-xs" id="activeWorkloadBadge">STANDBY</span>
           </div>
 
           <div class="hidden sm:flex items-center gap-space-xs px-space-md py-2 bg-surface-container-low/80 backdrop-blur-md rounded-full text-on-surface-variant">
-            <span class="font-label-sm text-label-sm text-outline">CONTAINMENT:</span>
-            <span class="font-label-sm text-label-sm font-semibold text-secondary">SUSPEND + WFP</span>
+            <span class="font-label-sm text-label-sm text-outline">SECCOMP:</span>
+            <span class="font-label-sm text-label-sm font-semibold text-secondary">BPF_PROG_ACTIVE</span>
             <span class="w-1 h-1 rounded-full bg-outline-variant mx-1"></span>
-            <span class="font-label-sm text-label-sm text-outline">JOB OBJECT:</span>
-            <span class="font-label-sm text-label-sm font-semibold text-on-surface">ENFORCED</span>
+            <span class="font-label-sm text-label-sm text-outline">CGROUP:</span>
+            <span class="font-label-sm text-label-sm font-semibold text-on-surface">V2::ENFORCED</span>
           </div>
         </div>
 
@@ -239,11 +243,10 @@
           </div>
         </div>
 
-        <!-- Exploded 3D Deconstruction Button & Camera Reset -->
+        <!-- Camera Reset & Exploded View Button -->
         <div class="flex items-center gap-space-sm">
-          <button class="flex items-center gap-space-xs px-space-md py-2 bg-surface-container-lowest/90 hover:bg-primary-fixed text-primary font-label-sm text-label-sm font-semibold rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.04)] transition-all" id="toggleExplodedBtn">
-            <span class="material-symbols-outlined text-[16px]">layers</span>
-            <span id="explodedBtnText">EXPLODE 3D LAYERS</span>
+          <button class="w-9 h-9 rounded-full bg-surface-container-lowest/90 hover:bg-surface-container flex items-center justify-center text-outline hover:text-on-surface shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all" id="btn-reset-perspective" title="Reset Ortho Orbit">
+            <span class="material-symbols-outlined text-[18px]">cached</span>
           </button>
         </div>
       </div>
@@ -251,7 +254,7 @@
       <!-- Main Spatial Viewport Stage Container -->
       <div class="relative w-full min-h-[calc(100vh-14rem)] px-margin-lg py-space-sm grid grid-cols-1 lg:grid-cols-12 gap-gutter items-stretch">
 
-        <!-- LEFT ANALYTICAL RAIL: Dynamic Workload Selector & Enclave Environment Spec -->
+        <!-- LEFT ANALYTICAL RAIL: Dynamic Workload Selector & Enclave Spec -->
         <div class="lg:col-span-3 flex flex-col gap-space-md z-20">
           <!-- Preset Workload Injector Module -->
           <div class="bg-surface-container-lowest/80 backdrop-blur-2xl rounded-xl p-space-md shadow-[0_8px_30px_rgba(15,23,42,0.04)] flex flex-col gap-space-md">
@@ -263,17 +266,17 @@
               <span class="font-label-sm text-label-sm text-outline tracking-wider font-mono">SPEC::SAND-01</span>
             </div>
             <p class="font-body-sm text-body-sm text-on-surface-variant">
-              Select an untrusted sample or drop a custom script to launch Cerberus runtime interception:
+              Select an untrusted probe binary or payload script to trigger Cerberus spatial kernel interception:
             </p>
 
             <!-- Payloads List -->
             <div class="flex flex-col gap-space-xs">
               <button class="payload-btn active text-left p-space-sm rounded-lg bg-surface-container-high/60 transition-all flex flex-col gap-0.5 ring-1 ring-primary" data-payload="rev_shell" id="payload-rev_shell">
                 <div class="flex items-center justify-between">
-                  <span class="font-label-md text-label-md font-bold text-on-surface">suspicious_payload.ps1</span>
+                  <span class="font-label-md text-label-md font-bold text-on-surface">reverse_shell.py</span>
                   <span class="font-label-sm text-label-sm px-1.5 py-0.2 bg-tertiary-container text-on-tertiary-container rounded">MALICIOUS</span>
                 </div>
-                <span class="font-body-sm text-body-sm text-outline">Probe SAM hive, spawn cmd.exe, outbound connect 198.51.100.42:443</span>
+                <span class="font-body-sm text-body-sm text-outline">Syscall: connect() to unauthorized IP 198.51.100.23:4444</span>
               </button>
 
               <button class="payload-btn text-left p-space-sm rounded-lg bg-surface-container-lowest hover:bg-surface-container-high/40 transition-all flex flex-col gap-0.5" data-payload="buffer_probe" id="payload-buffer_probe">
@@ -281,15 +284,15 @@
                   <span class="font-label-md text-label-md font-bold text-on-surface">buffer_probe.c</span>
                   <span class="font-label-sm text-label-sm px-1.5 py-0.2 bg-error-container text-on-error-container rounded">TAINT RISK</span>
                 </div>
-                <span class="font-body-sm text-body-sm text-outline">VirtualAlloc PAGE_EXECUTE_READWRITE heap taint attempt</span>
+                <span class="font-body-sm text-body-sm text-outline">Mem alloc: Cgroup memory.max breach injection attempt</span>
               </button>
 
               <button class="payload-btn text-left p-space-sm rounded-lg bg-surface-container-lowest hover:bg-surface-container-high/40 transition-all flex flex-col gap-0.5" data-payload="clean_eval" id="payload-clean_eval">
                 <div class="flex items-center justify-between">
-                  <span class="font-label-md text-label-md font-bold text-on-surface">clean_worker_benchmark.bat</span>
+                  <span class="font-label-md text-label-md font-bold text-on-surface">clean_data_agg.py</span>
                   <span class="font-label-sm text-label-sm px-1.5 py-0.2 bg-primary-fixed text-on-primary-fixed-variant rounded">BENIGN</span>
                 </div>
-                <span class="font-body-sm text-body-sm text-outline">Pure compute benchmark: bounded local calculation</span>
+                <span class="font-body-sm text-body-sm text-outline">Pure compute: CPU vector ops, read() / write() local tmpfs</span>
               </button>
             </div>
 
@@ -307,20 +310,20 @@
             </div>
             <div class="space-y-2 font-label-sm text-label-sm">
               <div class="flex items-center justify-between p-2 rounded bg-surface-container-low/70">
-                <span class="text-outline">ISOLATION</span>
-                <span class="font-semibold text-on-surface">Windows Sandbox / Job Object</span>
+                <span class="text-outline">LINUX NAMESPACES</span>
+                <span class="font-semibold text-on-surface">pid, mnt, net, ipc, user</span>
               </div>
               <div class="flex items-center justify-between p-2 rounded bg-surface-container-low/70">
                 <span class="text-outline">STORAGE ROOT</span>
-                <span class="font-semibold text-primary">Disposable VM VHD / RAM</span>
+                <span class="font-semibold text-primary">tmpfs (RAM only, 128MB)</span>
               </div>
               <div class="flex items-center justify-between p-2 rounded bg-surface-container-low/70">
-                <span class="text-outline">RESOURCE CAP</span>
-                <span class="font-semibold text-on-surface">JobObject Limit (Mem/CPU)</span>
+                <span class="text-outline">CGROUP V2 LIMITS</span>
+                <span class="font-semibold text-on-surface">cpu.max=10000 100000</span>
               </div>
               <div class="flex items-center justify-between p-2 rounded bg-surface-container-low/70">
-                <span class="text-outline">KERNEL HOOKS</span>
-                <span class="font-semibold text-secondary font-mono">ETW Microsoft-Windows-Kernel</span>
+                <span class="text-outline">BPF TELEMETRY</span>
+                <span class="font-semibold text-secondary font-mono">sys_enter_connect</span>
               </div>
             </div>
           </div>
@@ -328,9 +331,6 @@
 
         <!-- CENTRAL 3D SPATIAL CANVAS VIEWPORT: THE CERBERUS DEFENSE CORE -->
         <div class="lg:col-span-6 relative flex flex-col items-center justify-center min-h-[540px] bg-gradient-to-b from-surface-container-lowest/50 via-surface-container-low/30 to-surface-container-lowest/60 rounded-2xl shadow-[inset_0_0_40px_rgba(0,97,148,0.03)] overflow-hidden p-space-md">
-
-          <!-- Three.js Canvas Mount Layer -->
-          <div id="threejs-canvas-mount" class="absolute inset-0 pointer-events-none opacity-40"></div>
 
           <!-- Coordinate Compass HUD Overlays -->
           <div class="absolute top-4 left-4 flex items-center gap-space-xs text-outline font-label-sm text-label-sm z-20">
@@ -362,28 +362,28 @@
                   <span class="material-symbols-outlined text-primary text-[28px]" id="cubeIconState">shield</span>
                 </div>
                 <span class="font-headline-sm text-headline-sm uppercase text-on-surface font-bold tracking-tight" id="cubeCenterTitle">ENCLAVE α</span>
-                <span class="font-label-sm text-label-sm text-primary font-mono font-semibold mt-1" id="cubeCenterSub">DISPOSABLE WSB</span>
+                <span class="font-label-sm text-label-sm text-primary font-mono font-semibold mt-1" id="cubeCenterSub">ISOLATED TMPFS</span>
                 <div class="w-12 h-0.5 bg-primary/20 my-2"></div>
-                <span class="font-label-sm text-label-sm text-outline font-mono" id="cubeCenterPid">JOB OBJECT :: ACTIVE</span>
+                <span class="font-label-sm text-label-sm text-outline font-mono" id="cubeCenterPid">0x7FFF98E4::CG2</span>
               </div>
 
               <!-- Back Face -->
               <div class="absolute inset-0 bg-surface-container-high/70 backdrop-blur-md rounded-lg flex items-center justify-center text-center p-4 [transform:rotateY(180deg)_translateZ(96px)]">
-                <span class="font-label-sm text-label-sm text-outline font-mono uppercase">ETW KERNEL SINK<br/>RING_BUF: OK</span>
+                <span class="font-label-sm text-label-sm text-outline font-mono uppercase">BPF SINK BUFFER<br/>RING_BUF: OK</span>
               </div>
 
               <!-- Right Face -->
               <div class="absolute inset-0 bg-surface-container/75 backdrop-blur-md rounded-lg flex flex-col items-center justify-center p-3 text-center [transform:rotateY(90deg)_translateZ(96px)]">
-                <span class="font-label-sm text-label-sm text-outline font-mono">NET FILTER</span>
-                <span class="font-headline-sm text-headline-sm font-semibold text-secondary">WFP: ARMED</span>
-                <span class="font-label-sm text-label-sm text-outline-variant font-mono mt-1">Egress Sever Ready</span>
+                <span class="font-label-sm text-label-sm text-outline font-mono">LINUX NS</span>
+                <span class="font-headline-sm text-headline-sm font-semibold text-secondary">NET: NONE</span>
+                <span class="font-label-sm text-label-sm text-outline-variant font-mono mt-1">veth pair pruned</span>
               </div>
 
               <!-- Left Face -->
               <div class="absolute inset-0 bg-surface-container-low/80 backdrop-blur-md rounded-lg flex flex-col items-center justify-center p-3 text-center [transform:rotateY(-90deg)_translateZ(96px)]">
-                <span class="font-label-sm text-label-sm text-outline font-mono">JOB OBJECT</span>
-                <span class="font-headline-sm text-headline-sm font-semibold text-primary">CAP: 512 MB</span>
-                <span class="font-label-sm text-label-sm text-outline-variant font-mono mt-1">CPU Rate Limit</span>
+                <span class="font-label-sm text-label-sm text-outline font-mono">CGROUP V2</span>
+                <span class="font-headline-sm text-headline-sm font-semibold text-primary">MEM: 12.4 MB</span>
+                <span class="font-label-sm text-label-sm text-outline-variant font-mono mt-1">CAP: 128 MB</span>
               </div>
 
               <!-- Top Face -->
@@ -396,72 +396,20 @@
               <!-- Bottom Face (Shadow Projection Plane) -->
               <div class="absolute inset-0 bg-surface-dim/40 rounded-lg filter blur-lg [transform:rotateX(-90deg)_translateZ(96px)]"></div>
 
-              <!-- Dynamic Containment Ring Clamps (Activated on Contain/Detect state) -->
+              <!-- Dynamic Containment Ring Clamps -->
               <div class="absolute -inset-6 rounded-2xl pointer-events-none transition-all duration-500 opacity-0 scale-90 flex items-center justify-center" id="containmentClamps">
                 <div class="w-full h-full rounded-2xl border-2 border-tertiary-container shadow-[0_0_40px_rgba(224,41,40,0.45)] flex items-center justify-center">
-                  <span class="font-label-sm text-label-sm font-mono font-bold text-tertiary-container bg-surface-container-lowest px-2 py-0.5 rounded shadow">STASIS CONTAINMENT LOCKED</span>
+                  <span class="font-label-sm text-label-sm font-mono font-bold text-tertiary-container bg-surface-container-lowest px-2 py-0.5 rounded shadow">SECCOMP SIGKILL LOCKDOWN</span>
                 </div>
               </div>
             </div>
-
-            <!-- 4 FLOATING EXPLODED ARCHITECTURE LAYERS (Controlled by Toggle) -->
-            <div class="hidden absolute inset-0 flex flex-col items-center justify-between py-2 transition-all duration-700" id="explodedLayersContainer">
-              <!-- Layer 4: Containment Layer -->
-              <div class="w-80 p-3 bg-surface-container-lowest/95 backdrop-blur-xl rounded-lg shadow-[0_8px_24px_rgba(0,97,148,0.08)] flex items-center justify-between transform -rotate-6 hover:scale-105 transition-transform cursor-pointer">
-                <div class="flex items-center gap-space-xs">
-                  <span class="w-6 h-6 rounded bg-tertiary/10 text-tertiary flex items-center justify-center font-mono text-xs font-bold">L4</span>
-                  <div>
-                    <span class="font-label-md text-label-md font-bold text-on-surface block">Containment Enforcement</span>
-                    <span class="font-label-sm text-label-sm text-outline">SuspendThread &amp; Dynamic WFP Filter</span>
-                  </div>
-                </div>
-                <span class="material-symbols-outlined text-tertiary text-[18px]">lock</span>
-              </div>
-
-              <!-- Layer 3: Decision Nexus -->
-              <div class="w-80 p-3 bg-surface-container-lowest/95 backdrop-blur-xl rounded-lg shadow-[0_8px_24px_rgba(0,97,148,0.08)] flex items-center justify-between transform -rotate-3 hover:scale-105 transition-transform cursor-pointer">
-                <div class="flex items-center gap-space-xs">
-                  <span class="w-6 h-6 rounded bg-secondary/10 text-secondary flex items-center justify-center font-mono text-xs font-bold">L3</span>
-                  <div>
-                    <span class="font-label-md text-label-md font-bold text-on-surface block">Decision Nexus Policy Engine</span>
-                    <span class="font-label-sm text-label-sm text-outline">Rule 1 (Child Proc), Rule 2 (SAM), Rule 3 (Net)</span>
-                  </div>
-                </div>
-                <span class="material-symbols-outlined text-secondary text-[18px]">hub</span>
-              </div>
-
-              <!-- Layer 2: Observation Layer -->
-              <div class="w-80 p-3 bg-surface-container-lowest/95 backdrop-blur-xl rounded-lg shadow-[0_8px_24px_rgba(0,97,148,0.08)] flex items-center justify-between transform rotate-2 hover:scale-105 transition-transform cursor-pointer">
-                <div class="flex items-center gap-space-xs">
-                  <span class="w-6 h-6 rounded bg-primary/10 text-primary flex items-center justify-center font-mono text-xs font-bold">L2</span>
-                  <div>
-                    <span class="font-label-md text-label-md font-bold text-on-surface block">Observation (ETW Kernel Probes)</span>
-                    <span class="font-label-sm text-label-sm text-outline">Microsoft-Windows-Kernel-Process / File / Network</span>
-                  </div>
-                </div>
-                <span class="material-symbols-outlined text-primary text-[18px]">visibility</span>
-              </div>
-
-              <!-- Layer 1: Ephemeral Isolation Substrate -->
-              <div class="w-80 p-3 bg-surface-container-lowest/95 backdrop-blur-xl rounded-lg shadow-[0_8px_24px_rgba(0,97,148,0.08)] flex items-center justify-between transform rotate-6 hover:scale-105 transition-transform cursor-pointer">
-                <div class="flex items-center gap-space-xs">
-                  <span class="w-6 h-6 rounded bg-surface-container text-on-surface flex items-center justify-center font-mono text-xs font-bold">L1</span>
-                  <div>
-                    <span class="font-label-md text-label-md font-bold text-on-surface block">Isolation Substrate (Windows Sandbox)</span>
-                    <span class="font-label-sm text-label-sm text-outline">Disposable Hyper-V VM + Job Object Limits</span>
-                  </div>
-                </div>
-                <span class="material-symbols-outlined text-on-surface text-[18px]">view_quilt</span>
-              </div>
-            </div>
-
           </div>
 
           <!-- Realtime State HUD Descriptor Banner -->
           <div class="w-full max-w-lg mt-space-md p-space-sm bg-surface-container-lowest/90 backdrop-blur-md rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.03)] flex items-center justify-between gap-space-sm z-20" id="stateBannerBottom">
             <div class="flex items-center gap-space-sm">
               <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center" id="stateBannerIconBg">
-                <span class="material-symbols-outlined text-[20px]" id="stateBannerIcon">cloud_upload</span>
+                <span class="material-symbols-outlined text-[20px]" id="stateBannerIcon">upload_file</span>
               </div>
               <div>
                 <div class="font-label-md text-label-md font-bold text-on-surface" id="stateBannerTitle">STATE 1: UPLOAD &amp; INGESTION</div>
@@ -473,55 +421,69 @@
 
         </div>
 
-        <!-- RIGHT ANALYTICAL RAIL: ETW Kernel Inspection Stream & Action Log -->
+        <!-- RIGHT ANALYTICAL RAIL: Syscall eBPF Inspection Stream & Action Log -->
         <div class="lg:col-span-3 flex flex-col gap-space-md z-20">
-
-          <!-- Live Telemetry Stream Card -->
+          <!-- Live eBPF Syscall Trace Stream -->
           <div class="bg-surface-container-lowest/80 backdrop-blur-2xl rounded-xl p-space-md shadow-[0_8px_30px_rgba(15,23,42,0.04)] flex flex-col flex-1">
             <div class="flex items-center justify-between pb-space-xs">
               <div class="flex items-center gap-space-xs">
                 <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
-                <span class="font-headline-sm text-headline-sm uppercase text-on-surface font-semibold">ETW Telemetry Tap</span>
+                <span class="font-headline-sm text-headline-sm uppercase text-on-surface font-semibold">eBPF Syscall Tap</span>
               </div>
-              <span class="font-label-sm text-label-sm text-outline font-mono">RING0_STREAM</span>
+              <span class="font-label-sm text-label-sm text-outline font-mono">RING0_HOOK</span>
             </div>
-
-            <!-- Filter Buttons Strip -->
-            <div class="flex items-center justify-between my-space-xs pb-1">
-              <div class="flex items-center gap-1">
-                <button class="stream-filter-btn px-2 py-0.5 rounded text-[10px] font-label-sm uppercase font-semibold transition-all bg-primary text-on-primary shadow-xs" data-filter="all">ALL</button>
-                <button class="stream-filter-btn px-2 py-0.5 rounded text-[10px] font-label-sm uppercase font-semibold transition-all text-on-surface-variant hover:bg-surface-container" data-filter="violation">VIOLATIONS</button>
-                <button class="stream-filter-btn px-2 py-0.5 rounded text-[10px] font-label-sm uppercase font-semibold transition-all text-on-surface-variant hover:bg-surface-container" data-filter="containment">STASIS</button>
-              </div>
-              <label class="flex items-center gap-1 font-label-sm text-[10px] text-outline cursor-pointer">
-                <input type="checkbox" id="autoscroll-chk" checked class="rounded accent-primary" />
-                <span>Auto-scroll</span>
-              </label>
-            </div>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mb-space-sm">
+              Live stream from kernel probe tracepoints:
+            </p>
 
             <!-- Stream Output Container -->
-            <div class="flex flex-col gap-1.5 overflow-y-auto max-h-[290px] min-h-[220px] p-2 bg-surface-container-low/60 rounded-lg font-mono text-label-sm" id="syscallStreamBox">
-              <div class="p-2 rounded bg-surface-container-lowest text-center text-outline text-[11px]">
-                Awaiting sandbox launch. Upload a sample to start streaming live ETW kernel telemetry...
+            <div class="flex flex-col gap-1.5 overflow-y-auto max-h-[300px] min-h-[220px] p-2 bg-surface-container-low/60 rounded-lg font-mono text-label-sm" id="syscallStreamBox">
+              <div class="p-1.5 rounded bg-surface-container-lowest flex items-start justify-between gap-1 shadow-xs">
+                <div class="flex flex-col">
+                  <span class="text-primary font-semibold">sys_enter_execve</span>
+                  <span class="text-outline">/bin/python3 rev_shell.py</span>
+                </div>
+                <span class="text-outline-variant">0.00ms</span>
+              </div>
+              <div class="p-1.5 rounded bg-surface-container-lowest flex items-start justify-between gap-1 shadow-xs">
+                <div class="flex flex-col">
+                  <span class="text-primary font-semibold">sys_enter_openat</span>
+                  <span class="text-outline">flags: O_RDONLY | /dev/null</span>
+                </div>
+                <span class="text-outline-variant">+0.41ms</span>
+              </div>
+              <div class="p-1.5 rounded bg-surface-container-lowest flex items-start justify-between gap-1 shadow-xs">
+                <div class="flex flex-col">
+                  <span class="text-secondary font-semibold">sys_enter_socket</span>
+                  <span class="text-outline">family: AF_INET, type: SOCK_STREAM</span>
+                </div>
+                <span class="text-outline-variant">+1.08ms</span>
+              </div>
+              <div class="p-1.5 rounded bg-surface-container-lowest flex items-start justify-between gap-1 shadow-xs" id="targetTraceItem">
+                <div class="flex flex-col">
+                  <span class="text-outline font-semibold">sys_enter_read</span>
+                  <span class="text-outline">fd: 3, count: 4096</span>
+                </div>
+                <span class="text-outline-variant">+2.15ms</span>
               </div>
             </div>
 
             <!-- Telemetry Summary Counters -->
             <div class="grid grid-cols-2 gap-space-xs mt-space-md pt-space-sm">
               <div class="p-2 rounded-lg bg-surface-container-low/80 flex flex-col">
-                <span class="font-label-sm text-label-sm text-outline">TOTAL EVENTS</span>
-                <span class="font-headline-sm text-headline-sm font-bold text-on-surface" id="syscallCounter">0</span>
+                <span class="font-label-sm text-label-sm text-outline">TOTAL SYSCALLS</span>
+                <span class="font-headline-sm text-headline-sm font-bold text-on-surface" id="syscallCounter">48</span>
               </div>
               <div class="p-2 rounded-lg bg-surface-container-low/80 flex flex-col">
-                <span class="font-label-sm text-label-sm text-outline">EXEC TIME</span>
-                <span class="font-headline-sm text-headline-sm font-bold text-primary" id="latencyCounter">0.00s</span>
+                <span class="font-label-sm text-label-sm text-outline">LATENCY DELTA</span>
+                <span class="font-headline-sm text-headline-sm font-bold text-primary" id="latencyCounter">0.12 ms</span>
               </div>
             </div>
 
             <!-- Action Containment Button -->
             <button class="w-full mt-space-sm py-2 px-space-sm bg-tertiary hover:bg-tertiary-container text-on-tertiary font-label-md text-label-md font-bold rounded-lg uppercase tracking-wider transition-all shadow-[0_4px_16px_rgba(187,1,18,0.25)] flex items-center justify-center gap-1.5" id="btn-manual-contain">
               <span class="material-symbols-outlined text-[16px]">cancel</span>
-              Manual Freeze / Sever
+              Manual Kill Process
             </button>
           </div>
 
@@ -532,10 +494,9 @@
               <span class="font-label-sm text-label-sm px-2 py-0.5 rounded font-mono font-bold bg-surface-container-high text-on-surface" id="verdictBadge">PENDING RUN</span>
             </div>
             <p class="font-body-sm text-body-sm text-on-surface-variant mt-1" id="verdictDetailText">
-              Execute full pipeline or select test sample to obtain real-time threat containment status and forensic attestation.
+              Execute full pipeline or select automated stage progression to obtain comprehensive cryptographic signature and sandbox purge status.
             </p>
           </div>
-
         </div>
 
       </div>
@@ -549,7 +510,7 @@
             </div>
             <div class="flex flex-col">
               <span class="font-label-md text-label-md font-bold text-on-surface uppercase">Zero Persistence</span>
-              <span class="font-body-sm text-body-sm text-outline">Ephemeral VM discarded on completion</span>
+              <span class="font-body-sm text-body-sm text-outline">Ephemeral tmpfs unmounted &amp; destroyed on completion</span>
             </div>
           </div>
           <div class="flex items-center gap-space-sm">
@@ -557,8 +518,8 @@
               <span class="material-symbols-outlined">network_check</span>
             </div>
             <div class="flex flex-col">
-              <span class="font-label-md text-label-md font-bold text-on-surface uppercase">WFP Egress Clamp</span>
-              <span class="font-body-sm text-body-sm text-outline">Dynamic packet drop on unauthorized connect</span>
+              <span class="font-label-md text-label-md font-bold text-on-surface uppercase">Air-Gapped Loopback</span>
+              <span class="font-body-sm text-body-sm text-outline">Dedicated netns isolates external socket connect requests</span>
             </div>
           </div>
           <div class="flex items-center gap-space-sm">
@@ -566,21 +527,316 @@
               <span class="material-symbols-outlined">security</span>
             </div>
             <div class="flex flex-col">
-              <span class="font-label-md text-label-md font-bold text-on-surface uppercase">ETW Kernel Probes</span>
-              <span class="font-body-sm text-body-sm text-outline">Low overhead tracepoints intercept every opcode</span>
+              <span class="font-label-md text-label-md font-bold text-on-surface uppercase">eBPF Syscall Probe</span>
+              <span class="font-body-sm text-body-sm text-outline">Low overhead kernel tracepoints intercept every opcode</span>
             </div>
           </div>
           <div class="flex items-center justify-start md:justify-end gap-space-xs">
-            <span class="font-label-sm text-label-sm text-outline">SUBSTRATE:</span>
-            <span class="font-label-sm text-label-sm font-mono font-semibold bg-surface-container px-2 py-1 rounded text-primary">WINDOWS KERNEL 10.0</span>
+            <span class="font-label-sm text-label-sm text-outline">ENVIRONMENT:</span>
+            <span class="font-label-sm text-label-sm font-mono font-semibold bg-surface-container px-2 py-1 rounded text-primary">KERNEL 6.8.0-HARDENED</span>
           </div>
         </div>
       </div>
 
     </div>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 2: ACTIVE UPLOAD COCKPIT (from stitch_remix_2)                       -->
+    <!-- ========================================================================= -->
+    <div id="view-active-analysis" class="hidden flex flex-col w-full px-margin-lg py-space-md gap-gutter-lg transition-opacity duration-300">
+
+      <!-- TOP INSTRUMENTATION BAR & WORKLOAD SELECTOR -->
+      <div class="w-full flex flex-col lg:flex-row items-start lg:items-center justify-between gap-space-md bg-surface-container-lowest/90 backdrop-blur-xl p-space-md rounded-xl shadow-[0_8px_30px_rgba(19,27,46,0.04)]">
+        <!-- Workload Selector Pills & Return to Standby -->
+        <div class="flex flex-wrap items-center gap-space-xs">
+          <button class="flex items-center gap-1 px-3 py-1.5 rounded-full bg-surface-container-high hover:bg-surface-container-highest text-primary font-label-sm text-label-sm font-semibold transition-all mr-2 shadow-xs" id="btn-return-standby" title="Return to Upload / Standby View">
+            <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+            <span>NEW WORKLOAD</span>
+          </button>
+          <span class="font-label-sm text-label-sm text-outline uppercase tracking-wider mr-space-xs">TARGET BINARY:</span>
+          <button class="target-btn flex items-center gap-space-xs px-space-md py-1.5 rounded-full bg-primary-container text-on-primary-container font-label-md text-label-md shadow-sm transition-all" id="btn-active-target">
+            <span class="w-1.5 h-1.5 rounded-full bg-primary-fixed-dim animate-pulse"></span>
+            <span id="active-target-title">reverse_shell.py</span>
+            <span class="font-label-sm text-label-sm bg-surface-container-lowest/20 px-1 py-0.5 rounded text-on-primary-container" id="active-target-status-badge">SUSPICIOUS</span>
+          </button>
+          <button class="target-btn flex items-center gap-space-xs px-space-md py-1.5 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface-variant font-label-md text-label-md transition-all" id="btn-target-secondary">
+            <span class="w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
+            <span>buffer_probe.c</span>
+            <span class="font-label-sm text-label-sm bg-surface-container-high px-1 py-0.5 rounded text-outline">STANDBY</span>
+          </button>
+        </div>
+
+        <!-- Real-time Micro-Telemetry Badges -->
+        <div class="flex flex-wrap items-center gap-space-sm font-label-sm text-label-sm">
+          <div class="flex items-center gap-1.5 px-space-sm py-1 rounded bg-surface-container-low text-on-surface">
+            <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+            <span class="text-outline">SANDBOX:</span>
+            <span class="font-semibold text-primary" id="active-sandbox-label">ISOLATED_JAIL_04</span>
+          </div>
+          <div class="flex items-center gap-1.5 px-space-sm py-1 rounded bg-surface-container-low text-on-surface">
+            <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+            <span class="text-outline">ISOLATION:</span>
+            <span class="font-semibold">TMPFS+NAMESPACES</span>
+          </div>
+          <div class="flex items-center gap-1.5 px-space-sm py-1 rounded bg-surface-container-low text-on-surface">
+            <span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+            <span class="text-outline">CGROUPS:</span>
+            <span class="font-semibold">QUOTA_ENFORCED (128MB)</span>
+          </div>
+          <div class="flex items-center gap-1.5 px-space-sm py-1 rounded bg-surface-container-low text-on-surface">
+            <span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-ping"></span>
+            <span class="text-outline">SYSCALLS:</span>
+            <span class="font-semibold text-tertiary">BPF_HOOK_ACTIVE</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN COCKPIT: BESPOKE 3D VIEWPORT & TELEMETRY SIDECAR -->
+      <div class="grid grid-cols-1 xl:grid-cols-12 gap-gutter-lg items-stretch">
+
+        <!-- 3D DEFENSE CORE CANVAS (8 Cols) -->
+        <div class="xl:col-span-8 flex flex-col bg-surface-container-lowest/80 backdrop-blur-2xl rounded-xl shadow-[0_12px_40px_rgba(0,97,148,0.06)] relative overflow-hidden min-h-[580px] p-space-md">
+          <!-- Top HUD Header -->
+          <div class="flex items-center justify-between pb-space-sm z-20">
+            <div class="flex items-center gap-space-sm">
+              <span class="material-symbols-outlined text-primary text-[20px]">view_in_ar</span>
+              <span class="font-headline-sm text-headline-sm uppercase tracking-tight text-on-surface font-semibold">3D ENCLAVE CORE</span>
+              <span class="font-label-sm text-label-sm bg-primary-fixed text-on-primary-fixed font-medium px-space-xs py-0.5 rounded">LAYERED ORTHO-STRATA</span>
+            </div>
+            <div class="flex items-center gap-space-md font-label-sm text-label-sm text-outline">
+              <span>MEM: <strong class="text-on-surface" id="active-mem-display">24.2 / 128 MB</strong></span>
+              <span>CPU: <strong class="text-on-surface" id="active-cpu-display">6.8%</strong></span>
+              <span>CONTAINMENT: <strong class="text-primary font-semibold" id="active-contain-display">ENFORCED</strong></span>
+            </div>
+          </div>
+
+          <!-- 3D Interactive Spatial Viewport -->
+          <div class="flex-1 relative flex items-center justify-center select-none overflow-hidden my-space-sm rounded-lg bg-gradient-to-b from-surface-container-lowest/40 to-surface-container-low/60 min-h-[400px]" id="viewport-canvas">
+            <!-- Coordinate Crosshatch & Alignment Grid Lines -->
+            <div class="absolute inset-0 pointer-events-none opacity-40" style="background-image: radial-gradient(circle, rgba(0, 97, 148, 0.25) 1px, transparent 1px); background-size: 20px 20px;"></div>
+            <div class="absolute inset-x-0 top-1/2 h-px bg-gradient-to-r from-transparent via-primary-fixed-dim/60 to-transparent pointer-events-none"></div>
+            <div class="absolute inset-y-0 left-1/2 w-px bg-gradient-to-b from-transparent via-primary-fixed-dim/60 to-transparent pointer-events-none"></div>
+
+            <!-- The Crystalline 3D Translucent Cube Assembly -->
+            <div class="relative transition-transform duration-500 ease-out" id="enclave-cube" style="transform: perspective(1100px) rotateX(24deg) rotateY(-34deg) rotateZ(0deg) scale3d(1, 1, 1); transform-style: preserve-3d; width: 340px; height: 340px;">
+              <!-- STACK LAYER 1: BASE SUBSTRATE (UPLOAD & VM BOOT) -->
+              <div class="absolute inset-0 rounded-xl bg-surface-container-high/60 backdrop-blur-md shadow-[0_0_24px_rgba(0,97,148,0.15)] flex items-center justify-between p-space-sm" style="transform: translateZ(-90px); box-shadow: inset 0 0 0 1.5px rgba(0, 97, 148, 0.3);">
+                <span class="font-label-sm text-label-sm text-primary font-bold">L1: UPLOAD &amp; BOOT</span>
+                <div class="flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                  <span class="font-label-sm text-label-sm text-on-surface">TMPFS_INIT</span>
+                </div>
+              </div>
+
+              <!-- STACK LAYER 2: ISOLATION BOUNDARY (NAMESPACES + CGROUP JAIL) -->
+              <div class="absolute inset-4 rounded-xl bg-surface-container-highest/40 backdrop-blur-md flex items-center justify-between p-space-sm" style="transform: translateZ(-35px); box-shadow: inset 0 0 0 1.5px rgba(70, 72, 212, 0.35);">
+                <span class="font-label-sm text-label-sm text-secondary font-bold">L2: ISOLATION BARRIER</span>
+                <span class="font-label-sm text-label-sm text-on-surface font-mono" id="active-pid-badge">PID: 94022 [JAIL]</span>
+              </div>
+
+              <!-- STACK LAYER 3: OBSERVATION & DETECT (PROBES + BPF SYSCALL INTERCEPT) -->
+              <div class="absolute inset-8 rounded-xl bg-surface-container-lowest/70 backdrop-blur-xl flex flex-col justify-between p-space-sm" style="transform: translateZ(20px); box-shadow: inset 0 0 0 1.5px rgba(2, 132, 199, 0.45), 0 8px 32px rgba(0, 97, 148, 0.1);">
+                <div class="flex items-center justify-between">
+                  <span class="font-label-sm text-label-sm text-primary-container font-bold">L3: EBPF PROBES</span>
+                  <span class="font-label-sm text-label-sm text-tertiary font-semibold flex items-center gap-1" id="active-detect-badge">
+                    <span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-ping"></span>
+                    DETECTION
+                  </span>
+                </div>
+                <!-- Suspended Target Core Node -->
+                <div class="self-center flex flex-col items-center justify-center p-space-sm bg-surface-container-lowest rounded-lg shadow-[0_4px_18px_rgba(224,41,40,0.18)]" id="active-detect-node" style="box-shadow: inset 0 0 0 1px rgba(220, 38, 38, 0.4);">
+                  <span class="material-symbols-outlined text-tertiary text-[28px] animate-pulse" id="active-detect-icon">lock_clock</span>
+                  <span class="font-label-md text-label-md font-bold text-tertiary mt-1" id="active-detect-title">TAINT DETECTED</span>
+                  <span class="font-label-sm text-label-sm text-outline" id="active-detect-sub">SOCKET_CONNECT :: 4444</span>
+                </div>
+                <div class="flex items-center justify-between font-label-sm text-label-sm text-outline">
+                  <span id="active-hooks-count">HOOKS: 18</span>
+                  <span id="active-event-state">EVENT: SIG_INTERCEPT</span>
+                </div>
+              </div>
+
+              <!-- STACK LAYER 4: CONTAINMENT ENVELOPE (MICROSCOPIC QUARANTINE SHROUD) -->
+              <div class="absolute inset-2 rounded-xl bg-gradient-to-tr from-primary-fixed/20 via-transparent to-tertiary-fixed/20 backdrop-blur-sm pointer-events-none" style="transform: translateZ(75px); box-shadow: inset 0 0 0 1.5px rgba(0, 123, 185, 0.4);">
+                <div class="p-space-sm flex justify-between items-start">
+                  <span class="font-label-sm text-label-sm text-primary font-semibold">L4: CONTAINMENT STASIS</span>
+                  <span class="font-label-sm text-label-sm bg-tertiary text-on-tertiary px-1 py-0.5 rounded font-mono" id="active-seccomp-status">SECCAMP: LOCKED</span>
+                </div>
+              </div>
+
+              <!-- STACK LAYER 5: VERDICT SHIELD (TOP GLASS EMISSION) -->
+              <div class="absolute inset-0 rounded-xl bg-surface-container-lowest/30 backdrop-blur-[2px] pointer-events-none" style="transform: translateZ(120px); box-shadow: inset 0 0 0 2px rgba(187, 1, 18, 0.35);">
+                <div class="p-space-sm flex justify-between items-end h-full">
+                  <span class="font-label-sm text-label-sm text-tertiary font-bold tracking-wider" id="active-verdict-plane-title">L5: VERDICT PLANE</span>
+                  <span class="font-label-sm text-label-sm text-outline-variant font-mono" id="active-verdict-hash">0x4F09_AB71</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- FLOATING MINIMALIST GLASS ROTATION HUD OVERLAY -->
+            <div class="absolute bottom-space-md left-1/2 -translate-x-1/2 flex items-center gap-space-sm bg-surface-container-lowest/95 backdrop-blur-2xl px-space-md py-2 rounded-full shadow-[0_8px_30px_rgba(19,27,46,0.1)] z-30">
+              <button class="w-7 h-7 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" id="btn-rotate-left" title="Rotate Left 15°">
+                <span class="material-symbols-outlined text-[18px]">rotate_left</span>
+              </button>
+              <button class="w-7 h-7 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" id="btn-rotate-right" title="Rotate Right 15°">
+                <span class="material-symbols-outlined text-[18px]">rotate_right</span>
+              </button>
+              <span class="w-px h-4 bg-outline-variant"></span>
+              <button class="w-7 h-7 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" id="btn-reset-core-view" title="Reset Perspective">
+                <span class="material-symbols-outlined text-[18px]">aspect_ratio</span>
+              </button>
+              <button class="w-7 h-7 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" id="btn-focus-target" title="Center Focus">
+                <span class="material-symbols-outlined text-[18px]">filter_center_focus</span>
+              </button>
+              <span class="w-px h-4 bg-outline-variant"></span>
+              <!-- Coordinates Readout -->
+              <div class="font-label-sm text-label-sm text-on-surface-variant font-medium tracking-wide">
+                YAW: <span class="text-primary font-bold" id="yaw-val">-34°</span> · PITCH: <span class="text-primary font-bold" id="pitch-val">24°</span> · ZOOM: <span class="text-on-surface font-bold" id="zoom-val">1.0x</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 6-Stage Execution Pipeline Indicator -->
+          <div class="grid grid-cols-6 gap-space-xs pt-space-sm font-label-sm text-label-sm z-20">
+            <div class="flex flex-col gap-1 p-2 rounded bg-surface-container-low" id="pipe-stage-1">
+              <span class="text-outline">01. UPLOAD</span>
+              <span class="font-semibold text-primary">COMPLETED</span>
+            </div>
+            <div class="flex flex-col gap-1 p-2 rounded bg-surface-container-low" id="pipe-stage-2">
+              <span class="text-outline">02. ISOLATE</span>
+              <span class="font-semibold text-primary">ENFORCED</span>
+            </div>
+            <div class="flex flex-col gap-1 p-2 rounded bg-surface-container-low" id="pipe-stage-3">
+              <span class="text-outline">03. OBSERVE</span>
+              <span class="font-semibold text-primary">PROBING</span>
+            </div>
+            <div class="flex flex-col gap-1 p-2 rounded bg-tertiary-fixed/30 text-on-surface" id="pipe-stage-4">
+              <span class="text-tertiary font-bold">04. DETECT</span>
+              <span class="font-semibold text-tertiary" id="pipe-detect-label">SIGNAL TRIP</span>
+            </div>
+            <div class="flex flex-col gap-1 p-2 rounded bg-surface-container-low" id="pipe-stage-5">
+              <span class="text-outline">05. CONTAIN</span>
+              <span class="font-semibold text-primary" id="pipe-contain-label">STASIS CUBE</span>
+            </div>
+            <div class="flex flex-col gap-1 p-2 rounded bg-tertiary text-on-tertiary shadow-sm" id="pipe-stage-6">
+              <span class="text-on-tertiary/80">06. VERDICT</span>
+              <span class="font-bold" id="pipe-verdict-label">MALICIOUS</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ANALYTICAL SIDECAR & EMERGENCY KILL MECHANISM (4 Cols) -->
+        <div class="xl:col-span-4 flex flex-col gap-gutter-lg justify-between">
+
+          <!-- Live Syscall Log Panel -->
+          <div class="bg-surface-container-lowest/80 backdrop-blur-xl p-space-md rounded-xl shadow-[0_8px_30px_rgba(19,27,46,0.04)] flex flex-col gap-space-sm flex-1">
+            <div class="flex items-center justify-between pb-2">
+              <div class="flex items-center gap-space-xs">
+                <span class="material-symbols-outlined text-primary text-[18px]">terminal</span>
+                <span class="font-headline-sm text-headline-sm text-on-surface font-semibold">BPF TELEMETRY</span>
+              </div>
+              <span class="font-label-sm text-label-sm text-outline uppercase font-mono">RING_BUFFER: ACTIVE</span>
+            </div>
+
+            <!-- Scrolling Telemetry Log Stream -->
+            <div class="space-y-1.5 font-label-sm text-label-sm font-mono overflow-y-auto max-h-[190px] min-h-[160px] pr-1" id="active-syscall-box">
+              <div class="p-1.5 rounded bg-surface-container-low flex items-center justify-between">
+                <span class="text-outline">00:00:00.120</span>
+                <span class="text-on-surface font-semibold">sys_execve("/usr/bin/python")</span>
+                <span class="text-primary font-bold">ALLOW</span>
+              </div>
+              <div class="p-1.5 rounded bg-surface-container-low flex items-center justify-between">
+                <span class="text-outline">00:00:00.245</span>
+                <span class="text-on-surface">sys_mprotect(PROT_EXEC)</span>
+                <span class="text-primary font-bold">ALLOW</span>
+              </div>
+              <div class="p-1.5 rounded bg-surface-container-low flex items-center justify-between">
+                <span class="text-outline">00:00:00.812</span>
+                <span class="text-on-surface">sys_socket(AF_INET, SOCK_STREAM)</span>
+                <span class="text-secondary font-bold">LOGGED</span>
+              </div>
+              <div class="p-1.5 rounded bg-error-container text-on-error-container flex items-center justify-between">
+                <span class="text-on-error-container/80">00:00:01.004</span>
+                <span class="font-bold text-error">sys_connect(45.33.32.156:4444)</span>
+                <span class="font-bold text-error">BLOCKED</span>
+              </div>
+              <div class="p-1.5 rounded bg-surface-container-low flex items-center justify-between">
+                <span class="text-outline">00:00:01.018</span>
+                <span class="text-on-surface">sys_ptrace(PTRACE_ATTACH)</span>
+                <span class="text-error font-bold">REVOKED</span>
+              </div>
+            </div>
+
+            <!-- Compact Key-Value Diagnostic Attributes -->
+            <div class="pt-space-sm grid grid-cols-2 gap-space-xs font-label-sm text-label-sm">
+              <div class="p-2 rounded bg-surface-container-low flex flex-col">
+                <span class="text-outline">INODE WRITES</span>
+                <span class="font-headline-sm text-headline-sm text-on-surface font-bold" id="diag-inode-writes">0</span>
+              </div>
+              <div class="p-2 rounded bg-surface-container-low flex flex-col">
+                <span class="text-outline">FORK DEPTH</span>
+                <span class="font-headline-sm text-headline-sm text-on-surface font-bold" id="diag-fork-depth">1</span>
+              </div>
+              <div class="p-2 rounded bg-surface-container-low flex flex-col">
+                <span class="text-outline">MEMORY RESIDENT</span>
+                <span class="font-headline-sm text-headline-sm text-on-surface font-bold" id="diag-memory-resident">18.4 MB</span>
+              </div>
+              <div class="p-2 rounded bg-surface-container-low flex flex-col">
+                <span class="text-outline">THREAT SCORE</span>
+                <span class="font-headline-sm text-headline-sm text-tertiary font-bold" id="diag-threat-score">98/100</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Containment Status Card & Slide-to-Confirm Emergency Kill Action -->
+          <div class="bg-surface-container-lowest/90 backdrop-blur-2xl p-space-md rounded-xl shadow-[0_8px_30px_rgba(224,41,40,0.06)] flex flex-col gap-space-md">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-space-xs">
+                <span class="material-symbols-outlined text-tertiary text-[20px]">shield</span>
+                <span class="font-headline-sm text-headline-sm text-on-surface font-semibold">ACTIVE CONTAINMENT</span>
+              </div>
+              <span class="font-label-sm text-label-sm bg-tertiary-fixed text-on-tertiary-fixed px-space-xs py-0.5 rounded font-mono font-bold" id="active-containment-badge">LOCKDOWN</span>
+            </div>
+
+            <!-- SLIDE TO CONFIRM EMERGENCY KILL SLIDER -->
+            <div class="flex flex-col gap-1.5">
+              <div class="flex items-center justify-between font-label-sm text-label-sm text-outline">
+                <span>EMERGENCY STASIS KILL</span>
+                <span class="flex items-center gap-1 text-tertiary font-semibold">
+                  <span class="material-symbols-outlined text-[14px]">lock</span>
+                  SAFETY ARMED
+                </span>
+              </div>
+
+              <!-- Draggable Rail -->
+              <div class="relative w-full h-14 bg-surface-container-high rounded-full overflow-hidden flex items-center px-1 select-none shadow-inner cursor-pointer" id="kill-slider-track">
+                <!-- Background sliding track guide text -->
+                <div class="absolute inset-0 flex items-center justify-center font-label-sm text-label-sm font-bold tracking-widest text-on-surface-variant/60 uppercase pointer-events-none pl-8" id="slider-track-text">
+                  &gt;&gt;&gt; SLIDE TO TERMINATE SANDBOX &gt;&gt;&gt;
+                </div>
+                <!-- Filled progress layer -->
+                <div class="absolute left-0 top-0 bottom-0 bg-tertiary/20 rounded-full w-12 pointer-events-none transition-all" id="slider-progress"></div>
+                <!-- Draggable Thumb Handle -->
+                <div class="relative z-10 w-12 h-12 rounded-full bg-gradient-to-br from-tertiary-container to-tertiary text-on-tertiary flex items-center justify-center cursor-grab active:cursor-grabbing shadow-[0_4px_12px_rgba(224,41,40,0.35)] transition-shadow" id="kill-slider-handle">
+                  <span class="material-symbols-outlined text-[20px]" id="handle-icon">double_arrow</span>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between font-label-sm text-label-sm text-outline-variant pt-0.5">
+                <span>SIGKILL (9) DISPATCH</span>
+                <span id="kill-delay-label">DELAY: 0.00ms</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
   </main>
 
-  <!-- Footer -->
+  <!-- Clinical Footer -->
   <footer class="w-full bg-surface-container-lowest/80 backdrop-blur-xl shadow-[0_-1px_8px_rgba(0,0,0,0.03)] mt-auto z-40">
     <div class="w-full px-margin-lg py-space-sm flex flex-col md:flex-row items-center justify-between gap-space-sm">
       <div class="flex items-center gap-space-md">
@@ -603,8 +859,6 @@
     </div>
   </footer>
 
-  <!-- Three.js Library -->
-  <script src="https://ajax.googleapis.com/ajax/libs/threejs/r125/three.min.js"></script>
   <!-- Cerberus Integrated Application Logic -->
   <script src="/static/app.js"></script>
 </body>
