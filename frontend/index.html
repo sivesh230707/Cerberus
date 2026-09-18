@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cerberus — Windows-Native Behavioral Sandbox</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top System Header -->
+    <header class="top-nav">
+      <div class="brand">
+        <div class="brand-emblem">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L3 7v6c0 5.5 3.8 10.7 9 12 5.2-1.3 9-6.5 9-12V7l-9-5z" stroke="#00f0ff"/>
+            <circle cx="9" cy="11" r="1.5" fill="#00f0ff"/>
+            <circle cx="15" cy="11" r="1.5" fill="#00f0ff"/>
+            <path d="M10 16s1 1 2 1 2-1 2-1" stroke="#00f0ff" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">CERBERUS</span>
+          <span class="brand-sub">Windows-Native Behavioral Sandbox</span>
+        </div>
+      </div>
+
+      <div class="system-status-group">
+        <div class="status-indicator" id="status-wsb">
+          <span class="pulse-dot green"></span>
+          <span class="status-label">SANDBOX: <strong>READY</strong></span>
+        </div>
+        <div class="status-indicator" id="status-etw">
+          <span class="pulse-dot cyan"></span>
+          <span class="status-label">ETW KERNEL: <strong>ARMED</strong></span>
+        </div>
+        <div class="status-indicator" id="status-wfp">
+          <span class="pulse-dot violet"></span>
+          <span class="status-label">WFP FILTER: <strong>ENGAGED</strong></span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Top Prominent Verdict Banner -->
+    <section class="verdict-banner state-ready" id="verdict-banner">
+      <div class="verdict-icon-container" id="verdict-icon-container">
+        <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" class="icon-ready">
+          <circle cx="12" cy="12" r="10" stroke="currentColor"/>
+          <path d="M12 6v6l4 2" stroke="currentColor"/>
+        </svg>
+      </div>
+      <div class="verdict-content">
+        <div class="verdict-heading-row">
+          <span class="verdict-badge" id="verdict-badge">AWAITING TARGET</span>
+          <span class="verdict-timer" id="verdict-timer">00.00s</span>
+        </div>
+        <h2 class="verdict-title" id="verdict-title">Ready for Payload Submission</h2>
+        <p class="verdict-desc" id="verdict-desc">Drop a suspicious script or executable to launch an isolated Windows Sandbox session with real-time ETW behavior monitoring.</p>
+      </div>
+    </section>
+
+    <!-- Main Command Cockpit Grid -->
+    <main class="cockpit-grid">
+      <!-- Left Column: Upload Zone & Target Telemetry -->
+      <div class="cockpit-column-left">
+        <!-- File Dropzone Card -->
+        <div class="card dropzone-card">
+          <div class="card-header">
+            <h3 class="card-title">SUBMIT TARGET ARTIFACT</h3>
+            <span class="card-tag">WSB INGEST</span>
+          </div>
+
+          <div class="dropzone" id="dropzone">
+            <input type="file" id="file-input" class="file-input" />
+            <div class="dropzone-inner">
+              <div class="dropzone-icon">
+                <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="#00f0ff"/>
+                  <polyline points="17 8 12 3 7 8" stroke="#00f0ff"/>
+                  <line x1="12" y1="3" x2="12" y2="15" stroke="#00f0ff"/>
+                </svg>
+              </div>
+              <p class="dropzone-text">Drag & drop target payload here</p>
+              <p class="dropzone-sub">or <label for="file-input" class="browse-link">browse local filesystem</label></p>
+              <div class="file-types-list">
+                <span class="chip">.exe</span>
+                <span class="chip">.ps1</span>
+                <span class="chip">.bat</span>
+                <span class="chip">.dll</span>
+                <span class="chip">.vbs</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Test Triggers for Demo -->
+          <div class="demo-triggers">
+            <span class="demo-label">Instant Simulation Tests:</span>
+            <div class="demo-btn-group">
+              <button class="btn btn-danger" id="btn-demo-malicious">
+                <span class="btn-icon">⚡</span> Test Malicious Script Demo
+              </button>
+              <button class="btn btn-success" id="btn-demo-clean">
+                <span class="btn-icon">🛡️</span> Test Clean Script Demo
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Target Process & Isolation Card -->
+        <div class="card target-meta-card">
+          <div class="card-header">
+            <h3 class="card-title">CONTAINMENT TELEMETRY</h3>
+            <span class="card-tag" id="target-state-tag">STANDBY</span>
+          </div>
+
+          <div class="meta-grid">
+            <div class="meta-item">
+              <span class="meta-label">TARGET ARTIFACT</span>
+              <span class="meta-val" id="meta-filename">—</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">SANDBOX PID</span>
+              <span class="meta-val font-mono" id="meta-pid">—</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">JOB MEMORY CAP</span>
+              <span class="meta-val font-mono" id="meta-mem-cap">256 MB</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">CPU CONSTRAINT</span>
+              <span class="meta-val font-mono" id="meta-cpu-cap">1 Core Rate-Limited</span>
+            </div>
+          </div>
+
+          <!-- Response Containment States -->
+          <div class="containment-status-box">
+            <div class="containment-row">
+              <div class="containment-info">
+                <span class="containment-name">Process Execution State</span>
+                <span class="containment-detail" id="containment-proc-detail">Normal Execution</span>
+              </div>
+              <span class="containment-pill active" id="pill-proc-state">ACTIVE</span>
+            </div>
+
+            <div class="containment-row">
+              <div class="containment-info">
+                <span class="containment-name">WFP Network Filter</span>
+                <span class="containment-detail" id="containment-net-detail">Outbound Unfiltered</span>
+              </div>
+              <span class="containment-pill normal" id="pill-net-state">PASS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Live ETW Telemetry Feed -->
+      <div class="cockpit-column-right">
+        <div class="card terminal-card">
+          <div class="card-header terminal-header">
+            <div class="terminal-title-group">
+              <span class="terminal-pulse"></span>
+              <h3 class="card-title">LIVE ETW TELEMETRY STREAM</h3>
+              <span class="badge-count" id="event-count-badge">0 EVENTS</span>
+            </div>
+            <div class="terminal-controls">
+              <div class="filter-tabs">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="violation">Violations</button>
+                <button class="filter-btn" data-filter="containment">Containment</button>
+              </div>
+              <label class="autoscroll-toggle">
+                <input type="checkbox" id="autoscroll-chk" checked>
+                <span>Auto-scroll</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Event Log Stream -->
+          <div class="terminal-stream" id="terminal-stream">
+            <div class="stream-empty" id="stream-empty">
+              <div class="radar-scan-anim"></div>
+              <p>Awaiting sandbox process launch...</p>
+              <span>Submit a target file above to initiate real-time ETW tracing</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="app-footer">
+      <div class="footer-left">
+        <span>CERBERUS v1.0 MVP &bull; Windows Sandbox (WSB) &bull; Win32 Job Objects &bull; Event Tracing for Windows (ETW) &bull; Windows Filtering Platform (WFP)</span>
+      </div>
+      <div class="footer-right">
+        <span class="status-text">HOST KERNEL: <strong class="text-cyan">WINDOWS NATIVE</strong></span>
+      </div>
+    </footer>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
