@@ -23,6 +23,247 @@
     }
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 4px; }
+
+    /* ============================================================
+       3D ENCLAVE CORE: STRATA SLIDES ANIMATIONS & 3D SYSTEM
+       ============================================================ */
+    .strata-slide {
+      transform-style: preserve-3d;
+      will-change: transform, box-shadow, filter;
+      transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), 
+                  box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), 
+                  filter 0.35s ease;
+      cursor: pointer;
+      pointer-events: auto !important;
+    }
+
+    /* 1. Continuous Organic Floating Breathing Animations Between Slides */
+    @keyframes floatSlide1 {
+      0%   { transform: translateZ(-90px) rotateX(0deg) rotateY(0deg); }
+      50%  { transform: translateZ(-99px) rotateX(0.8deg) rotateY(-0.6deg); }
+      100% { transform: translateZ(-83px) rotateX(-0.5deg) rotateY(0.5deg); }
+    }
+
+    @keyframes floatSlide2 {
+      0%   { transform: translateZ(-35px) rotateX(0deg) rotateY(0deg); }
+      50%  { transform: translateZ(-43px) rotateX(-0.8deg) rotateY(0.7deg); }
+      100% { transform: translateZ(-27px) rotateX(0.6deg) rotateY(-0.5deg); }
+    }
+
+    @keyframes floatSlide3 {
+      0%   { transform: translateZ(20px) rotateX(0deg) rotateY(0deg); }
+      50%  { transform: translateZ(11px) rotateX(0.7deg) rotateY(-0.7deg); }
+      100% { transform: translateZ(29px) rotateX(-0.7deg) rotateY(0.6deg); }
+    }
+
+    @keyframes floatSlide4 {
+      0%   { transform: translateZ(75px) rotateX(0deg) rotateY(0deg); }
+      50%  { transform: translateZ(66px) rotateX(-0.6deg) rotateY(0.7deg); }
+      100% { transform: translateZ(84px) rotateX(0.7deg) rotateY(-0.6deg); }
+    }
+
+    @keyframes floatSlide5 {
+      0%   { transform: translateZ(120px) rotateX(0deg) rotateY(0deg); }
+      50%  { transform: translateZ(111px) rotateX(0.7deg) rotateY(-0.8deg); }
+      100% { transform: translateZ(131px) rotateX(-0.6deg) rotateY(0.7deg); }
+    }
+
+    .strata-slide-1 {
+      animation: floatSlide1 6.2s ease-in-out infinite alternate;
+    }
+    .strata-slide-2 {
+      animation: floatSlide2 5.4s ease-in-out infinite alternate;
+      animation-delay: -1.2s;
+    }
+    .strata-slide-3 {
+      animation: floatSlide3 4.8s ease-in-out infinite alternate;
+      animation-delay: -2.4s;
+    }
+    .strata-slide-4 {
+      animation: floatSlide4 5.8s ease-in-out infinite alternate;
+      animation-delay: -3.6s;
+    }
+    .strata-slide-5 {
+      animation: floatSlide5 5.0s ease-in-out infinite alternate;
+      animation-delay: -1.8s;
+    }
+
+    /* 2. Interactive Exploded View: Expanding Distance Between Slides on Hover */
+    #viewport-canvas:hover .strata-slide-1,
+    #enclave-cube:hover .strata-slide-1 {
+      animation-play-state: paused;
+      transform: translateZ(-145px) scale(0.95) !important;
+    }
+
+    #viewport-canvas:hover .strata-slide-2,
+    #enclave-cube:hover .strata-slide-2 {
+      animation-play-state: paused;
+      transform: translateZ(-68px) scale(0.98) !important;
+    }
+
+    #viewport-canvas:hover .strata-slide-3,
+    #enclave-cube:hover .strata-slide-3 {
+      animation-play-state: paused;
+      transform: translateZ(15px) scale(1.0) !important;
+    }
+
+    #viewport-canvas:hover .strata-slide-4,
+    #enclave-cube:hover .strata-slide-4 {
+      animation-play-state: paused;
+      transform: translateZ(98px) scale(1.02) !important;
+    }
+
+    #viewport-canvas:hover .strata-slide-5,
+    #enclave-cube:hover .strata-slide-5 {
+      animation-play-state: paused;
+      transform: translateZ(182px) scale(1.05) !important;
+    }
+
+    /* 3. Individual Slide Hover & Glow Illumination */
+    .strata-slide:hover {
+      filter: brightness(1.15) !important;
+      box-shadow: inset 0 0 0 2px rgba(0, 150, 255, 0.8), 0 12px 36px rgba(0, 97, 148, 0.3) !important;
+      z-index: 60 !important;
+    }
+
+    .strata-slide.active-focused {
+      box-shadow: inset 0 0 0 2.5px #007bb9, 0 0 30px rgba(0, 123, 185, 0.5) !important;
+      filter: brightness(1.18) !important;
+    }
+
+    .strata-slide.threat-pulse {
+      animation: slideThreatPulse 1.2s ease-in-out infinite alternate !important;
+    }
+
+    @keyframes slideThreatPulse {
+      0% {
+        box-shadow: inset 0 0 0 2px rgba(220, 38, 38, 0.5), 0 0 15px rgba(220, 38, 38, 0.25);
+      }
+      100% {
+        box-shadow: inset 0 0 0 2.5px rgba(220, 38, 38, 0.9), 0 0 35px rgba(220, 38, 38, 0.6);
+      }
+    }
+
+    /* 4. Scanning Energy Flux Beam Sweeping Between Slides */
+    .strata-scan-beam {
+      position: absolute;
+      inset: -6px;
+      border-radius: 14px;
+      pointer-events: none;
+      transform-style: preserve-3d;
+      background: linear-gradient(135deg, rgba(0, 123, 255, 0.03) 0%, rgba(0, 210, 255, 0.2) 50%, rgba(0, 123, 255, 0.03) 100%);
+      border: 1px solid rgba(0, 210, 255, 0.45);
+      box-shadow: 0 0 24px rgba(0, 180, 255, 0.3), inset 0 0 12px rgba(0, 220, 255, 0.18);
+      animation: scanBetweenSlides 6s ease-in-out infinite alternate;
+    }
+
+    @keyframes scanBetweenSlides {
+      0% {
+        transform: translateZ(-102px) scale(0.96);
+        opacity: 0.25;
+      }
+      25% {
+        opacity: 0.85;
+      }
+      50% {
+        transform: translateZ(15px) scale(1.01);
+        opacity: 0.95;
+      }
+      75% {
+        opacity: 0.85;
+      }
+      100% {
+        transform: translateZ(132px) scale(1.05);
+        opacity: 0.3;
+      }
+    }
+
+    #viewport-canvas:hover .strata-scan-beam,
+    #enclave-cube:hover .strata-scan-beam {
+      animation: scanBetweenSlidesHover 4.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes scanBetweenSlidesHover {
+      0% {
+        transform: translateZ(-155px) scale(0.94);
+        opacity: 0.25;
+      }
+      50% {
+        transform: translateZ(15px) scale(1.02);
+        opacity: 0.95;
+      }
+      100% {
+        transform: translateZ(195px) scale(1.08);
+        opacity: 0.3;
+      }
+    }
+
+    /* 5. Pipeline Stage Slides Transitions */
+    [id^="pipe-stage-"] {
+      position: relative;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+
+    [id^="pipe-stage-"]:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 97, 148, 0.12);
+      border-color: rgba(0, 97, 148, 0.25);
+    }
+
+    /* Pulse Beam connecting across the pipeline slides */
+    .pipeline-track {
+      position: relative;
+    }
+
+    .pipeline-track::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(to right, rgba(0, 97, 148, 0.08), rgba(0, 97, 148, 0.25), rgba(0, 97, 148, 0.08));
+      border-radius: 9999px;
+      pointer-events: none;
+    }
+
+    .pipeline-track::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -20%;
+      width: 25%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #007bb9, #93ccff, transparent);
+      border-radius: 9999px;
+      animation: pipelinePulseSweep 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      pointer-events: none;
+    }
+
+    @keyframes pipelinePulseSweep {
+      0% { left: -25%; opacity: 0; }
+      15% { opacity: 1; }
+      85% { opacity: 1; }
+      100% { left: 100%; opacity: 0; }
+    }
+
+    /* 6. View Slide Transitions */
+    .view-slide-fade {
+      animation: viewSlideFadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes viewSlideFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.995);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
   </style>
   <script src="https://cdn.tailwindcss.com"></script>
   <script id="tailwind-config">
@@ -619,8 +860,11 @@
 
             <!-- The Crystalline 3D Translucent Cube Assembly -->
             <div class="relative transition-transform duration-500 ease-out" id="enclave-cube" style="transform: perspective(1100px) rotateX(24deg) rotateY(-34deg) rotateZ(0deg) scale3d(1, 1, 1); transform-style: preserve-3d; width: 340px; height: 340px;">
+              <!-- Volumetric Energy Flux Scanner Sweeping Between Slides -->
+              <div class="strata-scan-beam" id="strata-scan-beam"></div>
+
               <!-- STACK LAYER 1: BASE SUBSTRATE (UPLOAD & VM BOOT) -->
-              <div class="absolute inset-0 rounded-xl bg-surface-container-high/60 backdrop-blur-md shadow-[0_0_24px_rgba(0,97,148,0.15)] flex items-center justify-between p-space-sm" style="transform: translateZ(-90px); box-shadow: inset 0 0 0 1.5px rgba(0, 97, 148, 0.3);">
+              <div class="strata-slide strata-slide-1 absolute inset-0 rounded-xl bg-surface-container-high/60 backdrop-blur-md shadow-[0_0_24px_rgba(0,97,148,0.15)] flex items-center justify-between p-space-sm" id="strata-layer-1" style="transform: translateZ(-90px); box-shadow: inset 0 0 0 1.5px rgba(0, 97, 148, 0.3);" title="Layer 1: Base Substrate (Upload & Boot)">
                 <span class="font-label-sm text-label-sm text-primary font-bold">L1: UPLOAD &amp; BOOT</span>
                 <div class="flex items-center gap-1">
                   <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
@@ -629,13 +873,13 @@
               </div>
 
               <!-- STACK LAYER 2: ISOLATION BOUNDARY (NAMESPACES + CGROUP JAIL) -->
-              <div class="absolute inset-4 rounded-xl bg-surface-container-highest/40 backdrop-blur-md flex items-center justify-between p-space-sm" style="transform: translateZ(-35px); box-shadow: inset 0 0 0 1.5px rgba(70, 72, 212, 0.35);">
+              <div class="strata-slide strata-slide-2 absolute inset-4 rounded-xl bg-surface-container-highest/40 backdrop-blur-md flex items-center justify-between p-space-sm" id="strata-layer-2" style="transform: translateZ(-35px); box-shadow: inset 0 0 0 1.5px rgba(70, 72, 212, 0.35);" title="Layer 2: Isolation Barrier (Namespaces & Cgroups)">
                 <span class="font-label-sm text-label-sm text-secondary font-bold">L2: ISOLATION BARRIER</span>
                 <span class="font-label-sm text-label-sm text-on-surface font-mono" id="active-pid-badge">PID: 94022 [JAIL]</span>
               </div>
 
               <!-- STACK LAYER 3: OBSERVATION & DETECT (PROBES + BPF SYSCALL INTERCEPT) -->
-              <div class="absolute inset-8 rounded-xl bg-surface-container-lowest/70 backdrop-blur-xl flex flex-col justify-between p-space-sm" style="transform: translateZ(20px); box-shadow: inset 0 0 0 1.5px rgba(2, 132, 199, 0.45), 0 8px 32px rgba(0, 97, 148, 0.1);">
+              <div class="strata-slide strata-slide-3 absolute inset-8 rounded-xl bg-surface-container-lowest/70 backdrop-blur-xl flex flex-col justify-between p-space-sm" id="strata-layer-3" style="transform: translateZ(20px); box-shadow: inset 0 0 0 1.5px rgba(2, 132, 199, 0.45), 0 8px 32px rgba(0, 97, 148, 0.1);" title="Layer 3: Observation & Probes">
                 <div class="flex items-center justify-between">
                   <span class="font-label-sm text-label-sm text-primary-container font-bold">L3: EBPF PROBES</span>
                   <span class="font-label-sm text-label-sm text-tertiary font-semibold flex items-center gap-1" id="active-detect-badge">
@@ -656,7 +900,7 @@
               </div>
 
               <!-- STACK LAYER 4: CONTAINMENT ENVELOPE (MICROSCOPIC QUARANTINE SHROUD) -->
-              <div class="absolute inset-2 rounded-xl bg-gradient-to-tr from-primary-fixed/20 via-transparent to-tertiary-fixed/20 backdrop-blur-sm pointer-events-none" style="transform: translateZ(75px); box-shadow: inset 0 0 0 1.5px rgba(0, 123, 185, 0.4);">
+              <div class="strata-slide strata-slide-4 absolute inset-2 rounded-xl bg-gradient-to-tr from-primary-fixed/20 via-transparent to-tertiary-fixed/20 backdrop-blur-sm pointer-events-none" id="strata-layer-4" style="transform: translateZ(75px); box-shadow: inset 0 0 0 1.5px rgba(0, 123, 185, 0.4);" title="Layer 4: Containment Envelope (Stasis Shroud)">
                 <div class="p-space-sm flex justify-between items-start">
                   <span class="font-label-sm text-label-sm text-primary font-semibold">L4: CONTAINMENT STASIS</span>
                   <span class="font-label-sm text-label-sm bg-tertiary text-on-tertiary px-1 py-0.5 rounded font-mono" id="active-seccomp-status">SECCAMP: LOCKED</span>
@@ -664,7 +908,7 @@
               </div>
 
               <!-- STACK LAYER 5: VERDICT SHIELD (TOP GLASS EMISSION) -->
-              <div class="absolute inset-0 rounded-xl bg-surface-container-lowest/30 backdrop-blur-[2px] pointer-events-none" style="transform: translateZ(120px); box-shadow: inset 0 0 0 2px rgba(187, 1, 18, 0.35);">
+              <div class="strata-slide strata-slide-5 absolute inset-0 rounded-xl bg-surface-container-lowest/30 backdrop-blur-[2px] pointer-events-none" id="strata-layer-5" style="transform: translateZ(120px); box-shadow: inset 0 0 0 2px rgba(187, 1, 18, 0.35);" title="Layer 5: Verdict Shield">
                 <div class="p-space-sm flex justify-between items-end h-full">
                   <span class="font-label-sm text-label-sm text-tertiary font-bold tracking-wider" id="active-verdict-plane-title">L5: VERDICT PLANE</span>
                   <span class="font-label-sm text-label-sm text-outline-variant font-mono" id="active-verdict-hash">0x4F09_AB71</span>
@@ -696,7 +940,7 @@
           </div>
 
           <!-- 6-Stage Execution Pipeline Indicator -->
-          <div class="grid grid-cols-6 gap-space-xs pt-space-sm font-label-sm text-label-sm z-20">
+          <div class="grid grid-cols-6 gap-space-xs pt-space-sm font-label-sm text-label-sm z-20 pipeline-track">
             <div class="flex flex-col gap-1 p-2 rounded bg-surface-container-low" id="pipe-stage-1">
               <span class="text-outline">01. UPLOAD</span>
               <span class="font-semibold text-primary">COMPLETED</span>

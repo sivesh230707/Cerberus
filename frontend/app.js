@@ -126,7 +126,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // -------------------------------------------------------------
   function switchToActiveView(filename, pid) {
     if (viewStandby) viewStandby.classList.add('hidden');
-    if (viewActiveAnalysis) viewActiveAnalysis.classList.remove('hidden');
+    if (viewActiveAnalysis) {
+      viewActiveAnalysis.classList.remove('hidden');
+      viewActiveAnalysis.classList.remove('view-slide-fade');
+      void viewActiveAnalysis.offsetWidth;
+      viewActiveAnalysis.classList.add('view-slide-fade');
+    }
 
     if (activeTargetTitle) activeTargetTitle.textContent = filename;
     if (activeTargetStatusBadge) {
@@ -146,6 +151,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (activeContainmentBadge) {
       activeContainmentBadge.textContent = 'MONITORING';
       activeContainmentBadge.className = 'font-label-sm text-label-sm bg-primary-fixed text-on-primary-fixed px-space-xs py-0.5 rounded font-mono font-bold';
+    }
+
+    // Reset strata slide highlight classes
+    for (let l = 1; l <= 5; l++) {
+      const el = document.getElementById(`strata-layer-${l}`);
+      if (el) el.classList.remove('threat-pulse', 'active-focused');
     }
 
     // Reset detect node
@@ -193,7 +204,12 @@ document.addEventListener('DOMContentLoaded', () => {
     clearInterval(timerInterval);
 
     if (viewActiveAnalysis) viewActiveAnalysis.classList.add('hidden');
-    if (viewStandby) viewStandby.classList.remove('hidden');
+    if (viewStandby) {
+      viewStandby.classList.remove('hidden');
+      viewStandby.classList.remove('view-slide-fade');
+      void viewStandby.offsetWidth;
+      viewStandby.classList.add('view-slide-fade');
+    }
 
     if (activeWorkloadLabel) {
       activeWorkloadLabel.textContent = 'Click or drop payload script...';
@@ -483,6 +499,12 @@ echo Result: %x%
       if (pipeDetectLabel) pipeDetectLabel.textContent = 'SIGNAL TRIP';
       if (pipeStage5) pipeStage5.className = 'flex flex-col gap-1 p-2 rounded bg-tertiary text-on-tertiary shadow-sm';
       if (pipeContainLabel) pipeContainLabel.textContent = 'STASIS CUBE';
+
+      // Pulse Strata Slide 3 & 4 with Threat Alert Animation
+      const s3 = document.getElementById('strata-layer-3');
+      const s4 = document.getElementById('strata-layer-4');
+      if (s3) s3.classList.add('threat-pulse');
+      if (s4) s4.classList.add('threat-pulse');
     }
 
     // Verdict handling
@@ -502,6 +524,8 @@ echo Result: %x%
           activeVerdictPlaneTitle.textContent = 'L5: CONTAINED (ZERO EGRESS)';
           activeVerdictPlaneTitle.className = 'font-label-sm text-label-sm text-tertiary font-bold tracking-wider';
         }
+        const s5 = document.getElementById('strata-layer-5');
+        if (s5) s5.classList.add('threat-pulse', 'active-focused');
       } else if (event.verdict_state === 'CLEAN') {
         if (activeTargetStatusBadge) {
           activeTargetStatusBadge.textContent = 'CLEAN';
@@ -532,6 +556,11 @@ echo Result: %x%
         if (activeVerdictPlaneTitle) {
           activeVerdictPlaneTitle.textContent = 'L5: CLEAN RUNTIME';
           activeVerdictPlaneTitle.className = 'font-label-sm text-label-sm text-primary font-bold tracking-wider';
+        }
+        const s5 = document.getElementById('strata-layer-5');
+        if (s5) {
+          s5.classList.remove('threat-pulse');
+          s5.classList.add('active-focused');
         }
       }
     }
@@ -654,6 +683,66 @@ echo Result: %x%
       parentContainer.addEventListener('mouseleave', () => {
         standbyCentralCube.style.transform = 'rotateX(-24deg) rotateY(38deg)';
       });
+    }
+  }
+
+  // Active Enclave Viewport Mouse Parallax
+  const viewportCanvas = document.getElementById('viewport-canvas');
+  if (viewportCanvas && enclaveCube) {
+    viewportCanvas.addEventListener('mousemove', (e) => {
+      const rect = viewportCanvas.getBoundingClientRect();
+      const x = e.clientX - rect.left - (rect.width / 2);
+      const y = e.clientY - rect.top - (rect.height / 2);
+      const dynYaw = yaw + (x / 28);
+      const dynPitch = pitch - (y / 28);
+      enclaveCube.style.transform = `perspective(1100px) rotateX(${dynPitch}deg) rotateY(${dynYaw}deg) rotateZ(0deg) scale3d(${zoom}, ${zoom}, ${zoom})`;
+    });
+
+    viewportCanvas.addEventListener('mouseleave', () => {
+      updateCubeTransform();
+    });
+  }
+
+  // Interactive Click Handlers Connecting Pipeline Slides with 3D Strata Slides
+  const stageToLayerMap = {
+    1: 'strata-layer-1',
+    2: 'strata-layer-2',
+    3: 'strata-layer-3',
+    4: 'strata-layer-3',
+    5: 'strata-layer-4',
+    6: 'strata-layer-5'
+  };
+
+  for (let s = 1; s <= 6; s++) {
+    const stageEl = document.getElementById(`pipe-stage-${s}`);
+    if (stageEl) {
+      stageEl.addEventListener('click', () => {
+        highlightStrataSlide(stageToLayerMap[s]);
+      });
+    }
+  }
+
+  for (let l = 1; l <= 5; l++) {
+    const layerEl = document.getElementById(`strata-layer-${l}`);
+    if (layerEl) {
+      layerEl.addEventListener('click', () => {
+        highlightStrataSlide(`strata-layer-${l}`);
+      });
+    }
+  }
+
+  function highlightStrataSlide(layerId) {
+    if (!layerId) return;
+    for (let l = 1; l <= 5; l++) {
+      const el = document.getElementById(`strata-layer-${l}`);
+      if (el) el.classList.remove('active-focused');
+    }
+    const target = document.getElementById(layerId);
+    if (target) {
+      target.classList.add('active-focused');
+      setTimeout(() => {
+        target.classList.remove('active-focused');
+      }, 2500);
     }
   }
 
