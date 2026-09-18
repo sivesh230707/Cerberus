@@ -124,6 +124,7 @@ class MonitorBridge:
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE
             )
+        except OSError as e:
             # WinError 740: Elevation Required
             if getattr(e, "winerror", None) == 740 or "elevation" in str(e).lower():
                 logger.info("Elevation required. Spawning elevated CerberusAgent via PowerShell RunAs...")
