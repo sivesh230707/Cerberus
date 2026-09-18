@@ -19,11 +19,10 @@ if not exist "%CSC_PATH%" (
 )
 
 echo Compiling CerberusAgent.exe...
-"%CSC_PATH%" /nologo /target:exe /platform:x64 /optimize+ /warn:1 /out:"%OUTPUT_EXE%" "%SCRIPT_DIR%AssemblyInfo.cs" "%SCRIPT_DIR%JobObjectWrapper.cs" "%SCRIPT_DIR%ResponseAgent.cs" "%SCRIPT_DIR%EtwListener.cs" "%SCRIPT_DIR%Program.cs"
+"%CSC_PATH%" /nologo /target:exe /platform:x64 /optimize+ /warn:1 /win32manifest:"%SCRIPT_DIR%app.manifest" /out:"%OUTPUT_EXE%" "%SCRIPT_DIR%AssemblyInfo.cs" "%SCRIPT_DIR%JobObjectWrapper.cs" "%SCRIPT_DIR%ResponseAgent.cs" "%SCRIPT_DIR%EtwListener.cs" "%SCRIPT_DIR%Program.cs"
 
 if %ERRORLEVEL% equ 0 (
-    echo [SUCCESS] CerberusAgent.exe built successfully at %OUTPUT_EXE%
-    "%OUTPUT_EXE%" --help
+    echo [SUCCESS] CerberusAgent.exe built successfully with UAC manifest at %OUTPUT_EXE%
     exit /b 0
 ) else (
     echo [ERROR] Compilation failed.

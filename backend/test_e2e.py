@@ -5,6 +5,7 @@ Uploads samples, connects to the WebSocket stream, verifies telemetry events and
 
 import asyncio
 import json
+from pathlib import Path
 import websockets
 import urllib.request
 import mimetypes
@@ -67,7 +68,12 @@ async def test_session(filename: str, content: bytes, expected_verdict: str):
 
 async def main():
     # 1. Test Malicious / Suspicious Payload
-    malicious_bytes = b"Probe-CredentialHive\r\nStart-Process cmd.exe\r\nConnect-Outbound\r\n"
+    sample_mal = Path(__file__).resolve().parent.parent / "samples" / "test_malicious_sample.ps1"
+    if sample_mal.exists():
+        malicious_bytes = sample_mal.read_bytes()
+    else:
+        malicious_bytes = b"Probe-CredentialHive\r\nStart-Process cmd.exe\r\nConnect-Outbound\r\n"
+
     events_mal = await test_session("malicious_test.ps1", malicious_bytes, "FROZEN")
 
     # Verify key violations and containment actions
@@ -79,7 +85,12 @@ async def main():
     print("[+] Policy violation and live containment response confirmed from real C# agent!")
 
     # 2. Test Clean / Benign Payload
-    clean_bytes = b"@echo off\r\nset /a res=40+2\r\necho %res%\r\n"
+    sample_clean = Path(__file__).resolve().parent.parent / "samples" / "test_clean_sample.bat"
+    if sample_clean.exists():
+        clean_bytes = sample_clean.read_bytes()
+    else:
+        clean_bytes = b"@echo off\r\nset /a res=40+2\r\necho %res%\r\n"
+
     events_clean = await test_session("clean_test.bat", clean_bytes, "CLEAN")
     types_clean = [e["type"] for e in events_clean]
     assert "VERDICT" in types_clean

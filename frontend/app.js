@@ -42,6 +42,21 @@ document.addEventListener('DOMContentLoaded', () => {
   let totalEvents = 0;
   let currentFilter = 'all';
 
+  // Query host sandbox capability
+  fetch('/api/system/status')
+    .then(res => res.json())
+    .then(status => {
+      const statusWsb = document.getElementById('status-wsb');
+      if (statusWsb) {
+        if (status.available) {
+          statusWsb.innerHTML = `<span class="pulse-dot green"></span><span class="status-label">SANDBOX: <strong>ISOLATED VM</strong></span>`;
+        } else {
+          statusWsb.innerHTML = `<span class="pulse-dot" style="background:#f59e0b;box-shadow:0 0 8px rgba(245,158,11,0.6)"></span><span class="status-label" title="${status.message}">SANDBOX: <strong>HOST JOB-OBJECT</strong></span>`;
+        }
+      }
+    })
+    .catch(() => {});
+
   // SVG Icons
   const ICONS = {
     ready: `<svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`,

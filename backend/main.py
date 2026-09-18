@@ -40,11 +40,18 @@ monitor = MonitorBridge()
 FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
 
 
+@app.get("/api/system/status")
+async def get_system_status():
+    """Retrieve host system capability and Windows Sandbox availability status."""
+    return launcher.support_info
+
+
 @app.post("/api/upload")
 async def upload_payload(file: UploadFile = File(...)):
     """
     Accepts an uploaded file/script, creates an isolated sandbox session,
-    stages the payload, and returns session coordinates for WebSocket streaming.
+    stages the payload, launches Windows Sandbox (or activates host fallback),
+    and returns session coordinates for WebSocket streaming.
     """
     if not file.filename:
         raise HTTPException(status_code=400, detail="Filename missing")
@@ -52,8 +59,12 @@ async def upload_payload(file: UploadFile = File(...)):
     content = await file.read()
     session = launcher.create_session(filename=file.filename, content=content)
     launcher.generate_wsb_config(session)
+    launcher.launch_sandbox(session)
 
-    logger.info(f"Created session {session.session_id} for target '{session.filename}' ({len(content)} bytes), PID: {session.target_pid}")
+    logger.info(
+        f"Created session {session.session_id} for target '{session.filename}' ({len(content)} bytes), "
+        f"PID: {session.target_pid}, FallbackHostMode: {session.fallback_host_mode}"
+    )
 
     return {
         "session_id": session.session_id,
@@ -61,6 +72,7 @@ async def upload_payload(file: UploadFile = File(...)):
         "filesize": session.filesize,
         "target_pid": session.target_pid,
         "status": session.status,
+        "fallback_host_mode": session.fallback_host_mode,
         "ws_url": f"/ws/analysis/{session.session_id}",
     }
 

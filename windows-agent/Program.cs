@@ -11,6 +11,29 @@ namespace Cerberus.WindowsAgent
     {
         private static bool _contained = false;
         private static readonly object _lock = new object();
+        private static string _outFilePath = null;
+        private static readonly object _fileLock = new object();
+
+        private static void EmitJsonLine(string json)
+        {
+            Console.WriteLine(json);
+            if (!string.IsNullOrEmpty(_outFilePath))
+            {
+                lock (_fileLock)
+                {
+                    try
+                    {
+                        using (FileStream fs = new FileStream(_outFilePath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
+                        using (StreamWriter sw = new StreamWriter(fs, Encoding.UTF8))
+                        {
+                            sw.WriteLine(json);
+                            sw.Flush();
+                        }
+                    }
+                    catch { }
+                }
+            }
+        }
 
         static int Main(string[] args)
         {
@@ -47,7 +70,7 @@ namespace Cerberus.WindowsAgent
         {
             Console.WriteLine("Cerberus Windows Host Agent v1.0");
             Console.WriteLine("Usage:");
-            Console.WriteLine("  CerberusAgent.exe launch --file <path> [--mem-mb 256] [--cpu-limit 50]");
+            Console.WriteLine("  CerberusAgent.exe launch --file <path> [--mem-mb 256] [--cpu-limit 50] [--out-file <path>]");
             Console.WriteLine("  CerberusAgent.exe monitor --pid <pid> [--file <path>]");
             Console.WriteLine("  CerberusAgent.exe contain --pid <pid>");
         }
@@ -66,6 +89,10 @@ namespace Cerberus.WindowsAgent
                 else if (args[i] == "--mem-mb" && i + 1 < args.Length)
                 {
                     long.TryParse(args[++i], out memLimitMb);
+                }
+                else if (args[i] == "--out-file" && i + 1 < args.Length)
+                {
+                    _outFilePath = args[++i];
                 }
             }
 
@@ -159,7 +186,7 @@ namespace Cerberus.WindowsAgent
 
             listener.OnTelemetryEvent += delegate(EtwTelemetryEvent evt)
             {
-                Console.WriteLine(evt.ToJson());
+                EmitJsonLine(evt.ToJson());
             };
 
             listener.OnPolicyViolation += delegate(EtwTelemetryEvent evt)
@@ -177,6 +204,10 @@ namespace Cerberus.WindowsAgent
                     Dictionary<string, string> meta = new Dictionary<string, string>();
                     meta["output"] = e.Data;
                     EmitRawEvent("TARGET_STDOUT", "process", "info", "Process Output", e.Data, targetPid, meta);
+                    if (listener != null)
+                    {
+                        listener.CheckAndReportSensitiveAccess(e.Data, "READ");
+                    }
                 }
             };
             process.ErrorDataReceived += delegate(object sender, DataReceivedEventArgs e)
@@ -186,6 +217,10 @@ namespace Cerberus.WindowsAgent
                     Dictionary<string, string> meta = new Dictionary<string, string>();
                     meta["stderr"] = e.Data;
                     EmitRawEvent("TARGET_STDERR", "process", "info", "Process Stderr", e.Data, targetPid, meta);
+                    if (listener != null)
+                    {
+                        listener.CheckAndReportSensitiveAccess(e.Data, "READ");
+                    }
                 }
             };
             process.BeginOutputReadLine();
@@ -232,7 +267,7 @@ namespace Cerberus.WindowsAgent
             if (listener != null) listener.MarkContained();
 
             // 1. Emit Violation
-            Console.WriteLine(violationEvt.ToJson());
+            EmitJsonLine(violationEvt.ToJson());
 
             // 2. Containment Protocol Activated
             Dictionary<string, string> containMeta = new Dictionary<string, string>();
@@ -294,7 +329,7 @@ namespace Cerberus.WindowsAgent
 
             listener.OnTelemetryEvent += delegate(EtwTelemetryEvent evt)
             {
-                Console.WriteLine(evt.ToJson());
+                EmitJsonLine(evt.ToJson());
             };
             listener.OnPolicyViolation += delegate(EtwTelemetryEvent evt)
             {
@@ -359,7 +394,7 @@ namespace Cerberus.WindowsAgent
             {
                 evt.Metadata = details;
             }
-            Console.WriteLine(evt.ToJson());
+            EmitJsonLine(evt.ToJson());
         }
 
         private static void EmitVerdict(string state, string title, string description, int pid, List<string> violations)
@@ -382,7 +417,7 @@ namespace Cerberus.WindowsAgent
             }
             sb.Append("]");
             sb.Append("}");
-            Console.WriteLine(sb.ToString());
+            EmitJsonLine(sb.ToString());
         }
 
         private static string Escape(string s)

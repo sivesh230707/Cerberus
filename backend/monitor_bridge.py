@@ -1,8 +1,7 @@
 """
-Cerberus Monitor Bridge (Live Subprocess IPC)
-Spawns and manages the compiled C# Windows Host Agent (CerberusAgent.exe).
+Cerberus Monitor Bridge (Live Subprocess & Sandbox File IPC)
 Streams real-time Win32 / ETW telemetry events and containment actions
-directly from the agent's unbuffered stdout over WebSocket to the cockpit.
+from either Windows Sandbox (via shared events.jsonl) or Host execution (via stdout / events.jsonl).
 """
 
 import asyncio
@@ -19,9 +18,10 @@ logger = logging.getLogger("cerberus.monitor")
 
 class MonitorBridge:
     """
-    Interfaces directly with the native CerberusAgent.exe via asynchronous
-    standard I/O subprocess streaming. Reads live ETW events, rule violations,
-    thread suspension actions, and WFP containment states in real time.
+    Interfaces with the compiled C# Windows Agent (CerberusAgent.exe).
+    Supports dual-channel ingestion:
+    1. Windows Sandbox isolation mode: Reads live events appended to events.jsonl in mapped staging directory.
+    2. Host mode (Job Object): Reads directly from subprocess stdout with automatic UAC RunAs fallback.
     """
 
     def __init__(self, agent_bin_path: Optional[Path] = None):
@@ -55,8 +55,9 @@ class MonitorBridge:
 
     async def stream_events(self, session: SandboxSession) -> AsyncGenerator[Dict[str, Any], None]:
         """
-        Launches the target file through CerberusAgent.exe as an asynchronous subprocess.
-        Streams real unbuffered JSON-lines telemetry output directly to the WebSocket client.
+        Streams events for the given session.
+        If running inside Windows Sandbox, streams from events.jsonl in the staging folder.
+        If running in Host fallback mode, launches the agent on host and streams stdout / events.jsonl.
         """
         self._ensure_agent_binary()
 
@@ -73,21 +74,84 @@ class MonitorBridge:
             }
             return
 
+        staging_dir = session.filepath.parent.resolve()
+        events_jsonl = staging_dir / "events.jsonl"
+
+        # If sandbox mode is active, tail events.jsonl
+        if not session.fallback_host_mode:
+            logger.info("Session %s running in Windows Sandbox mode. Monitoring events file: %s", session.session_id, events_jsonl)
+            yield {
+                "timestamp": session.created_at.strftime("%H:%M:%S.%f")[:-3],
+                "type": "SANDBOX_ATTACH",
+                "category": "isolation",
+                "severity": "info",
+                "title": "Windows Sandbox Isolation Active",
+                "description": "Target payload executing inside disposable Windows Sandbox VM container.",
+                "details": {"wsb_config": session.details.get("wsb_config_path", "")},
+                "session_id": session.session_id,
+            }
+            async for evt in self._tail_events_file(events_jsonl, session):
+                yield evt
+            return
+
+        # Host Fallback Mode
+        logger.info("Session %s running in Host Job-Object mode.", session.session_id)
+        yield {
+            "timestamp": session.created_at.strftime("%H:%M:%S.%f")[:-3],
+            "type": "SANDBOX_MODE_NOTICE",
+            "category": "isolation",
+            "severity": "info",
+            "title": "Host Job-Object Mode Active",
+            "description": "Windows Sandbox is unavailable on this system edition. Executing with Win32 Job Object containment on host.",
+            "details": {"reason": session.details.get("fallback_reason", "")},
+            "session_id": session.session_id,
+        }
+
         cmd = [
             str(self.agent_exe),
             "launch",
             "--file", str(session.filepath.resolve()),
             "--mem-mb", str(session.memory_limit_mb),
+            "--out-file", str(events_jsonl),
         ]
 
         logger.info("Spawning native agent for session %s: %s", session.session_id, " ".join(cmd))
 
-        proc = await asyncio.create_subprocess_exec(
-            *cmd,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
+        proc = None
+        try:
+            proc = await asyncio.create_subprocess_exec(
+                *cmd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE
+            )
+        except OSError as e:
+            # WinError 740: Elevation Required
+            if getattr(e, "winerror", None) == 740 or "elevation" in str(e).lower():
+                logger.info("Elevation required. Spawning elevated CerberusAgent via PowerShell RunAs...")
+                ps_cmd = [
+                    "powershell.exe",
+                    "-Command",
+                    f"Start-Process -FilePath '{self.agent_exe}' -ArgumentList 'launch --file \"{session.filepath.resolve()}\" --mem-mb {session.memory_limit_mb} --out-file \"{events_jsonl}\"' -Verb RunAs -Wait"
+                ]
+                # Start elevated process in background and stream from events_jsonl
+                asyncio.create_task(self._run_process_async(ps_cmd))
+                async for evt in self._tail_events_file(events_jsonl, session):
+                    yield evt
+                return
+            else:
+                logger.error("Failed to start agent process: %s", e)
+                yield {
+                    "type": "ERROR",
+                    "category": "system",
+                    "severity": "critical",
+                    "title": "Process Spawn Error",
+                    "description": str(e),
+                    "details": {},
+                    "session_id": session.session_id,
+                }
+                return
 
+        # Direct stdout streaming
         try:
             while True:
                 line_bytes = await proc.stdout.readline()
@@ -109,7 +173,6 @@ class MonitorBridge:
                     except json.JSONDecodeError as json_err:
                         logger.warning("Malformed JSON from agent: %s (%s)", line, json_err)
                 else:
-                    # Non-JSON diagnostics from agent
                     logger.debug("[Agent stdout] %s", line)
 
             await proc.wait()
@@ -117,11 +180,12 @@ class MonitorBridge:
 
         except asyncio.CancelledError:
             logger.warning("Stream cancelled for session %s. Terminating agent subprocess...", session.session_id)
-            try:
-                proc.terminate()
-                await proc.wait()
-            except Exception:
-                pass
+            if proc:
+                try:
+                    proc.terminate()
+                    await proc.wait()
+                except Exception:
+                    pass
             raise
         except Exception as e:
             logger.error("Error during agent event streaming: %s", e, exc_info=True)
@@ -134,3 +198,55 @@ class MonitorBridge:
                 "details": {},
                 "session_id": session.session_id,
             }
+
+    async def _run_process_async(self, cmd: list) -> None:
+        try:
+            proc = await asyncio.create_subprocess_exec(*cmd)
+            await proc.wait()
+        except Exception as e:
+            logger.warning("Background elevated process error: %s", e)
+
+    async def _tail_events_file(self, events_path: Path, session: SandboxSession, timeout: float = 60.0) -> AsyncGenerator[Dict[str, Any], None]:
+        """Tails events.jsonl asynchronously as the agent writes to it."""
+        loop = asyncio.get_event_loop()
+        start_time = loop.time()
+
+        # Wait up to 20 seconds for the file to be created
+        while not events_path.exists():
+            if loop.time() - start_time > 20.0:
+                logger.warning("Timed out waiting for events.jsonl at %s", events_path)
+                yield {
+                    "type": "ERROR",
+                    "category": "system",
+                    "severity": "critical",
+                    "title": "Timeout",
+                    "description": "Timed out waiting for agent telemetry file to initialize.",
+                    "details": {"path": str(events_path)},
+                    "session_id": session.session_id,
+                }
+                return
+            await asyncio.sleep(0.2)
+
+        with open(events_path, "r", encoding="utf-8", errors="replace") as f:
+            last_activity = loop.time()
+            while True:
+                line = f.readline()
+                if line:
+                    last_activity = loop.time()
+                    line = line.strip()
+                    if line.startswith("{") and line.endswith("}"):
+                        try:
+                            event = json.loads(line)
+                            event["session_id"] = session.session_id
+                            if "target_pid" in event and event["target_pid"]:
+                                session.target_pid = int(event["target_pid"])
+                            yield event
+                            if event.get("type") == "VERDICT":
+                                break
+                        except json.JSONDecodeError:
+                            pass
+                else:
+                    if loop.time() - last_activity > timeout:
+                        logger.warning("Events file idle for %s seconds. Concluding stream.", timeout)
+                        break
+                    await asyncio.sleep(0.1)

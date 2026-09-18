@@ -222,13 +222,13 @@ namespace Cerberus.WindowsAgent
                         Guid fileGuid = KernelFileGuid;
                         EnableTraceEx2(_etwSessionHandle, ref fileGuid, EVENT_CONTROL_CODE_ENABLE_PROVIDER, 4, 0x10, 0, 0, IntPtr.Zero);
 
-                        EmitEvent("ETW_SESSION_ACTIVE", "system", "info", "ETW Kernel Session Initialized",
-                            string.Format("Attached real-time ETW trace session '{0}' (Providers: Process, Network, File)", sessionName));
+                        EmitEvent("TELEMETRY_ENGINE_ACTIVE", "system", "info", "Telemetry Engine Active",
+                            string.Format("Kernel ETW session '{0}' attached; Win32 TCP table and process hierarchy monitors active.", sessionName));
                     }
                     else
                     {
-                        EmitEvent("ETW_STATUS", "system", "info", "ETW Kernel Hook Ready",
-                            string.Format("ETW session status {0}. Active telemetry observer attached to target PID {1}.", status, _targetPid));
+                        EmitEvent("TELEMETRY_ENGINE_ACTIVE", "system", "info", "Telemetry Engine Active (Win32 Monitoring)",
+                            string.Format("Win32 TCP table, process hierarchy, and file access monitors attached to target PID {0} (ETW probe status: {1}).", _targetPid, status));
                     }
                 }
                 finally
@@ -238,8 +238,8 @@ namespace Cerberus.WindowsAgent
             }
             catch (Exception ex)
             {
-                EmitEvent("ETW_STATUS", "system", "info", "Telemetry Observer Ready",
-                    string.Format("ETW observer initialized for target PID {0}: {1}", _targetPid, ex.Message));
+                EmitEvent("TELEMETRY_ENGINE_ACTIVE", "system", "info", "Telemetry Engine Active (Win32 Monitoring)",
+                    string.Format("Win32 telemetry observer initialized for target PID {0}: {1}", _targetPid, ex.Message));
             }
         }
 
@@ -443,6 +443,36 @@ namespace Cerberus.WindowsAgent
                 EmitEvent("FILE_READ_BENIGN", "filesystem", "info", "Legitimate File Access",
                     string.Format("Read benign runtime dependency: {0}", filePath));
             }
+        }
+
+        public bool CheckAndReportSensitiveAccess(string text, string accessType)
+        {
+            if (string.IsNullOrEmpty(text)) return false;
+
+            string matched = null;
+            foreach (string sensitive in SensitivePaths)
+            {
+                if (text.IndexOf(sensitive, StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    matched = sensitive;
+                    break;
+                }
+                string fileName = Path.GetFileName(sensitive);
+                if (text.IndexOf("config\\" + fileName, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    text.IndexOf("config/" + fileName, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    (text.IndexOf("config", StringComparison.OrdinalIgnoreCase) >= 0 && text.IndexOf(fileName, StringComparison.OrdinalIgnoreCase) >= 0))
+                {
+                    matched = sensitive;
+                    break;
+                }
+            }
+
+            if (matched != null)
+            {
+                ReportSensitiveFileAccess(matched, accessType);
+                return true;
+            }
+            return false;
         }
 
         private void RecordViolation(EtwTelemetryEvent evt, string summary)

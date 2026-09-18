@@ -33,21 +33,23 @@ Write-Host " Compiler: $cscPath" -ForegroundColor Gray
 Write-Host " Target:   $outputExe" -ForegroundColor Gray
 Write-Host "========================================================" -ForegroundColor Cyan
 
+$manifestFile = Join-Path $scriptDir "app.manifest"
+
 $params = @(
     "/nologo",
     "/target:exe",
     "/platform:x64",
     "/optimize+",
     "/warn:1",
+    "/win32manifest:$manifestFile",
     "/out:$outputExe"
 ) + $sourceFiles
 
 & $cscPath $params
 
 if ($LASTEXITCODE -eq 0 -and (Test-Path $outputExe)) {
-    Write-Host "[SUCCESS] CerberusAgent.exe built successfully!" -ForegroundColor Green
+    Write-Host "[SUCCESS] CerberusAgent.exe built successfully with UAC manifest (app.manifest)!" -ForegroundColor Green
     Write-Host "Output binary: $outputExe" -ForegroundColor Green
-    & $outputExe --help
     exit 0
 } else {
     Write-Host "[ERROR] Build failed with exit code $LASTEXITCODE." -ForegroundColor Red
