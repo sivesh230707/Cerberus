@@ -1,0 +1,73 @@
+name: Cerberus CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  python-check:
+    name: Python Backend Syntax & Import Verification
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if (Test-Path backend\requirements.txt) {
+            pip install -r backend\requirements.txt
+          } else {
+            pip install fastapi uvicorn websockets pydantic
+          }
+
+      - name: Compile-Check Backend Code (Syntax Verification)
+        run: |
+          python -m py_compile backend\main.py
+          python -m py_compile backend\sandbox_launcher.py
+          python -m py_compile backend\monitor_bridge.py
+          python -m py_compile backend\test_e2e.py
+
+      - name: Verify Module Imports
+        run: |
+          python -c "import backend.main; import backend.sandbox_launcher; import backend.monitor_bridge; print('Backend modules verified successfully.')"
+
+  agent-build:
+    name: Native Windows Agent C# Build
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build CerberusAgent.exe via build.ps1
+        run: |
+          powershell.exe -ExecutionPolicy Bypass -File .\windows-agent\build.ps1
+
+      - name: Build CerberusAgent via MSBuild
+        run: |
+          msbuild windows-agent\CerberusAgent.csproj /p:Configuration=Release /p:Platform=x64
+
+      - name: Verify Compiled Binary and Manifest Existence
+        run: |
+          if (!(Test-Path "windows-agent\bin\CerberusAgent.exe")) {
+            Write-Error "CerberusAgent.exe not found in bin directory."
+            exit 1
+          }
+          if (!(Test-Path "windows-agent\app.manifest")) {
+            Write-Error "app.manifest not found."
+            exit 1
+          }
+          Write-Host "[SUCCESS] Agent binary compiled and verified." -ForegroundColor Green

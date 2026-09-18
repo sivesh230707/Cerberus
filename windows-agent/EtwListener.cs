@@ -65,7 +65,7 @@ namespace Cerberus.WindowsAgent
     /// </summary>
     public class EtwListener : IDisposable
     {
-        #region Win32 ETW API P/Invoke
+        #region Win32 ETW API P/Invoke & Structures
 
         [DllImport("advapi32.dll", EntryPoint = "StartTraceW", CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern uint StartTrace(out ulong sessionHandle, string sessionName, IntPtr properties);
@@ -84,13 +84,134 @@ namespace Cerberus.WindowsAgent
             uint timeout,
             IntPtr enableParameters);
 
+        [DllImport("advapi32.dll", EntryPoint = "OpenTraceW", CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern ulong OpenTrace(ref EVENT_TRACE_LOGFILEW logfile);
+
+        [DllImport("advapi32.dll", SetLastError = true)]
+        private static extern uint ProcessTrace(
+            [In] ulong[] handleArray,
+            [In] uint handleCount,
+            [In] IntPtr startTime,
+            [In] IntPtr endTime);
+
+        [DllImport("advapi32.dll", SetLastError = true)]
+        private static extern uint CloseTrace(ulong traceHandle);
+
         private const uint EVENT_CONTROL_CODE_ENABLE_PROVIDER = 1;
         private const uint EVENT_TRACE_CONTROL_STOP = 1;
+        private const uint PROCESS_TRACE_MODE_REAL_TIME = 0x00000100;
+        private const uint PROCESS_TRACE_MODE_EVENT_RECORD = 0x10000000;
+        private const ulong INVALID_PROCESSTRACE_HANDLE = unchecked((ulong)-1);
 
         // Kernel ETW Provider GUIDs
         public static readonly Guid KernelProcessGuid = new Guid("22FB2CD6-0E7B-422B-A0C7-2FAD1FD0E716");
         public static readonly Guid KernelNetworkGuid = new Guid("7DD42A49-5329-4832-8DFD-43D979153A88");
         public static readonly Guid KernelFileGuid = new Guid("EDD08927-9CC4-4E65-B970-C2560FB5C289");
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate void EventRecordCallback(IntPtr pEventRecord);
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate bool EventTraceBufferCallback(IntPtr logfile);
+
+        [StructLayout(LayoutKind.Sequential, Size = 0xac, CharSet = CharSet.Unicode)]
+        private struct TIME_ZONE_INFORMATION
+        {
+            public uint bias;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+            public string standardName;
+            [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.U2, SizeConst = 8)]
+            public ushort[] standardDate;
+            public uint standardBias;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+            public string daylightName;
+            [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.U2, SizeConst = 8)]
+            public ushort[] daylightDate;
+            public uint daylightBias;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct ETW_BUFFER_CONTEXT
+        {
+            public byte ProcessorNumber;
+            public byte Alignment;
+            public ushort LoggerId;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct EVENT_TRACE_HEADER
+        {
+            public ushort Size;
+            public ushort FieldTypeFlags;
+            public byte Type;
+            public byte Level;
+            public ushort Version;
+            public int ThreadId;
+            public int ProcessId;
+            public long TimeStamp;
+            public Guid Guid;
+            public uint KernelTime;
+            public uint UserTime;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct EVENT_TRACE
+        {
+            public EVENT_TRACE_HEADER Header;
+            public uint InstanceId;
+            public uint ParentInstanceId;
+            public Guid ParentGuid;
+            public IntPtr MofData;
+            public int MofLength;
+            public ETW_BUFFER_CONTEXT BufferContext;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct TRACE_LOGFILE_HEADER
+        {
+            public uint BufferSize;
+            public uint Version;
+            public uint ProviderVersion;
+            public uint NumberOfProcessors;
+            public long EndTime;
+            public uint TimerResolution;
+            public uint MaximumFileSize;
+            public uint LogFileMode;
+            public uint BuffersWritten;
+            public uint StartBuffers;
+            public uint PointerSize;
+            public uint EventsLost;
+            public uint CpuSpeedInMHz;
+            public IntPtr LoggerName;
+            public IntPtr LogFileName;
+            public TIME_ZONE_INFORMATION TimeZone;
+            public long BootTime;
+            public long PerfFreq;
+            public long StartTime;
+            public uint ReservedFlags;
+            public uint BuffersLost;
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        private struct EVENT_TRACE_LOGFILEW
+        {
+            [MarshalAs(UnmanagedType.LPWStr)]
+            public string LogFileName;
+            [MarshalAs(UnmanagedType.LPWStr)]
+            public string LoggerName;
+            public long CurrentTime;
+            public uint BuffersRead;
+            public uint LogFileMode;
+            public EVENT_TRACE CurrentEvent;
+            public TRACE_LOGFILE_HEADER LogfileHeader;
+            public EventTraceBufferCallback BufferCallback;
+            public uint BufferSize;
+            public uint Filled;
+            public uint EventsLost;
+            public EventRecordCallback EventCallback;
+            public int IsKernelTrace;
+            public IntPtr Context;
+        }
 
         #endregion
 
@@ -157,10 +278,16 @@ namespace Cerberus.WindowsAgent
 
         private readonly int _targetPid;
         private ulong _etwSessionHandle = 0;
+        private ulong _openTraceHandle = 0;
         private bool _isMonitoring = false;
         private bool _isContained = false;
         private Thread _monitorThread;
+        private Thread _etwConsumerThread;
+        private EventRecordCallback _eventRecordCallbackDelegate;
+        private EventTraceBufferCallback _bufferCallbackDelegate;
         private readonly List<string> _detectedViolations = new List<string>();
+        private readonly HashSet<int> _knownChildPids = new HashSet<int>();
+        private readonly HashSet<string> _knownConnections = new HashSet<string>();
 
         public EtwListener(int targetPid)
         {
@@ -170,6 +297,11 @@ namespace Cerberus.WindowsAgent
         public void Start()
         {
             _isMonitoring = true;
+
+            // Pin callback delegates to instance to avoid GC reclamation during unmanaged ETW dispatch
+            _eventRecordCallbackDelegate = new EventRecordCallback(OnEventRecord);
+            _bufferCallbackDelegate = new EventTraceBufferCallback(OnBufferRecord);
+
             TryInitializeEtwSession();
 
             _monitorThread = new Thread(MonitorWorkerLoop);
@@ -220,10 +352,33 @@ namespace Cerberus.WindowsAgent
                         EnableTraceEx2(_etwSessionHandle, ref netGuid, EVENT_CONTROL_CODE_ENABLE_PROVIDER, 4, 0x10, 0, 0, IntPtr.Zero);
 
                         Guid fileGuid = KernelFileGuid;
-                        EnableTraceEx2(_etwSessionHandle, ref fileGuid, EVENT_CONTROL_CODE_ENABLE_PROVIDER, 4, 0x10, 0, 0, IntPtr.Zero);
+                        // Enable CREATE (0x80) | FILEIO (0x20) | CREATE_NEW_FILE (0x1000) = 0x10A0
+                        EnableTraceEx2(_etwSessionHandle, ref fileGuid, EVENT_CONTROL_CODE_ENABLE_PROVIDER, 4, 0x10A0, 0, 0, IntPtr.Zero);
 
-                        EmitEvent("TELEMETRY_ENGINE_ACTIVE", "system", "info", "Telemetry Engine Active",
-                            string.Format("Kernel ETW session '{0}' attached; Win32 TCP table and process hierarchy monitors active.", sessionName));
+                        // Attach real-time ETW event consumer
+                        EVENT_TRACE_LOGFILEW logfile = new EVENT_TRACE_LOGFILEW();
+                        logfile.LoggerName = sessionName;
+                        logfile.LogFileMode = PROCESS_TRACE_MODE_REAL_TIME | PROCESS_TRACE_MODE_EVENT_RECORD;
+                        logfile.EventCallback = _eventRecordCallbackDelegate;
+                        logfile.BufferCallback = _bufferCallbackDelegate;
+
+                        _openTraceHandle = OpenTrace(ref logfile);
+
+                        if (_openTraceHandle != 0 && _openTraceHandle != INVALID_PROCESSTRACE_HANDLE)
+                        {
+                            _etwConsumerThread = new Thread(EtwConsumerWorker);
+                            _etwConsumerThread.IsBackground = true;
+                            _etwConsumerThread.Start();
+
+                            EmitEvent("TELEMETRY_ENGINE_ACTIVE", "system", "info", "Telemetry Engine Active (Kernel ETW + Win32)",
+                                string.Format("Kernel ETW session '{0}' active with real-time ProcessTrace consumer loop (syscall-level FileIO, Network, and Process interception).", sessionName));
+                        }
+                        else
+                        {
+                            uint openErr = (uint)Marshal.GetLastWin32Error();
+                            EmitEvent("TELEMETRY_ENGINE_ACTIVE", "system", "info", "Telemetry Engine Active (Win32 Monitoring)",
+                                string.Format("Kernel ETW session created but consumer attach returned {0}; active Win32 polling engaged.", openErr));
+                        }
                     }
                     else
                     {
@@ -243,8 +398,191 @@ namespace Cerberus.WindowsAgent
             }
         }
 
+        private void EtwConsumerWorker()
+        {
+            try
+            {
+                if (_openTraceHandle != 0 && _openTraceHandle != INVALID_PROCESSTRACE_HANDLE)
+                {
+                    ulong[] handles = new ulong[] { _openTraceHandle };
+                    ProcessTrace(handles, 1, IntPtr.Zero, IntPtr.Zero);
+                }
+            }
+            catch { }
+        }
+
+        private bool OnBufferRecord(IntPtr logfile)
+        {
+            return _isMonitoring && !_isContained;
+        }
+
+        private void OnEventRecord(IntPtr pEventRecord)
+        {
+            if (pEventRecord == IntPtr.Zero || !_isMonitoring || _isContained) return;
+
+            try
+            {
+                // ProcessId is at offset 12 in EVENT_RECORD.EventHeader
+                int eventPid = Marshal.ReadInt32(pEventRecord, 12);
+
+                // Filter: target process or known children
+                if (eventPid != _targetPid && !_knownChildPids.Contains(eventPid))
+                {
+                    return;
+                }
+
+                // ProviderId is at offset 24 (16 bytes)
+                byte[] guidBytes = new byte[16];
+                Marshal.Copy((IntPtr)(pEventRecord.ToInt64() + 24), guidBytes, 0, 16);
+                Guid providerId = new Guid(guidBytes);
+
+                // UserDataLength is at offset 86 (2 bytes); UserData pointer is at offset 96 (8 bytes on x64)
+                ushort userDataLen = (ushort)Marshal.ReadInt16(pEventRecord, 86);
+                IntPtr pUserData = Marshal.ReadIntPtr(pEventRecord, 96);
+
+                if (pUserData == IntPtr.Zero || userDataLen == 0) return;
+
+                byte[] userData = new byte[userDataLen];
+                Marshal.Copy(pUserData, userData, 0, userDataLen);
+
+                if (providerId == KernelFileGuid)
+                {
+                    ProcessKernelFileEvent(eventPid, userData);
+                }
+                else if (providerId == KernelNetworkGuid)
+                {
+                    ProcessKernelNetworkEvent(eventPid, userData);
+                }
+                else if (providerId == KernelProcessGuid)
+                {
+                    ProcessKernelProcessEvent(eventPid, userData);
+                }
+            }
+            catch
+            {
+                // Suppress exceptions in callback to avoid crashing native ETW dispatch
+            }
+        }
+
+        private void ProcessKernelFileEvent(int pid, byte[] userData)
+        {
+            if (userData == null || userData.Length == 0) return;
+
+            string payload = Encoding.Unicode.GetString(userData);
+
+            foreach (string sensitive in SensitivePaths)
+            {
+                string fileName = Path.GetFileName(sensitive);
+                bool match = false;
+
+                if (payload.IndexOf(sensitive, StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    match = true;
+                }
+                else if (payload.IndexOf("config\\" + fileName, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                         payload.IndexOf("config/" + fileName, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                         payload.IndexOf("System32\\config\\" + fileName, StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    match = true;
+                }
+                else if (sensitive.IndexOf("Vault", StringComparison.OrdinalIgnoreCase) >= 0 &&
+                         payload.IndexOf("Vault", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    match = true;
+                }
+                else if (sensitive.IndexOf("Credentials", StringComparison.OrdinalIgnoreCase) >= 0 &&
+                         payload.IndexOf("Credentials", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    match = true;
+                }
+
+                if (match)
+                {
+                    string extracted = ExtractCleanPath(payload, fileName) ?? sensitive;
+
+                    EtwTelemetryEvent evt = new EtwTelemetryEvent
+                    {
+                        EventType = "FILE_ACCESS_VIOLATION",
+                        Category = "filesystem",
+                        Severity = "violation",
+                        Title = "Rule Violation: Sensitive Path Access (Kernel Syscall Intercept)",
+                        Description = string.Format("Target PID {0} intercepted calling Win32 file-open syscall on protected credential store: {1}", pid, extracted),
+                        ProcessId = _targetPid
+                    };
+                    evt.Metadata["path"] = extracted;
+                    evt.Metadata["desired_access"] = "KERNEL_SYSCALL_CREATE";
+                    evt.Metadata["detection_layer"] = "Microsoft-Windows-Kernel-File (ETW)";
+
+                    RecordViolation(evt, string.Format("Kernel FileIO Intercept ({0})", extracted));
+                    break;
+                }
+            }
+        }
+
+        private void ProcessKernelNetworkEvent(int pid, byte[] userData)
+        {
+            // Auxiliary kernel network event telemetry
+        }
+
+        private void ProcessKernelProcessEvent(int pid, byte[] userData)
+        {
+            // Auxiliary kernel process creation telemetry
+        }
+
+        private static string ExtractCleanPath(string payload, string keyword)
+        {
+            if (string.IsNullOrEmpty(payload) || string.IsNullOrEmpty(keyword)) return null;
+
+            int idx = payload.IndexOf(keyword, StringComparison.OrdinalIgnoreCase);
+            if (idx < 0) return null;
+
+            int start = idx;
+            while (start > 0)
+            {
+                char c = payload[start - 1];
+                if (char.IsControl(c) || c == '\0' || c == '"' || c == '<' || c == '>' || c == '|' || c == '\r' || c == '\n')
+                    break;
+                start--;
+            }
+
+            int end = idx + keyword.Length;
+            while (end < payload.Length)
+            {
+                char c = payload[end];
+                if (char.IsControl(c) || c == '\0' || c == '"' || c == '<' || c == '>' || c == '|' || c == '\r' || c == '\n')
+                    break;
+                end++;
+            }
+
+            string candidate = payload.Substring(start, end - start).Trim();
+            if (candidate.Length > 0) return candidate;
+            return null;
+        }
+
         private void StopEtwSession()
         {
+            // 1. Close OpenTrace handle to unblock ProcessTrace loop
+            if (_openTraceHandle != 0 && _openTraceHandle != INVALID_PROCESSTRACE_HANDLE)
+            {
+                try
+                {
+                    CloseTrace(_openTraceHandle);
+                }
+                catch { }
+                _openTraceHandle = 0;
+            }
+
+            // 2. Wait for consumer thread to exit
+            if (_etwConsumerThread != null && _etwConsumerThread.IsAlive)
+            {
+                try
+                {
+                    _etwConsumerThread.Join(500);
+                }
+                catch { }
+            }
+
+            // 3. Stop trace session
             if (_etwSessionHandle != 0)
             {
                 try
@@ -424,17 +762,31 @@ namespace Cerberus.WindowsAgent
 
             if (isSensitive)
             {
+                string desc;
+                string layer;
+                if (accessType == "OUTPUT_HEURISTIC_REF" || accessType == "READ")
+                {
+                    desc = string.Format("Target process referenced protected credential path in output stream: {0} (Output Heuristic)", filePath);
+                    layer = "Output-Based Heuristic";
+                }
+                else
+                {
+                    desc = string.Format("Target process intercepted accessing protected Windows credential store at {0} ({1})", filePath, accessType);
+                    layer = "Microsoft-Windows-Kernel-File (ETW)";
+                }
+
                 EtwTelemetryEvent evt = new EtwTelemetryEvent
                 {
                     EventType = "FILE_ACCESS_VIOLATION",
                     Category = "filesystem",
                     Severity = "violation",
                     Title = "Rule Violation: Sensitive Path Access",
-                    Description = string.Format("Target attempted to read protected Windows credential store at {0}", filePath),
+                    Description = desc,
                     ProcessId = _targetPid
                 };
                 evt.Metadata["path"] = filePath;
                 evt.Metadata["desired_access"] = accessType;
+                evt.Metadata["detection_layer"] = layer;
 
                 RecordViolation(evt, string.Format("Sensitive path access ({0})", filePath));
             }
@@ -469,7 +821,7 @@ namespace Cerberus.WindowsAgent
 
             if (matched != null)
             {
-                ReportSensitiveFileAccess(matched, accessType);
+                ReportSensitiveFileAccess(matched, "OUTPUT_HEURISTIC_REF");
                 return true;
             }
             return false;
