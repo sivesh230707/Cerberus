@@ -27,7 +27,7 @@ jobs:
           if (Test-Path backend\requirements.txt) {
             pip install -r backend\requirements.txt
           } else {
-            pip install fastapi uvicorn websockets pydantic
+            pip install fastapi uvicorn websockets pydantic pywebview
           }
 
       - name: Compile-Check Backend Code (Syntax Verification)
@@ -36,10 +36,11 @@ jobs:
           python -m py_compile backend\sandbox_launcher.py
           python -m py_compile backend\monitor_bridge.py
           python -m py_compile backend\test_e2e.py
+          python -m py_compile desktop_app.py
 
       - name: Verify Module Imports
         run: |
-          python -c "import backend.main; import backend.sandbox_launcher; import backend.monitor_bridge; print('Backend modules verified successfully.')"
+          python -c "import backend.main; import backend.sandbox_launcher; import backend.monitor_bridge; import desktop_app; print('All modules verified successfully.')"
 
   agent-build:
     name: Native Windows Agent C# Build
