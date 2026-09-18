@@ -90,23 +90,28 @@ namespace Cerberus.WindowsAgent
         private IntPtr _jobHandle = IntPtr.Zero;
         private bool _disposed = false;
 
-        public JobObjectWrapper(string jobName = null)
+        public JobObjectWrapper(string jobName)
         {
             _jobHandle = CreateJobObject(IntPtr.Zero, jobName);
             if (_jobHandle == IntPtr.Zero)
             {
-                throw new InvalidOperationException($"Failed to create Job Object. Win32 Error: {Marshal.GetLastWin32Error()}");
+                int error = Marshal.GetLastWin32Error();
+                throw new InvalidOperationException(string.Format("Failed to create Job Object. Win32 Error: {0}", error));
             }
+        }
+
+        public JobObjectWrapper() : this(null)
+        {
         }
 
         /// <summary>
         /// Configures resource constraints: maximum committed memory limit and active child process ceiling.
         /// </summary>
-        public void ApplyLimits(long maxMemoryBytes = 256 * 1024 * 1024, uint maxActiveProcesses = 5)
+        public void ApplyLimits(long maxMemoryBytes, uint maxActiveProcesses)
         {
             if (_jobHandle == IntPtr.Zero) return;
 
-            var info = new JOBOBJECT_EXTENDED_LIMIT_INFORMATION();
+            JOBOBJECT_EXTENDED_LIMIT_INFORMATION info = new JOBOBJECT_EXTENDED_LIMIT_INFORMATION();
             info.BasicLimitInformation.LimitFlags = LimitFlags.JOB_OBJECT_LIMIT_PROCESS_MEMORY |
                                                     LimitFlags.JOB_OBJECT_LIMIT_JOB_MEMORY |
                                                     LimitFlags.JOB_OBJECT_LIMIT_ACTIVE_PROCESS |
@@ -123,7 +128,8 @@ namespace Cerberus.WindowsAgent
                 Marshal.StructureToPtr(info, infoPtr, false);
                 if (!SetInformationJobObject(_jobHandle, JobObjectInfoType.ExtendedLimitInformation, infoPtr, (uint)length))
                 {
-                    throw new InvalidOperationException($"SetInformationJobObject failed. Win32 Error: {Marshal.GetLastWin32Error()}");
+                    int error = Marshal.GetLastWin32Error();
+                    throw new InvalidOperationException(string.Format("SetInformationJobObject failed. Win32 Error: {0}", error));
                 }
             }
             finally
@@ -137,9 +143,16 @@ namespace Cerberus.WindowsAgent
         /// </summary>
         public bool AssignProcess(int pid)
         {
-            using (var process = Process.GetProcessById(pid))
+            try
             {
-                return AssignProcessToJobObject(_jobHandle, process.Handle);
+                using (Process process = Process.GetProcessById(pid))
+                {
+                    return AssignProcessToJobObject(_jobHandle, process.Handle);
+                }
+            }
+            catch
+            {
+                return false;
             }
         }
 
