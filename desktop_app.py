@@ -94,7 +94,7 @@ def main():
         width=1400,
         height=880,
         min_size=(1050, 700),
-        background_color="#080d14",
+        background_color="#faf8ff",
         text_select=True,
     )
 
