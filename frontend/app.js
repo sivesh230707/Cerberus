@@ -281,7 +281,26 @@ document.addEventListener('DOMContentLoaded', () => {
         verdictDesc.textContent = 'Target ran to completion inside the sandbox with 0 suspicious behaviors detected.';
         verdictIconContainer.innerHTML = ICONS.clean;
         targetStateTag.textContent = 'COMPLETED';
+      } else if (event.verdict_state === 'ERROR') {
+        verdictBanner.className = 'verdict-banner state-frozen';
+        verdictBadge.textContent = 'ERROR';
+        verdictTitle.textContent = event.title || 'Execution Error';
+        verdictDesc.textContent = event.description || 'Analysis encountered a runtime error.';
+        verdictIconContainer.innerHTML = ICONS.frozen;
+        targetStateTag.textContent = 'ERROR';
       }
+    }
+
+    if (event.type === 'ERROR') {
+      clearInterval(timerInterval);
+      verdictBanner.className = 'verdict-banner state-frozen';
+      verdictBadge.textContent = 'ERROR';
+      verdictTitle.textContent = event.title || 'Execution Error';
+      verdictDesc.textContent = event.description || 'An error occurred during sandbox execution.';
+      verdictIconContainer.innerHTML = ICONS.frozen;
+      targetStateTag.textContent = 'ERROR';
+      pillProcState.className = 'containment-pill normal';
+      pillProcState.textContent = 'HALTED';
     }
 
     // Render Event Item in terminal

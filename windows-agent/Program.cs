@@ -135,6 +135,16 @@ namespace Cerberus.WindowsAgent
                 psi.FileName = "cmd.exe";
                 psi.Arguments = string.Format("/c \"{0}\"", filePath);
             }
+            else if (ext == ".py")
+            {
+                psi.FileName = "python.exe";
+                psi.Arguments = string.Format("\"{0}\"", filePath);
+            }
+            else if (ext == ".vbs" || ext == ".js")
+            {
+                psi.FileName = "cscript.exe";
+                psi.Arguments = string.Format("//Nologo \"{0}\"", filePath);
+            }
             else
             {
                 psi.FileName = filePath;

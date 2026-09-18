@@ -72,6 +72,17 @@ class MonitorBridge:
                 "details": {"agent_path": str(self.agent_exe)},
                 "session_id": session.session_id,
             }
+            yield {
+                "timestamp": session.created_at.strftime("%H:%M:%S.%f")[:-3],
+                "type": "VERDICT",
+                "category": "verdict",
+                "severity": "violation",
+                "verdict_state": "ERROR",
+                "title": "Analysis Aborted: Agent Binary Missing",
+                "description": "CerberusAgent.exe could not be found.",
+                "target_pid": 0,
+                "violations": ["Agent Binary Missing"],
+            }
             return
 
         staging_dir = session.filepath.parent.resolve()
@@ -157,6 +168,16 @@ class MonitorBridge:
                             "details": {"agent_path": str(self.agent_exe), "error": err_msg},
                             "session_id": session.session_id,
                         }
+                        yield {
+                            "type": "VERDICT",
+                            "category": "verdict",
+                            "severity": "violation",
+                            "verdict_state": "ERROR",
+                            "title": "Analysis Aborted: Elevation Required",
+                            "description": "Administrator elevation required to launch agent.",
+                            "target_pid": 0,
+                            "violations": [f"Elevation Error: {err_msg}"],
+                        }
                         return
                 except Exception as runas_err:
                     logger.warning("PowerShell RunAs spawn error: %s", runas_err)
@@ -174,6 +195,16 @@ class MonitorBridge:
                     "description": str(e),
                     "details": {},
                     "session_id": session.session_id,
+                }
+                yield {
+                    "type": "VERDICT",
+                    "category": "verdict",
+                    "severity": "violation",
+                    "verdict_state": "ERROR",
+                    "title": "Analysis Aborted: Process Spawn Error",
+                    "description": str(e),
+                    "target_pid": 0,
+                    "violations": [f"Spawn Error: {e}"],
                 }
                 return
 
