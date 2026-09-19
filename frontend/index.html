@@ -375,7 +375,7 @@
     <div class="h-20 w-full px-margin-lg flex items-center justify-between gap-gutter">
       <!-- Brand & Triad Emblem -->
       <div class="flex items-center gap-space-md">
-        <img alt="Cerberus Geometric Triad Emblem" class="h-8 w-auto object-contain" src="/static/emblem.svg"/>
+        <img alt="Cerberus Emblem" class="h-9 w-auto object-contain shrink-0" src="/static/cerberus-logo.png"/>
         <div class="flex flex-col">
           <div class="flex items-center gap-space-sm">
             <span class="font-headline-sm text-headline-sm uppercase text-on-surface tracking-wider font-bold">CERBERUS</span>
@@ -391,7 +391,6 @@
           <a aria-current="page" class="uppercase px-space-md py-1.5 rounded-full transition-all bg-primary-container text-on-primary-container font-semibold shadow-[0_2px_8px_rgba(0,97,148,0.18)]" data-path="analyze" href="/">ANALYZE</a>
           <a class="font-label-sm text-label-sm uppercase px-space-md py-1.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="timeline-and-history" href="/timeline.html">TIMELINE &amp; HISTORY</a>
           <a class="font-label-sm text-label-sm uppercase px-space-md py-1.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="deep-report" href="/report.html">DEEP REPORT</a>
-          <a class="font-label-sm text-label-sm uppercase px-space-md py-1.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="architecture-and-system" href="/architecture.html">ARCHITECTURE &amp; SYSTEM</a>
         </nav>
       </div>
 
@@ -423,7 +422,6 @@
         <a aria-current="page" class="uppercase px-space-sm py-1 rounded-full transition-all whitespace-nowrap bg-primary-container text-on-primary-container font-semibold shadow-[0_2px_8px_rgba(0,97,148,0.18)]" href="/">ANALYZE</a>
         <a class="font-label-sm text-label-sm uppercase px-space-sm py-1 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all whitespace-nowrap" href="/timeline.html">TIMELINE</a>
         <a class="font-label-sm text-label-sm uppercase px-space-sm py-1 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all whitespace-nowrap" href="/report.html">DEEP REPORT</a>
-        <a class="font-label-sm text-label-sm uppercase px-space-sm py-1 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all whitespace-nowrap" href="/architecture.html">SYSTEM</a>
       </nav>
     </div>
   </header>
@@ -440,57 +438,49 @@
     <div id="view-standby" class="flex flex-col w-full transition-opacity duration-300">
 
       <!-- Spatial Stage Toolbar & Pipeline Stepper -->
-      <div class="w-full px-margin-lg py-space-md flex flex-col xl:flex-row items-center justify-between gap-space-md z-30">
+      <div class="w-full px-margin-lg py-space-md flex flex-col 2xl:flex-row items-center justify-between gap-space-md z-30">
         <!-- Ephemeral Target File Dropper & State Meta -->
-        <div class="flex items-center gap-space-md w-full xl:w-auto">
-          <div class="group relative flex items-center gap-space-sm px-space-md py-2.5 bg-surface-container-lowest/90 backdrop-blur-xl rounded-full shadow-[0_4px_20px_rgba(0,97,148,0.08)] cursor-pointer hover:shadow-[0_8px_28px_rgba(0,97,148,0.16)] transition-all duration-300" id="fileUploadBtn" title="Click or drop executable / script to launch sandbox">
+        <div class="flex items-center gap-space-sm sm:gap-space-md w-full 2xl:w-auto shrink-0 justify-between sm:justify-start">
+          <div class="group relative flex items-center gap-space-sm px-space-md py-2.5 bg-surface-container-lowest/90 backdrop-blur-xl rounded-full shadow-[0_4px_20px_rgba(0,97,148,0.08)] cursor-pointer hover:shadow-[0_8px_28px_rgba(0,97,148,0.16)] transition-all duration-300 shrink-0" id="fileUploadBtn" title="Click or drop executable / script to launch sandbox">
             <span class="w-2.5 h-2.5 rounded-full bg-primary animate-ping"></span>
             <span class="material-symbols-outlined text-primary text-[20px]">cloud_upload</span>
             <div class="flex flex-col">
               <span class="font-label-sm text-label-sm font-semibold tracking-wider text-on-surface uppercase">SANDBOX WORKLOAD:</span>
-              <span class="font-label-md text-label-md text-primary font-bold" id="activeWorkloadLabel">Click or drop payload script...</span>
+              <span class="font-label-md text-label-md text-primary font-bold truncate max-w-[200px]" id="activeWorkloadLabel">Click or drop payload script...</span>
             </div>
             <span class="font-label-sm text-label-sm bg-surface-container px-2 py-0.5 rounded text-outline uppercase ml-space-xs" id="activeWorkloadBadge">STANDBY</span>
-          </div>
-
-          <div class="hidden sm:flex items-center gap-space-xs px-space-md py-2 bg-surface-container-low/80 backdrop-blur-md rounded-full text-on-surface-variant">
-            <span class="font-label-sm text-label-sm text-outline">SECCOMP:</span>
-            <span class="font-label-sm text-label-sm font-semibold text-secondary">BPF_PROG_ACTIVE</span>
-            <span class="w-1 h-1 rounded-full bg-outline-variant mx-1"></span>
-            <span class="font-label-sm text-label-sm text-outline">CGROUP:</span>
-            <span class="font-label-sm text-label-sm font-semibold text-on-surface">V2::ENFORCED</span>
           </div>
         </div>
 
         <!-- Active State Pipeline Rail (6 Interactive Steps) -->
-        <div class="flex items-center justify-center w-full xl:w-auto overflow-x-auto py-1">
-          <div class="flex items-center gap-1.5 p-1.5 bg-surface-container/80 backdrop-blur-xl rounded-full shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-            <button class="state-step-btn active px-space-md py-1.5 rounded-full font-label-sm text-label-sm uppercase font-semibold transition-all duration-200 flex items-center gap-1 bg-primary text-on-primary shadow-sm" data-step="upload">
+        <div class="flex items-center justify-start 2xl:justify-center max-w-full overflow-x-auto py-1 shrink-0">
+          <div class="flex items-center gap-1 p-1 bg-surface-container/80 backdrop-blur-xl rounded-full shadow-[0_2px_12px_rgba(0,0,0,0.04)] shrink-0 whitespace-nowrap">
+            <button class="state-step-btn active px-3 py-1.5 rounded-full font-label-sm text-label-sm uppercase font-semibold transition-all duration-200 flex items-center gap-1 bg-primary text-on-primary shadow-sm shrink-0 whitespace-nowrap" data-step="upload">
               <span class="step-dot w-1.5 h-1.5 rounded-full bg-surface-container-lowest"></span>
               1. Upload
             </button>
-            <span class="material-symbols-outlined text-outline-variant text-[14px]">chevron_right</span>
-            <button class="state-step-btn px-space-md py-1.5 rounded-full font-label-sm text-label-sm uppercase font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all duration-200 flex items-center gap-1" data-step="isolate">
+            <span class="material-symbols-outlined text-outline-variant text-[14px] shrink-0">chevron_right</span>
+            <button class="state-step-btn px-3 py-1.5 rounded-full font-label-sm text-label-sm uppercase font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all duration-200 flex items-center gap-1 shrink-0 whitespace-nowrap" data-step="isolate">
               <span class="step-dot w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
               2. Isolate
             </button>
-            <span class="material-symbols-outlined text-outline-variant text-[14px]">chevron_right</span>
-            <button class="state-step-btn px-space-md py-1.5 rounded-full font-label-sm text-label-sm uppercase font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all duration-200 flex items-center gap-1" data-step="observe">
+            <span class="material-symbols-outlined text-outline-variant text-[14px] shrink-0">chevron_right</span>
+            <button class="state-step-btn px-3 py-1.5 rounded-full font-label-sm text-label-sm uppercase font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all duration-200 flex items-center gap-1 shrink-0 whitespace-nowrap" data-step="observe">
               <span class="step-dot w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
               3. Observe
             </button>
-            <span class="material-symbols-outlined text-outline-variant text-[14px]">chevron_right</span>
-            <button class="state-step-btn px-space-md py-1.5 rounded-full font-label-sm text-label-sm uppercase font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all duration-200 flex items-center gap-1" data-step="detect">
+            <span class="material-symbols-outlined text-outline-variant text-[14px] shrink-0">chevron_right</span>
+            <button class="state-step-btn px-3 py-1.5 rounded-full font-label-sm text-label-sm uppercase font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all duration-200 flex items-center gap-1 shrink-0 whitespace-nowrap" data-step="detect">
               <span class="step-dot w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
               4. Detect
             </button>
-            <span class="material-symbols-outlined text-outline-variant text-[14px]">chevron_right</span>
-            <button class="state-step-btn px-space-md py-1.5 rounded-full font-label-sm text-label-sm uppercase font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all duration-200 flex items-center gap-1" data-step="contain">
+            <span class="material-symbols-outlined text-outline-variant text-[14px] shrink-0">chevron_right</span>
+            <button class="state-step-btn px-3 py-1.5 rounded-full font-label-sm text-label-sm uppercase font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all duration-200 flex items-center gap-1 shrink-0 whitespace-nowrap" data-step="contain">
               <span class="step-dot w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
               5. Contain
             </button>
-            <span class="material-symbols-outlined text-outline-variant text-[14px]">chevron_right</span>
-            <button class="state-step-btn px-space-md py-1.5 rounded-full font-label-sm text-label-sm uppercase font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all duration-200 flex items-center gap-1" data-step="verdict">
+            <span class="material-symbols-outlined text-outline-variant text-[14px] shrink-0">chevron_right</span>
+            <button class="state-step-btn px-3 py-1.5 rounded-full font-label-sm text-label-sm uppercase font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all duration-200 flex items-center gap-1 shrink-0 whitespace-nowrap" data-step="verdict">
               <span class="step-dot w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
               6. Verdict
             </button>
@@ -498,7 +488,7 @@
         </div>
 
         <!-- Camera Reset & Exploded View Button -->
-        <div class="flex items-center gap-space-sm">
+        <div class="flex items-center gap-space-sm shrink-0">
           <button class="w-9 h-9 rounded-full bg-surface-container-lowest/90 hover:bg-surface-container flex items-center justify-center text-outline hover:text-on-surface shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all" id="btn-reset-perspective" title="Reset Ortho Orbit">
             <span class="material-symbols-outlined text-[18px]">cached</span>
           </button>
@@ -587,10 +577,6 @@
         <div class="lg:col-span-6 relative flex flex-col items-center justify-center min-h-[540px] bg-gradient-to-b from-surface-container-lowest/50 via-surface-container-low/30 to-surface-container-lowest/60 rounded-2xl shadow-[inset_0_0_40px_rgba(0,97,148,0.03)] overflow-hidden p-space-md">
 
           <!-- Coordinate Compass HUD Overlays -->
-          <div class="absolute top-4 left-4 flex items-center gap-space-xs text-outline font-label-sm text-label-sm z-20">
-            <span class="material-symbols-outlined text-[16px] text-primary">view_in_ar</span>
-            <span>PROJECTION: <span class="text-on-surface font-mono font-medium">ISOMETRIC 38.5°</span></span>
-          </div>
           <div class="absolute top-4 right-4 flex items-center gap-2 z-20">
             <span class="font-label-sm text-label-sm px-2.5 py-1 rounded-full font-mono font-bold uppercase transition-all bg-primary-fixed text-on-primary-fixed-variant flex items-center gap-1.5" id="threatStatusPill">
               <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
