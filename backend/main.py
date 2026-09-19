@@ -144,6 +144,16 @@ if FRONTEND_DIR.exists():
     async def serve_index():
         return FileResponse(FRONTEND_DIR / "index.html")
 
+    @app.get("/landing")
+    @app.get("/landing.html")
+    async def serve_landing():
+        return FileResponse(FRONTEND_DIR / "landing.html")
+
+    @app.get("/download")
+    @app.get("/download.html")
+    async def serve_download():
+        return FileResponse(FRONTEND_DIR / "download.html")
+
     @app.get("/timeline")
     @app.get("/timeline.html")
     async def serve_timeline():

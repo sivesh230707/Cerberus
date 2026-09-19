@@ -381,10 +381,13 @@
 
       <!-- Center Multi-View Navigation -->
       <div class="hidden xl:flex items-center">
-        <nav class="flex items-center gap-space-xs p-1 bg-surface-container/70 rounded-full backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.03)]">
+        <nav class="flex items-center gap-space-xs p-1 bg-surface-container/70 rounded-full backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.03)]" data-active-classes="bg-primary-container text-on-primary-container font-semibold shadow-[0_2px_8px_rgba(0,97,148,0.18)]">
+          <a class="font-label-sm text-label-sm uppercase px-space-md py-1.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all nav-pill-transition" data-path="landing" href="/landing.html">LANDING</a>
           <a aria-current="page" class="uppercase px-space-md py-1.5 rounded-full transition-all bg-primary-container text-on-primary-container font-semibold shadow-[0_2px_8px_rgba(0,97,148,0.18)] nav-pill-transition nav-pill-active" data-path="analyze" href="/">ANALYZE</a>
-          <a class="font-label-sm text-label-sm uppercase px-space-md py-1.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all nav-pill-transition" data-path="timeline-and-history" href="/timeline.html">TIMELINE &amp; HISTORY</a>
+          <a class="font-label-sm text-label-sm uppercase px-space-md py-1.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all nav-pill-transition" data-path="timeline-and-history" href="/timeline.html">TIMELINE & HISTORY</a>
           <a class="font-label-sm text-label-sm uppercase px-space-md py-1.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all nav-pill-transition" data-path="deep-report" href="/report.html">DEEP REPORT</a>
+          <a class="font-label-sm text-label-sm uppercase px-space-md py-1.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all nav-pill-transition" data-path="architecture-and-system" href="/architecture.html">ARCHITECTURE</a>
+          <a class="font-label-sm text-label-sm uppercase px-space-md py-1.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all nav-pill-transition" data-path="download" href="/download.html">DOWNLOAD</a>
         </nav>
       </div>
 
@@ -412,10 +415,13 @@
 
     <!-- Mobile Navigation Drawer -->
     <div class="xl:hidden flex items-center justify-center pb-2 px-margin">
-      <nav class="flex items-center gap-space-xs p-1 bg-surface-container/80 rounded-full backdrop-blur-md overflow-x-auto max-w-full">
+      <nav class="flex items-center gap-space-xs p-1 bg-surface-container/80 rounded-full backdrop-blur-md overflow-x-auto max-w-full" data-active-classes="bg-primary-container text-on-primary-container font-semibold shadow-[0_2px_8px_rgba(0,97,148,0.18)]">
+        <a class="font-label-sm text-label-sm uppercase px-space-sm py-1 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all whitespace-nowrap nav-pill-transition" href="/landing.html">LANDING</a>
         <a aria-current="page" class="uppercase px-space-sm py-1 rounded-full transition-all whitespace-nowrap bg-primary-container text-on-primary-container font-semibold shadow-[0_2px_8px_rgba(0,97,148,0.18)] nav-pill-transition nav-pill-active" href="/">ANALYZE</a>
-        <a class="font-label-sm text-label-sm uppercase px-space-sm py-1 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all whitespace-nowrap nav-pill-transition" href="/timeline.html">TIMELINE</a>
+        <a class="font-label-sm text-label-sm uppercase px-space-sm py-1 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all whitespace-nowrap nav-pill-transition" href="/timeline.html">TIMELINE & HISTORY</a>
         <a class="font-label-sm text-label-sm uppercase px-space-sm py-1 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all whitespace-nowrap nav-pill-transition" href="/report.html">DEEP REPORT</a>
+        <a class="font-label-sm text-label-sm uppercase px-space-sm py-1 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all whitespace-nowrap nav-pill-transition" href="/architecture.html">ARCHITECTURE</a>
+        <a class="font-label-sm text-label-sm uppercase px-space-sm py-1 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all whitespace-nowrap nav-pill-transition" href="/download.html">DOWNLOAD</a>
       </nav>
     </div>
   </header>

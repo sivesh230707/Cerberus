@@ -1,0 +1,717 @@
+<!DOCTYPE html><html class="scroll-smooth" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>CERBERUS - Real-Time Runtime Security &amp; Sandbox Containment</title>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface": "#F7F9FF",
+            "surface-dim": "#E5EEF9",
+            "surface-bright": "#FFFFFF",
+            "surface-container-lowest": "#FFFFFF",
+            "surface-container-low": "#F4F7FC",
+            "surface-container": "#EEF4FF",
+            "surface-container-high": "#E2EDFB",
+            "primary": "#087DB3",
+            "primary-dark": "#06628D",
+            "primary-light": "#DCEEFF",
+            "secondary": "#1E3A8A",
+            "navy-dark": "#172033",
+            "slate-muted": "#5D6878",
+            "border-tech": "#D9E5F2",
+            "safe": "#059669",
+            "frozen": "#E11D48"
+          },
+          fontFamily: {
+            "headline-xl": ["Plus Jakarta Sans", "sans-serif"],
+            "headline-lg": ["Plus Jakarta Sans", "sans-serif"],
+            "headline-md": ["Plus Jakarta Sans", "sans-serif"],
+            "body-lg": ["Inter", "sans-serif"],
+            "body-md": ["Inter", "sans-serif"],
+            "body-sm": ["Inter", "sans-serif"],
+            "mono": ["JetBrains Mono", "monospace"]
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    body {
+      -webkit-font-smoothing: antialiased;
+      background-color: #F7F9FF;
+      background-image: radial-gradient(rgba(8, 125, 179, 0.08) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+    ::-webkit-scrollbar { width: 7px; }
+    ::-webkit-scrollbar-track { background: #F7F9FF; }
+    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+    @keyframes pulseSoft {
+      0%, 100% { opacity: 0.35; transform: scale(1); }
+      50% { opacity: 0.65; transform: scale(1.06); }
+    }
+    @keyframes radarPing {
+      0% { transform: scale(0.9); opacity: 0.85; }
+      70% { transform: scale(1.85); opacity: 0; }
+      100% { transform: scale(1.95); opacity: 0; }
+    }
+    @keyframes pulseGlowRing {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(8, 125, 179, 0.35); }
+      50% { box-shadow: 0 0 0 8px rgba(8, 125, 179, 0); }
+    }
+    @keyframes flowLine {
+      0% { stroke-dashoffset: 40; }
+      100% { stroke-dashoffset: 0; }
+    }
+
+    .animate-pulse-soft {
+      animation: pulseSoft 8s ease-in-out infinite;
+    }
+    .radar-pulse {
+      animation: radarPing 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+    .monitor-ring-glow {
+      animation: pulseGlowRing 2.4s ease-in-out infinite;
+    }
+    .flow-dash {
+      stroke-dasharray: 6 6;
+      animation: flowLine 1.4s linear infinite;
+    }
+    .reveal-on-scroll {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal-on-scroll.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .soc-card {
+      background: #FFFFFF;
+      border: 1px solid #D9E5F2;
+      box-shadow: 0 1px 3px rgba(8, 125, 179, 0.04), 0 4px 14px rgba(23, 32, 51, 0.03);
+    }
+    .soc-card:hover {
+      border-color: rgba(8, 125, 179, 0.4);
+      box-shadow: 0 4px 20px rgba(8, 125, 179, 0.08);
+    }
+  </style>
+</head>
+<body class="bg-[#F7F9FF] text-[#172033] font-body-md text-sm selection:bg-[#DCEEFF] selection:text-[#06628D] min-h-screen flex flex-col relative overflow-x-hidden">
+<!-- Ambient Background Mesh & Lighting -->
+<canvas class="fixed inset-0 pointer-events-none z-0 opacity-35 w-full h-full" height="3206" id="ambient-mesh" width="1280"></canvas>
+<div class="fixed -top-36 -right-24 w-96 h-96 rounded-full bg-[#087DB3]/10 blur-3xl pointer-events-none z-0 animate-pulse-soft"></div>
+<div class="fixed top-1/3 -left-32 w-96 h-96 rounded-full bg-[#1E3A8A]/10 blur-3xl pointer-events-none z-0 animate-pulse-soft" style="animation-delay: -3.5s;"></div>
+<div class="fixed -bottom-24 right-1/4 w-96 h-96 rounded-full bg-[#087DB3]/8 blur-3xl pointer-events-none z-0 animate-pulse-soft" style="animation-delay: -5s;"></div>
+<!-- ==========================================
+       SECTION 1: NAVBAR (DESKTOP / RESPONSIVE)
+       ========================================== -->
+<header class="sticky top-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-[#D9E5F2] transition-all shadow-[0_1px_4px_rgba(23,32,51,0.02)]">
+<div class="max-w-7xl mx-auto px-6 lg:px-8 h-18 flex items-center justify-between py-3.5">
+<!-- Logo -->
+<a class="flex items-center gap-2.5 group" href="#">
+<div class="w-10 h-10 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0"><img alt="Cerberus Logo" class="w-full h-full object-contain rounded" src="/static/cerberus-logo.png" onerror="this.onerror=null;this.src='https://lh3.googleusercontent.com/aida-public/AB6AXuC7Hsc5JuqnBjwfYnq9X2IbPXX5EESTC87-OaGJYSqgK0D46bP_sXe97kD87TNFvkebqmpdjaX144jRh-v4gdCrjQTMfGW233_gxcVTFFgVDLPMQgBDmMI0Sei2T0YmR41-_CpuuceXrWWRBNEWd2-bpfVWbVjAYEJ2OQHx3Cw8fxMmsqFLq2rp0ipoBNKxJBbCGBM82RcwuEc5EcgGEnah-9HdEoERpDdHqiUKmDKb'"></div>
+<span class="font-headline-md font-bold tracking-tight text-[#172033] text-xl">CERBERUS</span>
+</a>
+<!-- Navigation Links -->
+<nav class="hidden md:flex items-center gap-8 text-[13.5px] font-semibold text-[#5D6878]">
+<a class="hover:text-[#087DB3] transition-colors" href="#why-cerberus">Features</a>
+<a class="hover:text-[#087DB3] transition-colors" href="#how-it-works">How It Works</a>
+<a class="hover:text-[#087DB3] transition-colors" href="/architecture.html">Architecture</a>
+<a class="hover:text-[#087DB3] transition-colors" href="#outcomes">Outcomes</a>
+<a class="hover:text-[#087DB3] transition-colors font-semibold text-[#087DB3]" href="download.html">Download</a>
+</nav>
+<!-- Action Button -->
+<div class="flex items-center gap-3">
+<a class="h-10 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs lg:text-sm active:scale-[0.98] transition-all flex items-center gap-1.5 shadow-sm shadow-emerald-600/25 border border-emerald-600/30" href="/">
+<span class="material-symbols-outlined text-[17px]">rocket_launch</span>
+<span class="">Launch Sandbox</span>
+</a>
+<a class="h-10 px-4 rounded-lg bg-[#087DB3] text-white font-semibold text-xs lg:text-sm hover:bg-[#06628D] active:scale-[0.98] transition-all flex items-center gap-1.5 shadow-sm shadow-[#087DB3]/25 border border-[#087DB3]/30" href="/download.html">
+<span class="">Download</span>
+<span class="material-symbols-outlined text-[16px]">download</span>
+</a>
+</div>
+</div>
+</header>
+<!-- ==========================================
+       MAIN CONTENT CONTAINER
+       ========================================== -->
+<main class="relative z-10 flex-1 flex flex-col space-y-20 lg:space-y-32">
+<!-- ==========================================
+         SECTION 2: HERO SECTION (2-COLUMN GRID)
+         ========================================== -->
+<section class="max-w-7xl mx-auto px-6 lg:px-8 pt-12 lg:pt-20">
+<div class="grid lg:grid-cols-12 gap-12 lg:gap-14 items-center">
+<!-- Left Column: Copy & CTAs -->
+<div class="lg:col-span-6 xl:col-span-7 flex flex-col items-start reveal-on-scroll revealed">
+<div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#EEF4FF] border border-[#D9E5F2] text-[#087DB3] shadow-xs mb-6 font-mono">
+<span class="w-2 h-2 rounded-full bg-[#087DB3] animate-pulse"></span>
+<span class="text-xs font-semibold tracking-wide">Real-Time Runtime Security</span>
+</div>
+<h1 class="font-headline-xl text-3xl sm:text-4xl lg:text-5xl lg:leading-[1.18] font-extrabold text-[#172033] tracking-tight mb-5">
+            Run Untrusted Code. <br>
+<span class="bg-gradient-to-r from-[#087DB3] via-[#0284C7] to-[#1E3A8A] bg-clip-text text-transparent">
+              Detect Dangerous Behavior.
+            </span> <br>
+            Contain It.
+          </h1>
+<p class="font-body-lg text-[#5D6878] text-base sm:text-lg leading-relaxed mb-8 max-w-2xl">
+            Cerberus runs untrusted code inside an ephemeral RAM-backed sandbox, observes its behavior in real time, and automatically contains suspicious activity before it can cause damage.
+          </p>
+<div class="flex flex-col sm:flex-row gap-3.5 w-full sm:w-auto">
+<a class="h-12 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold shadow-md shadow-emerald-600/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2 border border-emerald-600" href="/">
+<span class="material-symbols-outlined text-[19px]">rocket_launch</span>
+<span class="">Launch Sandbox Cockpit</span>
+</a>
+<a class="h-12 px-6 rounded-xl bg-[#087DB3] text-white text-sm font-semibold shadow-sm hover:bg-[#06628D] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-[#087DB3]/20 border border-[#087DB3]" href="#how-it-works">
+<span class="">Explore Pipeline</span>
+<span class="material-symbols-outlined text-[18px]">arrow_downward</span>
+</a>
+<a class="h-12 px-6 rounded-xl bg-white border border-[#D9E5F2] text-[#172033] text-sm font-semibold hover:border-[#087DB3] hover:text-[#087DB3] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-xs" href="#defense-flow">
+<span class="material-symbols-outlined text-[19px] text-[#087DB3]">shield</span>
+<span class="">Defense Flow</span>
+</a>
+</div>
+</div>
+<!-- Right Column: Interactive Conceptual Visualization -->
+<div class="lg:col-span-6 xl:col-span-5 reveal-on-scroll revealed" id="defense-flow">
+<div class="bg-white rounded-2xl border border-[#D9E5F2] shadow-md p-6 sm:p-7 relative overflow-hidden backdrop-blur-sm">
+<!-- Top Controls -->
+<div class="flex items-center justify-between mb-6 pb-4 border-b border-[#D9E5F2]">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-[#087DB3]"></span>
+<span class="text-xs font-bold text-[#172033] tracking-wider uppercase font-mono">Runtime Protection Flow</span>
+</div>
+<div class="inline-flex bg-[#F4F7FC] p-1 rounded-lg text-xs font-semibold border border-[#D9E5F2]" id="concept-toggle-group">
+<button class="px-3 py-1 rounded-md bg-white text-emerald-700 shadow-xs transition-all flex items-center gap-1.5 font-mono border border-[#D9E5F2]" id="btn-show-safe" type="button">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+<span class="">Safe Pass</span>
+</button>
+<button class="px-3 py-1 rounded-md text-[#5D6878] hover:text-[#172033] transition-all flex items-center gap-1.5 font-mono" id="btn-show-frozen" type="button">
+<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+<span class="">Contained</span>
+</button>
+</div>
+</div>
+<!-- Flow Stages -->
+<div class="grid grid-cols-4 gap-2.5 text-center relative mb-6">
+<!-- Node 1: Untrusted File -->
+<div class="p-3 rounded-xl bg-[#F4F7FC] border border-[#D9E5F2] flex flex-col items-center justify-center relative">
+<div class="w-9 h-9 rounded-lg bg-white border border-[#D9E5F2] flex items-center justify-center text-[#5D6878] shadow-xs mb-2">
+<span class="material-symbols-outlined text-[19px]">draft</span>
+</div>
+<span class="text-xs font-bold text-[#172033]">Untrusted</span>
+<span class="text-[10px] text-[#5D6878] font-mono mt-0.5">Payload</span>
+</div>
+<!-- Node 2: RAM Sandbox -->
+<div class="p-3 rounded-xl bg-[#EEF4FF] border border-[#D9E5F2] flex flex-col items-center justify-center relative">
+<div class="w-9 h-9 rounded-lg bg-[#087DB3] text-white flex items-center justify-center shadow-xs mb-2">
+<span class="material-symbols-outlined text-[19px]">memory</span>
+</div>
+<span class="text-xs font-bold text-[#06628D]">RAM Box</span>
+<span class="text-[10px] text-[#087DB3] font-mono mt-0.5">Ephemeral</span>
+</div>
+<!-- Node 3: Monitoring -->
+<div class="p-3 rounded-xl bg-[#EEF4FF] border border-[#D9E5F2] flex flex-col items-center justify-center relative">
+<div class="relative w-9 h-9 rounded-lg bg-[#1E3A8A] text-white flex items-center justify-center shadow-xs mb-2 monitor-ring-glow">
+<span class="radar-pulse absolute inset-0 rounded-lg bg-[#087DB3] opacity-70"></span>
+<span class="material-symbols-outlined text-[19px] relative z-10">visibility</span>
+</div>
+<span class="text-xs font-bold text-[#1E3A8A]">Monitor</span>
+<span class="text-[10px] text-[#087DB3] font-mono mt-0.5">Real-time</span>
+</div>
+<!-- Node 4: Dynamic Verdict -->
+<div class="p-3 rounded-xl bg-emerald-50 border border-emerald-300 flex flex-col items-center justify-center transition-all duration-300" id="flow-verdict-node">
+<div class="w-9 h-9 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-xs mb-2 transition-colors duration-300" id="flow-verdict-icon">
+<span class="material-symbols-outlined text-[19px]">check_circle</span>
+</div>
+<span class="text-xs font-bold text-emerald-800 transition-colors duration-300 font-mono" id="flow-verdict-label">SAFE</span>
+<span class="text-[10px] text-emerald-600 font-mono mt-0.5 transition-colors duration-300" id="flow-verdict-sub">Clean Exit</span>
+</div>
+</div>
+<!-- Animated Line Track -->
+<div class="w-full h-3 mb-6 px-3 relative">
+<svg class="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 320 12">
+<line stroke="#D9E5F2" stroke-linecap="round" stroke-width="2" x1="10" x2="310" y1="6" y2="6"></line>
+<line class="flow-dash" id="flow-indicator-line" stroke="#087DB3" stroke-linecap="round" stroke-width="2" x1="10" x2="310" y1="6" y2="6"></line>
+<circle cx="0" cy="6" fill="#087DB3" r="3.5">
+<animate attributeName="cx" dur="1.8s" fill="freeze" from="10" repeatCount="indefinite" to="310"></animate>
+<animate attributeName="opacity" dur="1.8s" repeatCount="indefinite" values="0.1;1;1;0.2"></animate>
+</circle>
+</svg>
+</div>
+<!-- Dynamic Interactive Notification Card -->
+<div class="p-4 rounded-xl bg-[#EEF4FF] border border-emerald-300 transition-all duration-300 flex items-start gap-3.5" id="flow-status-card">
+<div class="w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 mt-0.5 transition-colors duration-300" id="flow-status-badge">
+<span class="material-symbols-outlined text-[16px]">verified_user</span>
+</div>
+<div class="transition-opacity duration-300" id="flow-status-text-wrap">
+<h4 class="text-xs sm:text-sm font-bold text-emerald-900 font-headline-md" id="flow-status-title">Normal execution completed</h4>
+<p class="text-xs text-[#5D6878] mt-1 leading-relaxed" id="flow-status-desc">
+                  Code executed strictly within authorized bounds. The ephemeral RAM-disk was immediately unmounted and cleanly purged.
+                </p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ==========================================
+         SECTION 3: WHY CERBERUS (4-COLUMN GRID)
+         ========================================== -->
+<section class="max-w-7xl mx-auto px-6 lg:px-8 w-full reveal-on-scroll revealed" id="why-cerberus">
+<div class="mb-10 text-center max-w-2xl mx-auto">
+<span class="text-xs font-bold uppercase tracking-wider text-[#087DB3] font-mono">Runtime Risks</span>
+<h2 class="font-headline-lg text-2xl sm:text-3xl font-bold text-[#172033] mt-2">Why Cerberus</h2>
+<p class="font-body-md text-[#5D6878] text-sm sm:text-base mt-2">Running untrusted scripts introduces critical risks that static analysis cannot prevent.</p>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Card 1 -->
+<div class="soc-card p-6 rounded-2xl border border-[#D9E5F2] hover:border-[#087DB3]/40 transition-all group flex flex-col justify-between">
+<div>
+<div class="w-10 h-10 rounded-xl bg-[#EEF4FF] border border-[#D9E5F2] text-[#087DB3] flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[22px]">folder_open</span>
+</div>
+<h3 class="font-headline-md text-base font-bold text-[#172033] mb-2">Unauthorized file access</h3>
+<p class="font-body-sm text-xs sm:text-sm text-[#5D6878] leading-relaxed">
+              Attempts to access credentials, private keys, or sensitive files across host directories.
+            </p>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="soc-card p-6 rounded-2xl border border-[#D9E5F2] hover:border-[#087DB3]/40 transition-all group flex flex-col justify-between">
+<div>
+<div class="w-10 h-10 rounded-xl bg-[#EEF4FF] border border-[#D9E5F2] text-[#087DB3] flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[22px]">fork_right</span>
+</div>
+<h3 class="font-headline-md text-base font-bold text-[#172033] mb-2">Unexpected process activity</h3>
+<p class="font-body-sm text-xs sm:text-sm text-[#5D6878] leading-relaxed">
+              Unexpected child processes, shell spawns, or hidden binary execution behavior.
+            </p>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="soc-card p-6 rounded-2xl border border-[#D9E5F2] hover:border-[#087DB3]/40 transition-all group flex flex-col justify-between">
+<div>
+<div class="w-10 h-10 rounded-xl bg-[#EEF4FF] border border-[#D9E5F2] text-[#087DB3] flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[22px]">wifi_tethering</span>
+</div>
+<h3 class="font-headline-md text-base font-bold text-[#172033] mb-2">Suspicious connections</h3>
+<p class="font-body-sm text-xs sm:text-sm text-[#5D6878] leading-relaxed">
+              Unauthorized outbound connections, data exfiltration, or malicious socket creation.
+            </p>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="soc-card p-6 rounded-2xl border border-[#D9E5F2] hover:border-[#087DB3]/40 transition-all group flex flex-col justify-between">
+<div>
+<div class="w-10 h-10 rounded-xl bg-[#EEF4FF] border border-[#D9E5F2] text-[#087DB3] flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[22px]">cleaning_services</span>
+</div>
+<h3 class="font-headline-md text-base font-bold text-[#172033] mb-2">Persistent host artifacts</h3>
+<p class="font-body-sm text-xs sm:text-sm text-[#5D6878] leading-relaxed">
+              Unwanted files, scheduled tasks, or residual storage artifacts remaining post-execution.
+            </p>
+</div>
+</div>
+</div>
+</section>
+<!-- ==========================================
+         SECTION 4: HOW IT WORKS (HORIZONTAL PIPELINE)
+         ========================================== -->
+<section class="max-w-7xl mx-auto px-6 lg:px-8 w-full reveal-on-scroll revealed" id="how-it-works">
+<div class="mb-10 text-center max-w-2xl mx-auto">
+<span class="text-xs font-bold uppercase tracking-wider text-[#087DB3] font-mono">Runtime Pipeline</span>
+<h2 class="font-headline-lg text-2xl sm:text-3xl font-bold text-[#172033] mt-2">How It Works</h2>
+<p class="font-body-md text-[#5D6878] text-sm sm:text-base mt-2">A four-stage defense pipeline that intercepts threats in real time.</p>
+</div>
+<!-- 4-Stage Horizontal Workflow -->
+<div class="relative">
+<!-- Connecting Line for Desktop -->
+<div class="hidden lg:block absolute top-7 left-12 right-12 h-0.5 bg-gradient-to-r from-[#087DB3]/30 via-[#0284C7]/30 to-[#087DB3]/30 z-0"></div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
+<!-- Stage 1 -->
+<div class="soc-card p-6 rounded-2xl border border-[#D9E5F2] hover:shadow-md transition-all flex flex-col">
+<div class="flex items-center justify-between mb-4">
+<span class="w-8 h-8 rounded-full bg-[#087DB3] text-white font-bold text-xs flex items-center justify-center shadow-xs font-mono">1</span>
+<span class="text-[11px] font-bold text-[#087DB3] bg-[#EEF4FF] border border-[#D9E5F2] px-2.5 py-1 rounded-full uppercase tracking-wider font-mono">STAGE 1</span>
+</div>
+<h3 class="font-headline-md text-base font-bold text-[#172033] uppercase tracking-wide mb-2">ISOLATE</h3>
+<p class="font-body-sm text-xs sm:text-sm text-[#5D6878] leading-relaxed flex-1">
+              Run code inside an ephemeral RAM-backed sandbox designed to avoid persistent artifacts.
+            </p>
+</div>
+<!-- Stage 2 -->
+<div class="soc-card p-6 rounded-2xl border border-[#D9E5F2] hover:shadow-md transition-all flex flex-col">
+<div class="flex items-center justify-between mb-4">
+<span class="w-8 h-8 rounded-full bg-[#087DB3] text-white font-bold text-xs flex items-center justify-center shadow-xs font-mono">2</span>
+<span class="text-[11px] font-bold text-[#087DB3] bg-[#EEF4FF] border border-[#D9E5F2] px-2.5 py-1 rounded-full uppercase tracking-wider font-mono">STAGE 2</span>
+</div>
+<h3 class="font-headline-md text-base font-bold text-[#172033] uppercase tracking-wide mb-2">OBSERVE</h3>
+<p class="font-body-sm text-xs sm:text-sm text-[#5D6878] leading-relaxed flex-1">
+              Monitor runtime behavior using kernel-level observation and low-overhead hooks.
+            </p>
+</div>
+<!-- Stage 3 -->
+<div class="soc-card p-6 rounded-2xl border border-[#D9E5F2] hover:shadow-md transition-all flex flex-col">
+<div class="flex items-center justify-between mb-4">
+<span class="w-8 h-8 rounded-full bg-[#087DB3] text-white font-bold text-xs flex items-center justify-center shadow-xs font-mono">3</span>
+<span class="text-[11px] font-bold text-[#087DB3] bg-[#EEF4FF] border border-[#D9E5F2] px-2.5 py-1 rounded-full uppercase tracking-wider font-mono">STAGE 3</span>
+</div>
+<h3 class="font-headline-md text-base font-bold text-[#172033] uppercase tracking-wide mb-2">DETECT</h3>
+<p class="font-body-sm text-xs sm:text-sm text-[#5D6878] leading-relaxed flex-1">
+              Identify suspicious activity against runtime security policies as actions occur.
+            </p>
+</div>
+<!-- Stage 4 -->
+<div class="soc-card p-6 rounded-2xl border border-[#D9E5F2] hover:shadow-md transition-all flex flex-col">
+<div class="flex items-center justify-between mb-4">
+<span class="w-8 h-8 rounded-full bg-rose-600 text-white font-bold text-xs flex items-center justify-center shadow-xs font-mono">4</span>
+<span class="text-[11px] font-bold text-rose-600 bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-full uppercase tracking-wider font-mono">STAGE 4</span>
+</div>
+<h3 class="font-headline-md text-base font-bold text-[#172033] uppercase tracking-wide mb-2">CONTAIN</h3>
+<p class="font-body-sm text-xs sm:text-sm text-[#5D6878] leading-relaxed flex-1">
+              Block and freeze dangerous execution before damage occurs, containing suspicious execution instantly.
+            </p>
+</div>
+</div>
+</div>
+</section>
+<!-- ==========================================
+         SECTION 5: THREE CORE LAYERS (ARCHITECTURE)
+         ========================================== -->
+<section class="max-w-7xl mx-auto px-6 lg:px-8 w-full reveal-on-scroll revealed" id="architecture">
+<div class="mb-10 text-center max-w-2xl mx-auto">
+<span class="text-xs font-bold uppercase tracking-wider text-[#087DB3] font-mono">Architecture</span>
+<h2 class="font-headline-lg text-2xl sm:text-3xl font-bold text-[#172033] mt-2">Three Core Layers</h2>
+<p class="font-body-md text-[#5D6878] text-sm sm:text-base mt-2">Built from foundational Linux primitives into a unified defense architecture.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Layer 1 -->
+<div class="soc-card p-7 rounded-2xl border border-[#D9E5F2] hover:-translate-y-1 hover:shadow-md hover:border-[#087DB3]/50 transition-all flex flex-col">
+<div class="w-12 h-12 rounded-xl bg-[#EEF4FF] text-[#087DB3] flex items-center justify-center mb-5 border border-[#D9E5F2]">
+<span class="material-symbols-outlined text-[26px]">memory</span>
+</div>
+<h3 class="font-headline-md text-lg font-bold text-[#172033] mb-2">Isolation</h3>
+<p class="font-body-sm text-[#5D6878] text-sm leading-relaxed">
+            RAM-backed temporary environment, namespaces, and resource controls to ensure no persistent storage is touched during runtime.
+          </p>
+</div>
+<!-- Layer 2 -->
+<div class="soc-card p-7 rounded-2xl border border-[#D9E5F2] hover:-translate-y-1 hover:shadow-md hover:border-[#087DB3]/50 transition-all flex flex-col">
+<div class="w-12 h-12 rounded-xl bg-[#EEF4FF] text-[#087DB3] flex items-center justify-center mb-5 border border-[#D9E5F2]">
+<span class="material-symbols-outlined text-[26px]">troubleshoot</span>
+</div>
+<h3 class="font-headline-md text-lg font-bold text-[#172033] mb-2">Observation</h3>
+<p class="font-body-sm text-[#5D6878] text-sm leading-relaxed">
+            eBPF and system-level behavior monitoring that tracks runtime events cleanly without degrading runtime performance.
+          </p>
+</div>
+<!-- Layer 3 -->
+<div class="soc-card p-7 rounded-2xl border border-[#D9E5F2] hover:-translate-y-1 hover:shadow-md hover:border-[#087DB3]/50 transition-all flex flex-col">
+<div class="w-12 h-12 rounded-xl bg-[#EEF4FF] text-[#087DB3] flex items-center justify-center mb-5 border border-[#D9E5F2]">
+<span class="material-symbols-outlined text-[26px]">security</span>
+</div>
+<h3 class="font-headline-md text-lg font-bold text-[#172033] mb-2">Response</h3>
+<p class="font-body-sm text-[#5D6878] text-sm leading-relaxed">
+            Automatic network blocking, process containment, and ephemeral session cleanup immediately after code terminates.
+          </p>
+</div>
+</div>
+</section>
+<!-- ==========================================
+         SECTION 6: RUNTIME OUTCOMES (SIDE-BY-SIDE)
+         ========================================== -->
+<section class="max-w-7xl mx-auto px-6 lg:px-8 w-full reveal-on-scroll revealed" id="outcomes">
+<div class="mb-10 text-center max-w-2xl mx-auto">
+<span class="text-xs font-bold uppercase tracking-wider text-[#5D6878] font-mono">Verdicts</span>
+<h2 class="font-headline-lg text-2xl sm:text-3xl font-bold text-[#172033] mt-2">Clear Runtime Outcomes</h2>
+<p class="font-body-md text-[#5D6878] text-sm sm:text-base mt-2">Predictable outcomes followed by immediate ephemeral cleanup.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- SAFE Outcome -->
+<div class="p-6 sm:p-8 rounded-2xl bg-[#FFFFFF] border-2 border-emerald-500 shadow-sm flex flex-col justify-between transition-all duration-300 cursor-pointer" id="card-verdict-safe">
+<div>
+<div class="flex items-center justify-between mb-4">
+<span class="inline-flex items-center gap-2 text-sm font-bold text-emerald-800 font-mono">
+<span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                SAFE PASS
+              </span>
+<span class="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-0.5 rounded-full font-mono">NORMAL</span>
+</div>
+<h3 class="font-headline-md text-xl font-bold text-[#172033] mb-2">Standard Clean Execution</h3>
+<p class="text-sm text-[#5D6878] leading-relaxed mb-6">
+              Execution completes normally. Ephemeral memory is immediately unmounted and discarded without leaving artifacts on host machines.
+            </p>
+</div>
+<div class="pt-4 border-t border-[#D9E5F2] flex items-center text-xs sm:text-sm font-semibold text-emerald-700 gap-2">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+<span class="">Clean unmount verified &amp; all RAM traces purged</span>
+</div>
+</div>
+<!-- FROZEN Outcome -->
+<div class="p-6 sm:p-8 rounded-2xl bg-[#FFFFFF] border-2 border-[#D9E5F2] shadow-sm flex flex-col justify-between transition-all duration-300 cursor-pointer hover:border-rose-300" id="card-verdict-frozen">
+<div>
+<div class="flex items-center justify-between mb-4">
+<span class="inline-flex items-center gap-2 text-sm font-bold text-rose-800 font-mono">
+<span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                FROZEN
+              </span>
+<span class="text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 px-3 py-0.5 rounded-full font-mono">CONTAINED</span>
+</div>
+<h3 class="font-headline-md text-xl font-bold text-[#172033] mb-2">Automated Threat Mitigation</h3>
+<p class="text-sm text-[#5D6878] leading-relaxed mb-6">
+              Suspicious behavior is detected. Unauthorized outbound network activity is blocked instantly and the offending process is immediately contained.
+            </p>
+</div>
+<div class="pt-4 border-t border-[#D9E5F2] flex items-center text-xs sm:text-sm font-semibold text-rose-700 gap-2">
+<span class="material-symbols-outlined text-[18px]">lock</span>
+<span class="">Threat contained automatically mid-flight</span>
+</div>
+</div>
+</div>
+</section>
+<!-- ==========================================
+         SECTION 7: FINAL CTA
+         ========================================== -->
+<section class="max-w-7xl mx-auto px-6 lg:px-8 w-full reveal-on-scroll revealed pb-4">
+<div class="bg-gradient-to-br from-[#087DB3] via-[#1E3A8A] to-[#0F172A] rounded-3xl p-8 sm:p-12 lg:p-16 text-white text-center shadow-lg relative overflow-hidden border border-[#087DB3]/30">
+<!-- Ambient decorative shapes inside banner -->
+<div class="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-white/10 blur-2xl pointer-events-none"></div>
+<div class="absolute -bottom-24 -right-24 w-72 h-72 rounded-full bg-[#087DB3]/25 blur-2xl pointer-events-none"></div>
+<div class="relative z-10 max-w-3xl mx-auto">
+<h2 class="font-headline-lg text-2xl sm:text-3xl lg:text-4xl font-extrabold leading-tight mb-4 text-white">
+            Don't Just Run Untrusted Code. <br class="hidden sm:inline">Watch It. Detect It. Contain It.
+          </h2>
+<p class="text-[#DCEEFF] text-sm sm:text-base leading-relaxed mb-8 max-w-xl mx-auto">
+            See how Cerberus observes, detects, and contains suspicious runtime behavior with instant containment in ephemeral sandboxes.
+          </p>
+<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+<a class="h-12 px-8 rounded-xl bg-white text-[#087DB3] text-sm font-bold hover:bg-[#EEF4FF] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm" href="/">
+<span class="">Launch Defense Sandbox</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</a>
+<a class="h-12 px-8 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 text-sm font-semibold active:scale-[0.98] transition-all flex items-center justify-center gap-2" href="/download.html">
+<span class="material-symbols-outlined text-[18px]">download</span>
+<span class="">Download Client</span>
+</a>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- ==========================================
+       SECTION 8: FOOTER (CLEAN DESKTOP)
+       ========================================== -->
+<footer class="mt-20 border-t border-[#D9E5F2] bg-white/90 backdrop-blur-sm py-10 relative z-10">
+<div class="max-w-7xl mx-auto px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 flex items-center justify-center shrink-0"><img alt="Cerberus Logo" class="w-full h-full object-contain rounded" src="/static/cerberus-logo.png" onerror="this.onerror=null;this.src='https://lh3.googleusercontent.com/aida-public/AB6AXuC7Hsc5JuqnBjwfYnq9X2IbPXX5EESTC87-OaGJYSqgK0D46bP_sXe97kD87TNFvkebqmpdjaX144jRh-v4gdCrjQTMfGW233_gxcVTFFgVDLPMQgBDmMI0Sei2T0YmR41-_CpuuceXrWWRBNEWd2-bpfVWbVjAYEJ2OQHx3Cw8fxMmsqFLq2rp0ipoBNKxJBbCGBM82RcwuEc5EcgGEnah-9HdEoERpDdHqiUKmDKb'"></div>
+<span class="font-headline-md font-bold tracking-tight text-[#172033] text-base">CERBERUS</span>
+</div>
+<p class="text-xs sm:text-sm text-[#5D6878] text-center md:text-left max-w-md leading-relaxed">
+        Ephemeral RAM-disk sandbox with real-time behavior detection and automatic containment.
+      </p>
+<div class="flex items-center gap-6 text-xs sm:text-sm font-medium text-[#5D6878]">
+<a class="hover:text-[#087DB3] transition-colors" href="#why-cerberus">Features</a>
+<a class="hover:text-[#087DB3] transition-colors" href="#how-it-works">How It Works</a>
+<a class="hover:text-[#087DB3] transition-colors" href="/architecture.html">Architecture</a>
+<a class="hover:text-[#087DB3] transition-colors" href="#outcomes">Outcomes</a>
+<a class="hover:text-[#087DB3] transition-colors font-semibold text-[#087DB3]" href="download.html">Download</a>
+</div>
+</div>
+</footer>
+<!-- LIGHTWEIGHT INTERACTIONS SCRIPT -->
+<script>
+    (function () {
+      // 1. Ambient Node Canvas Animation
+      const canvas = document.getElementById('ambient-mesh');
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let nodes = [];
+        const nodeCount = 28;
+
+        function resize() {
+          width = canvas.width = window.innerWidth;
+          height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize, { passive: true });
+        resize();
+
+        for (let i = 0; i < nodeCount; i++) {
+          nodes.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            vx: (Math.random() - 0.5) * 0.35,
+            vy: (Math.random() - 0.5) * 0.35,
+            radius: Math.random() * 1.5 + 1
+          });
+        }
+
+        function render() {
+          ctx.clearRect(0, 0, width, height);
+
+          for (let i = 0; i < nodes.length; i++) {
+            const n = nodes[i];
+            n.x += n.vx;
+            n.y += n.vy;
+
+            if (n.x < 0) n.x = width;
+            if (n.x > width) n.x = 0;
+            if (n.y < 0) n.y = height;
+            if (n.y > height) n.y = 0;
+
+            ctx.beginPath();
+            ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(8, 125, 179, 0.25)';
+            ctx.fill();
+
+            for (let j = i + 1; j < nodes.length; j++) {
+              const n2 = nodes[j];
+              const dx = n.x - n2.x;
+              const dy = n.y - n2.y;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+
+              if (dist < 130) {
+                ctx.beginPath();
+                ctx.moveTo(n.x, n.y);
+                ctx.lineTo(n2.x, n2.y);
+                ctx.strokeStyle = `rgba(8, 125, 179, ${0.14 * (1 - dist / 130)})`;
+                ctx.lineWidth = 0.75;
+                ctx.stroke();
+              }
+            }
+          }
+          requestAnimationFrame(render);
+        }
+
+        const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+        if (!mediaQuery.matches) {
+          render();
+        }
+      }
+
+      // 2. Interactive SAFE / CONTAINED Concept Switcher
+      const btnSafe = document.getElementById('btn-show-safe');
+      const btnFrozen = document.getElementById('btn-show-frozen');
+
+      const verdictNode = document.getElementById('flow-verdict-node');
+      const verdictIcon = document.getElementById('flow-verdict-icon');
+      const verdictLabel = document.getElementById('flow-verdict-label');
+      const verdictSub = document.getElementById('flow-verdict-sub');
+
+      const statusCard = document.getElementById('flow-status-card');
+      const statusBadge = document.getElementById('flow-status-badge');
+      const statusTextWrap = document.getElementById('flow-status-text-wrap');
+      const statusTitle = document.getElementById('flow-status-title');
+      const statusDesc = document.getElementById('flow-status-desc');
+
+      const cardSafe = document.getElementById('card-verdict-safe');
+      const cardFrozen = document.getElementById('card-verdict-frozen');
+
+      function updateStateAnimated(isSafe) {
+        if (statusTextWrap) {
+          statusTextWrap.style.opacity = '0';
+          statusTextWrap.style.transform = 'translateY(4px)';
+        }
+
+        setTimeout(() => {
+          if (isSafe) {
+            btnSafe.className = "px-3 py-1 rounded-md bg-white text-emerald-700 shadow-xs transition-all flex items-center gap-1.5 font-mono border border-[#D9E5F2]";
+            btnFrozen.className = "px-3 py-1 rounded-md text-[#5D6878] hover:text-[#172033] transition-all flex items-center gap-1.5 font-mono";
+
+            verdictNode.className = "p-3 rounded-xl bg-emerald-50 border border-emerald-300 flex flex-col items-center justify-center transition-all duration-300";
+            verdictIcon.className = "w-9 h-9 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-xs mb-2 transition-colors duration-300";
+            verdictIcon.innerHTML = '<span class="material-symbols-outlined text-[19px]">check_circle</span>';
+            verdictLabel.textContent = "SAFE";
+            verdictLabel.className = "text-xs font-bold text-emerald-800 transition-colors duration-300 font-mono";
+            verdictSub.textContent = "Clean Exit";
+            verdictSub.className = "text-[10px] text-emerald-600 font-mono mt-0.5 transition-colors duration-300";
+
+            statusCard.className = "p-4 rounded-xl bg-[#EEF4FF] border border-emerald-300 transition-all duration-300 flex items-start gap-3.5";
+            statusBadge.className = "w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 mt-0.5 transition-colors duration-300";
+            statusBadge.innerHTML = '<span class="material-symbols-outlined text-[16px]">verified_user</span>';
+            statusTitle.className = "text-xs sm:text-sm font-bold text-emerald-900 font-headline-md";
+            statusTitle.textContent = "Normal execution completed";
+            statusDesc.textContent = "Code executed strictly within authorized bounds. The ephemeral RAM-disk was immediately unmounted and cleanly purged.";
+
+            if (cardSafe && cardFrozen) {
+              cardSafe.classList.add('border-emerald-500');
+              cardSafe.classList.remove('border-[#D9E5F2]');
+              cardFrozen.classList.remove('border-rose-500');
+              cardFrozen.classList.add('border-[#D9E5F2]');
+            }
+          } else {
+            btnFrozen.className = "px-3 py-1 rounded-md bg-white text-rose-700 shadow-xs transition-all flex items-center gap-1.5 font-mono border border-rose-200";
+            btnSafe.className = "px-3 py-1 rounded-md text-[#5D6878] hover:text-[#172033] transition-all flex items-center gap-1.5 font-mono";
+
+            verdictNode.className = "p-3 rounded-xl bg-rose-50 border border-rose-300 flex flex-col items-center justify-center transition-all duration-300";
+            verdictIcon.className = "w-9 h-9 rounded-lg bg-rose-600 text-white flex items-center justify-center shadow-xs mb-2 transition-colors duration-300";
+            verdictIcon.innerHTML = '<span class="material-symbols-outlined text-[19px]">lock</span>';
+            verdictLabel.textContent = "FROZEN";
+            verdictLabel.className = "text-xs font-bold text-rose-800 transition-colors duration-300 font-mono";
+            verdictSub.textContent = "Contained";
+            verdictSub.className = "text-[10px] text-rose-600 font-mono mt-0.5 transition-colors duration-300";
+
+            statusCard.className = "p-4 rounded-xl bg-rose-50/70 border border-rose-300 transition-all duration-300 flex items-start gap-3.5";
+            statusBadge.className = "w-7 h-7 rounded-full bg-rose-600 text-white flex items-center justify-center shrink-0 mt-0.5 transition-colors duration-300";
+            statusBadge.innerHTML = '<span class="material-symbols-outlined text-[16px]">gpp_bad</span>';
+            statusTitle.className = "text-xs sm:text-sm font-bold text-rose-900 font-headline-md";
+            statusTitle.textContent = "Threat neutralized mid-flight";
+            statusDesc.textContent = "Unauthorized outbound network activity was blocked and the suspicious process was immediately contained.";
+
+            if (cardSafe && cardFrozen) {
+              cardFrozen.classList.add('border-rose-500');
+              cardFrozen.classList.remove('border-[#D9E5F2]');
+              cardSafe.classList.remove('border-emerald-500');
+              cardSafe.classList.add('border-[#D9E5F2]');
+            }
+          }
+
+          if (statusTextWrap) {
+            statusTextWrap.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+            statusTextWrap.style.opacity = '1';
+            statusTextWrap.style.transform = 'translateY(0)';
+          }
+        }, 120);
+      }
+
+      if (btnSafe && btnFrozen) {
+        btnSafe.addEventListener('click', () => updateStateAnimated(true));
+        btnFrozen.addEventListener('click', () => updateStateAnimated(false));
+      }
+
+      if (cardSafe && cardFrozen) {
+        cardSafe.addEventListener('click', () => updateStateAnimated(true));
+        cardFrozen.addEventListener('click', () => updateStateAnimated(false));
+      }
+
+      // 3. Scroll Reveal Observer
+      const reveals = document.querySelectorAll('.reveal-on-scroll');
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('revealed');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+        reveals.forEach(el => observer.observe(el));
+      }
+    })();
+  </script>
+
+
+</body></html>
