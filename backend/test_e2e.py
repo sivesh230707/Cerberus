@@ -98,6 +98,14 @@ async def main():
     assert "ACTION_SUSPEND_THREAD" not in types_clean
     print("[+] Clean payload verified with 0 violations!")
 
+    # 3. Test Corrupted / Broken Syntax Payload
+    corrupted_bytes = b"..\r\n"
+    events_corrupted = await test_session("corrupted_syntax.py", corrupted_bytes, "CORRUPTED")
+    types_corrupted = [e["type"] for e in events_corrupted]
+    assert "VERDICT" in types_corrupted
+    assert any(e.get("verdict_state") == "CORRUPTED" for e in events_corrupted if e.get("type") == "VERDICT")
+    print("[+] Corrupted payload correctly flagged with verdict CORRUPTED!")
+
     print("\n=======================================================")
     print("ALL END-TO-END TELEMETRY & VERDICT TESTS PASSED!")
     print("=======================================================")

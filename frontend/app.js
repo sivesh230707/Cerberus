@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Reset strata slide highlight classes
     for (let l = 1; l <= 5; l++) {
       const el = document.getElementById(`strata-layer-${l}`);
-      if (el) el.classList.remove('threat-pulse', 'active-focused');
+      if (el) el.classList.remove('threat-pulse', 'active-focused', 'corrupted-pulse');
     }
 
     // Reset detect node
@@ -559,8 +559,48 @@ echo Result: %x%
         }
         const s5 = document.getElementById('strata-layer-5');
         if (s5) {
-          s5.classList.remove('threat-pulse');
+          s5.classList.remove('threat-pulse', 'corrupted-pulse');
           s5.classList.add('active-focused');
+        }
+      } else if (event.verdict_state === 'CORRUPTED' || event.verdict_state === 'ERROR') {
+        if (activeTargetStatusBadge) {
+          activeTargetStatusBadge.textContent = 'CORRUPTED';
+          activeTargetStatusBadge.className = 'font-label-sm text-label-sm bg-amber-600 text-white px-2 py-0.5 rounded font-bold uppercase';
+        }
+        if (diagThreatScore) {
+          diagThreatScore.textContent = 'CORRUPTED';
+          diagThreatScore.className = 'font-headline-sm text-headline-sm text-amber-600 font-bold';
+        }
+        if (activeContainmentBadge) {
+          activeContainmentBadge.textContent = 'FAILED / CORRUPTED';
+          activeContainmentBadge.className = 'font-label-sm text-label-sm bg-amber-100 text-amber-900 px-space-xs py-0.5 rounded font-mono font-bold';
+        }
+        if (activeDetectNode) {
+          activeDetectNode.style.boxShadow = 'inset 0 0 0 1px rgba(217, 119, 6, 0.6), 0 4px 18px rgba(217, 119, 6, 0.25)';
+        }
+        if (activeDetectIcon) {
+          activeDetectIcon.textContent = 'warning';
+          activeDetectIcon.className = 'material-symbols-outlined text-amber-600 text-[28px] animate-pulse';
+        }
+        if (activeDetectTitle) {
+          activeDetectTitle.textContent = 'EXECUTION FAILED';
+          activeDetectTitle.className = 'font-label-md text-label-md font-bold text-amber-600 mt-1';
+        }
+        if (activeDetectSub) {
+          activeDetectSub.textContent = escapeHtml(event.description || 'FILE CORRUPTED / SYNTAX ERROR');
+        }
+        if (pipeStage6) {
+          pipeStage6.className = 'flex flex-col gap-1 p-2 rounded bg-amber-500 text-white shadow-sm font-bold';
+        }
+        if (pipeVerdictLabel) pipeVerdictLabel.textContent = 'CORRUPTED';
+        if (activeVerdictPlaneTitle) {
+          activeVerdictPlaneTitle.textContent = 'L5: CORRUPTED WORKLOAD';
+          activeVerdictPlaneTitle.className = 'font-label-sm text-label-sm text-amber-600 font-bold tracking-wider';
+        }
+        const s5 = document.getElementById('strata-layer-5');
+        if (s5) {
+          s5.classList.remove('threat-pulse');
+          s5.classList.add('corrupted-pulse', 'active-focused');
         }
       }
     }
@@ -576,9 +616,15 @@ echo Result: %x%
     } else if (isContainment) {
       statusStr = "STASIS";
       typeClass = "warning";
+    } else if (event.type === 'TARGET_STDERR') {
+      statusStr = "STDERR";
+      typeClass = "warning";
+    } else if (event.type === 'PROCESS_ABNORMAL_EXIT' || event.type === 'FILE_INTEGRITY_WARNING') {
+      statusStr = "CORRUPT";
+      typeClass = "error";
     } else if (event.type === 'VERDICT') {
       statusStr = event.verdict_state || "DONE";
-      typeClass = "verdict";
+      typeClass = event.verdict_state === 'CORRUPTED' ? 'corrupted-verdict' : 'verdict';
     }
 
     appendActiveLog({
@@ -603,11 +649,18 @@ echo Result: %x%
         <span class="font-bold text-error text-[10px]">${escapeHtml(entry.status)}</span>
       `;
     } else if (entry.type === 'warning') {
-      row.className += ' bg-tertiary-fixed/30 text-on-surface';
+      row.className += ' bg-amber-500/15 text-amber-950 border border-amber-300/40';
       row.innerHTML = `
-        <span class="text-outline text-[10px]">${escapeHtml(entry.timestamp)}</span>
-        <span class="font-semibold text-tertiary text-[11px] truncate mx-2">${escapeHtml(entry.call)}</span>
-        <span class="font-bold text-tertiary text-[10px]">${escapeHtml(entry.status)}</span>
+        <span class="text-amber-800/80 text-[10px]">${escapeHtml(entry.timestamp)}</span>
+        <span class="font-semibold text-amber-950 text-[11px] truncate mx-2">${escapeHtml(entry.call)}</span>
+        <span class="font-bold text-amber-700 text-[10px]">${escapeHtml(entry.status)}</span>
+      `;
+    } else if (entry.type === 'corrupted-verdict') {
+      row.className += ' bg-amber-500 text-white font-bold shadow-sm';
+      row.innerHTML = `
+        <span class="text-white/80 text-[10px]">${escapeHtml(entry.timestamp)}</span>
+        <span class="font-bold text-white text-[11px] truncate mx-2">${escapeHtml(entry.call)}</span>
+        <span class="font-bold text-white text-[10px]">CORRUPTED</span>
       `;
     } else {
       row.className += ' bg-surface-container-low text-on-surface';

@@ -53,6 +53,55 @@ class MonitorBridge:
             else:
                 logger.warning("build.ps1 not found at %s", build_script)
 
+    @staticmethod
+    def check_file_integrity(filepath: Path) -> Optional[str]:
+        """
+        Inspects file before execution to detect syntax errors, empty files, or corrupted headers.
+        Returns a string describing the issue if corrupted, otherwise None.
+        """
+        try:
+            if not filepath.exists():
+                return "File does not exist"
+            
+            size = filepath.stat().st_size
+            if size == 0:
+                return "Zero-byte file (empty payload)"
+
+            suffix = filepath.suffix.lower()
+
+            # 1. Python Syntax / AST check
+            if suffix == ".py":
+                try:
+                    content = filepath.read_text(encoding="utf-8", errors="replace")
+                    import ast
+                    ast.parse(content, filename=filepath.name)
+                except SyntaxError as syn_err:
+                    return f"Python SyntaxError: {syn_err.msg} (line {syn_err.lineno})"
+                except Exception as e:
+                    return f"Python parse error: {e}"
+
+            # 2. Windows Executable / PE header check
+            elif suffix in [".exe", ".dll", ".sys"]:
+                try:
+                    with open(filepath, "rb") as f:
+                        magic = f.read(2)
+                        if magic != b"MZ":
+                            return f"Corrupted PE Header: missing 'MZ' signature (found {magic!r})"
+                except Exception as e:
+                    return f"Binary read error: {e}"
+
+            # 3. JSON file check
+            elif suffix == ".json":
+                try:
+                    json.loads(filepath.read_text(encoding="utf-8", errors="replace"))
+                except Exception as e:
+                    return f"Invalid JSON syntax: {e}"
+
+        except Exception as e:
+            return f"Integrity check failed: {e}"
+
+        return None
+
     async def stream_events(self, session: SandboxSession) -> AsyncGenerator[Dict[str, Any], None]:
         """
         Streams events for the given session.
@@ -88,6 +137,20 @@ class MonitorBridge:
         staging_dir = session.filepath.parent.resolve()
         events_jsonl = staging_dir / "events.jsonl"
 
+        integrity_issue = self.check_file_integrity(session.filepath)
+        if integrity_issue:
+            logger.warning("Integrity check warning for %s: %s", session.filepath.name, integrity_issue)
+            yield {
+                "timestamp": session.created_at.strftime("%H:%M:%S.%f")[:-3],
+                "type": "FILE_INTEGRITY_WARNING",
+                "category": "integrity",
+                "severity": "warning",
+                "title": "File Integrity / Syntax Anomaly Detected",
+                "description": f"Pre-execution analysis identified corruption or syntax errors: {integrity_issue}",
+                "details": {"issue": integrity_issue, "filename": session.filepath.name},
+                "session_id": session.session_id,
+            }
+
         # If sandbox mode is active, tail events.jsonl
         if not session.fallback_host_mode:
             logger.info("Session %s running in Windows Sandbox mode. Monitoring events file: %s", session.session_id, events_jsonl)
@@ -101,7 +164,7 @@ class MonitorBridge:
                 "details": {"wsb_config": session.details.get("wsb_config_path", "")},
                 "session_id": session.session_id,
             }
-            async for evt in self._tail_events_file(events_jsonl, session):
+            async for evt in self._tail_events_file(events_jsonl, session, integrity_issue=integrity_issue):
                 yield evt
             return
 
@@ -136,13 +199,14 @@ class MonitorBridge:
                 stderr=asyncio.subprocess.PIPE
             )
         except OSError as e:
-            # WinError 740: Elevation Required
-            if getattr(e, "winerror", None) == 740 or "elevation" in str(e).lower():
-                logger.info("Elevation required. Spawning elevated CerberusAgent via PowerShell RunAs...")
+            # WinError 740: Elevation Required, WinError 4551: Application Control / SmartScreen
+            win_err = getattr(e, "winerror", None)
+            if win_err in (740, 4551) or "elevation" in str(e).lower() or "application control" in str(e).lower() or "blocked" in str(e).lower():
+                logger.info("Elevation or execution approval required (winerror %s). Spawning CerberusAgent via PowerShell RunAs...", win_err)
                 ps_cmd = [
                     "powershell.exe",
                     "-Command",
-                    f"Start-Process -FilePath '{self.agent_exe}' -ArgumentList 'launch --file \"{session.filepath.resolve()}\" --mem-mb {session.memory_limit_mb} --out-file \"{events_jsonl}\"' -Verb RunAs -Wait"
+                    f"Unblock-File -Path '{self.agent_exe}'; Start-Process -FilePath '{self.agent_exe}' -ArgumentList 'launch --file \"{session.filepath.resolve()}\" --mem-mb {session.memory_limit_mb} --out-file \"{events_jsonl}\"' -Verb RunAs -Wait"
                 ]
                 try:
                     ps_proc = await asyncio.create_subprocess_exec(
@@ -182,7 +246,7 @@ class MonitorBridge:
                 except Exception as runas_err:
                     logger.warning("PowerShell RunAs spawn error: %s", runas_err)
 
-                async for evt in self._tail_events_file(events_jsonl, session):
+                async for evt in self._tail_events_file(events_jsonl, session, integrity_issue=integrity_issue):
                     yield evt
                 return
             else:
@@ -209,6 +273,11 @@ class MonitorBridge:
                 return
 
         # Direct stdout streaming
+        received_verdict = False
+        target_exit_code = 0
+        stderr_lines = []
+        has_violation = False
+
         try:
             while True:
                 line_bytes = await proc.stdout.readline()
@@ -226,6 +295,52 @@ class MonitorBridge:
                         if "target_pid" in event and event["target_pid"]:
                             session.target_pid = int(event["target_pid"])
 
+                        evt_type = event.get("type", "")
+                        if evt_type in ["FILE_ACCESS_VIOLATION", "CHILD_PROCESS_VIOLATION", "NETWORK_VIOLATION", "CONTAINMENT_TRIGGERED", "ACTION_SUSPEND_THREAD", "ACTION_WFP_SEVER"]:
+                            has_violation = True
+
+                        if evt_type == "TARGET_STDERR":
+                            event["severity"] = "warning"
+                            stderr_msg = event.get("description") or event.get("details", {}).get("stderr", "")
+                            if stderr_msg:
+                                stderr_lines.append(stderr_msg)
+
+                        if evt_type == "PROCESS_EXIT":
+                            code_val = event.get("details", {}).get("exit_code", "0")
+                            try:
+                                target_exit_code = int(code_val)
+                            except (ValueError, TypeError):
+                                target_exit_code = 0
+                            if target_exit_code != 0:
+                                event["severity"] = "warning"
+                                event["title"] = "Process Terminated Abnormally"
+
+                        if evt_type == "VERDICT":
+                            received_verdict = True
+                            if not has_violation and event.get("verdict_state") != "FROZEN":
+                                is_corrupted = False
+                                reasons = []
+                                if integrity_issue:
+                                    is_corrupted = True
+                                    reasons.append(integrity_issue)
+                                if target_exit_code != 0:
+                                    is_corrupted = True
+                                    reasons.append(f"Abnormal Exit Code: {target_exit_code}")
+                                if stderr_lines:
+                                    for err in stderr_lines:
+                                        lower = err.lower()
+                                        if any(k in lower for k in ["syntaxerror", "nameerror", "typeerror", "traceback", "fatal", "corrupt", "is not recognized", "cannot find"]):
+                                            is_corrupted = True
+                                            reasons.append(f"Stderr: {err.strip()}")
+                                            break
+
+                                if is_corrupted:
+                                    event["verdict_state"] = "CORRUPTED"
+                                    event["severity"] = "warning"
+                                    event["title"] = "Analysis Complete: Execution Failed / File Corrupted"
+                                    event["description"] = f"File execution failed or corrupted: {reasons[0]}"
+                                    event["violations"] = reasons
+
                         yield event
                     except json.JSONDecodeError as json_err:
                         logger.warning("Malformed JSON from agent: %s (%s)", line, json_err)
@@ -234,6 +349,19 @@ class MonitorBridge:
 
             await proc.wait()
             logger.info("Agent process for session %s exited with code %s", session.session_id, proc.returncode)
+
+            if not received_verdict:
+                yield {
+                    "timestamp": session.created_at.strftime("%H:%M:%S.%f")[:-3],
+                    "type": "VERDICT",
+                    "category": "verdict",
+                    "severity": "warning" if (integrity_issue or target_exit_code != 0) else "violation",
+                    "verdict_state": "CORRUPTED" if (integrity_issue or target_exit_code != 0) else "ERROR",
+                    "title": "Analysis Complete: Corrupted File" if (integrity_issue or target_exit_code != 0) else "Analysis Aborted: Execution Failed",
+                    "description": f"File could not execute or terminated abnormally with code {proc.returncode}." if not integrity_issue else f"File has syntax/format corruption: {integrity_issue}.",
+                    "target_pid": session.target_pid,
+                    "violations": [integrity_issue] if integrity_issue else [f"Process exit code {proc.returncode}"],
+                }
 
         except asyncio.CancelledError:
             logger.warning("Stream cancelled for session %s. Terminating agent subprocess...", session.session_id)
@@ -263,10 +391,19 @@ class MonitorBridge:
         except Exception as e:
             logger.warning("Background elevated process error: %s", e)
 
-    async def _tail_events_file(self, events_path: Path, session: SandboxSession, timeout: float = 60.0) -> AsyncGenerator[Dict[str, Any], None]:
-        """Tails events.jsonl asynchronously as the agent writes to it."""
+    async def _tail_events_file(
+        self,
+        events_path: Path,
+        session: SandboxSession,
+        integrity_issue: Optional[str] = None,
+        timeout: float = 30.0
+    ) -> AsyncGenerator[Dict[str, Any], None]:
+        """Tails the shared events.jsonl file, yielding parsed events until VERDICT is emitted."""
         loop = asyncio.get_event_loop()
         start_time = loop.time()
+        target_exit_code = 0
+        stderr_lines = []
+        has_violation = False
 
         # Wait up to 20 seconds for the file to be created
         while not events_path.exists():
@@ -297,9 +434,54 @@ class MonitorBridge:
                             event["session_id"] = session.session_id
                             if "target_pid" in event and event["target_pid"]:
                                 session.target_pid = int(event["target_pid"])
-                            yield event
-                            if event.get("type") == "VERDICT":
+
+                            evt_type = event.get("type", "")
+                            if evt_type in ["FILE_ACCESS_VIOLATION", "CHILD_PROCESS_VIOLATION", "NETWORK_VIOLATION", "CONTAINMENT_TRIGGERED", "ACTION_SUSPEND_THREAD", "ACTION_WFP_SEVER"]:
+                                has_violation = True
+
+                            if evt_type == "TARGET_STDERR":
+                                event["severity"] = "warning"
+                                stderr_msg = event.get("description") or event.get("details", {}).get("stderr", "")
+                                if stderr_msg:
+                                    stderr_lines.append(stderr_msg)
+
+                            if evt_type == "PROCESS_EXIT":
+                                code_val = event.get("details", {}).get("exit_code", "0")
+                                try:
+                                    target_exit_code = int(code_val)
+                                except (ValueError, TypeError):
+                                    target_exit_code = 0
+                                if target_exit_code != 0:
+                                    event["severity"] = "warning"
+                                    event["title"] = "Process Terminated Abnormally"
+                            
+                            if evt_type == "VERDICT":
+                                if not has_violation and event.get("verdict_state") != "FROZEN":
+                                    is_corrupted = False
+                                    reasons = []
+                                    if integrity_issue:
+                                        is_corrupted = True
+                                        reasons.append(integrity_issue)
+                                    if target_exit_code != 0:
+                                        is_corrupted = True
+                                        reasons.append(f"Abnormal Exit Code: {target_exit_code}")
+                                    if stderr_lines:
+                                        for err in stderr_lines:
+                                            lower = err.lower()
+                                            if any(k in lower for k in ["syntaxerror", "nameerror", "typeerror", "traceback", "fatal", "corrupt", "is not recognized", "cannot find"]):
+                                                is_corrupted = True
+                                                reasons.append(f"Stderr: {err.strip()}")
+                                                break
+
+                                    if is_corrupted:
+                                        event["verdict_state"] = "CORRUPTED"
+                                        event["severity"] = "warning"
+                                        event["title"] = "Analysis Complete: Execution Failed / File Corrupted"
+                                        event["description"] = f"File execution failed or corrupted: {reasons[0]}"
+                                        event["violations"] = reasons
+                                yield event
                                 break
+                            yield event
                         except json.JSONDecodeError:
                             pass
                 else:
