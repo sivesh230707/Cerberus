@@ -916,3 +916,189 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================================================
+   CERBERUS VISUAL LAYER: POLISH ANIMATIONS & MICRO-INTERACTIONS
+   Wrapped in prefers-reduced-motion: no-preference guard
+   ========================================================================== */
+@media (prefers-reduced-motion: no-preference) {
+  /* 1. Page / View Transitions (fade + subtle 8-12px slide) */
+  @keyframes pageFadeSlideIn {
+    0% {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .page-transition {
+    animation: pageFadeSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .view-transition {
+    animation: pageFadeSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .view-slide-fade {
+    animation: pageFadeSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  #view-standby:not(.hidden),
+  #view-active-analysis:not(.hidden) {
+    animation: pageFadeSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* 2. Nav Link Active-State Transition (smooth animated pill background) */
+  @keyframes navPillPop {
+    0% {
+      transform: scale(0.95);
+      opacity: 0.85;
+    }
+    50% {
+      transform: scale(1.02);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .nav-pill-transition {
+    transition: background-color 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                color 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  .nav-pill-transition:hover {
+    transform: translateY(-1px);
+  }
+
+  .nav-pill-transition:active {
+    transform: translateY(0);
+  }
+
+  .nav-pill-active,
+  nav a[aria-current="page"].nav-pill-transition {
+    animation: navPillPop 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* 3. Status Indicator Micro-Animations */
+  @keyframes statusSmoothPulse {
+    0% {
+      transform: scale(1);
+      opacity: 0.8;
+      box-shadow: 0 0 0 0 rgba(0, 97, 148, 0.45);
+    }
+    50% {
+      transform: scale(1.2);
+      opacity: 1;
+      box-shadow: 0 0 0 5px rgba(0, 97, 148, 0);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 0.8;
+      box-shadow: 0 0 0 0 rgba(0, 97, 148, 0);
+    }
+  }
+
+  @keyframes statusEmeraldPulse {
+    0% {
+      transform: scale(1);
+      opacity: 0.85;
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45);
+    }
+    50% {
+      transform: scale(1.22);
+      opacity: 1;
+      box-shadow: 0 0 0 5px rgba(16, 185, 129, 0);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 0.85;
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+  }
+
+  .status-indicator-smooth,
+  #status-wsb,
+  #status-probes {
+    transition: color 0.35s ease, background-color 0.35s ease, opacity 0.35s ease;
+  }
+
+  .status-dot-smooth {
+    transition: background-color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  #status-wsb .animate-pulse,
+  .status-dot-smooth.animate-pulse {
+    animation: statusSmoothPulse 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+  }
+
+  .status-dot-smooth.dot-emerald {
+    animation: statusEmeraldPulse 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+  }
+
+  /* 4. Card / Panel Entrance Animations (staggered fade-up) */
+  @keyframes cardFadeUp {
+    0% {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .card-entrance {
+    animation: cardFadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .stagger-1 { animation-delay: 0.05s; }
+  .stagger-2 { animation-delay: 0.10s; }
+  .stagger-3 { animation-delay: 0.15s; }
+  .stagger-4 { animation-delay: 0.20s; }
+  .stagger-5 { animation-delay: 0.25s; }
+  .stagger-6 { animation-delay: 0.30s; }
+
+  /* 5. Interactive Element Micro-Interactions (scale/shadow easing 150-250ms ease-out) */
+  .btn-micro-interaction {
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  .btn-micro-interaction:hover {
+    transform: translateY(-1.5px) scale(1.015);
+    box-shadow: 0 6px 18px rgba(0, 97, 148, 0.14) !important;
+  }
+
+  .btn-micro-interaction:active {
+    transform: translateY(0.5px) scale(0.985);
+    box-shadow: 0 1px 4px rgba(0, 97, 148, 0.08) !important;
+  }
+
+  #fileUploadBtn {
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                background-color 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  #fileUploadBtn:hover {
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 8px 28px rgba(0, 97, 148, 0.16);
+  }
+
+  #fileUploadBtn:active {
+    transform: translateY(0) scale(0.99);
+  }
+}

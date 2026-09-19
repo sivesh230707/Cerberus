@@ -376,37 +376,31 @@
       <!-- Brand & Triad Emblem -->
       <div class="flex items-center gap-space-md">
         <img alt="Cerberus Emblem" class="h-9 w-auto object-contain shrink-0" src="/static/cerberus-logo.png"/>
-        <div class="flex flex-col">
-          <div class="flex items-center gap-space-sm">
-            <span class="font-headline-sm text-headline-sm uppercase text-on-surface tracking-wider font-bold">CERBERUS</span>
-            <span class="font-label-sm text-label-sm uppercase bg-surface-container-high text-primary px-space-xs py-0.5 rounded">RUNTIME DEFENSE</span>
-          </div>
-          <span class="font-label-sm text-label-sm text-outline tracking-widest">EXECUTE • OBSERVE • CONTAIN</span>
-        </div>
+        <span class="font-headline-sm text-headline-sm uppercase text-on-surface tracking-wider font-bold">CERBERUS</span>
       </div>
 
       <!-- Center Multi-View Navigation -->
       <div class="hidden xl:flex items-center">
         <nav class="flex items-center gap-space-xs p-1 bg-surface-container/70 rounded-full backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.03)]">
-          <a aria-current="page" class="uppercase px-space-md py-1.5 rounded-full transition-all bg-primary-container text-on-primary-container font-semibold shadow-[0_2px_8px_rgba(0,97,148,0.18)]" data-path="analyze" href="/">ANALYZE</a>
-          <a class="font-label-sm text-label-sm uppercase px-space-md py-1.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="timeline-and-history" href="/timeline.html">TIMELINE &amp; HISTORY</a>
-          <a class="font-label-sm text-label-sm uppercase px-space-md py-1.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="deep-report" href="/report.html">DEEP REPORT</a>
+          <a aria-current="page" class="uppercase px-space-md py-1.5 rounded-full transition-all bg-primary-container text-on-primary-container font-semibold shadow-[0_2px_8px_rgba(0,97,148,0.18)] nav-pill-transition nav-pill-active" data-path="analyze" href="/">ANALYZE</a>
+          <a class="font-label-sm text-label-sm uppercase px-space-md py-1.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all nav-pill-transition" data-path="timeline-and-history" href="/timeline.html">TIMELINE &amp; HISTORY</a>
+          <a class="font-label-sm text-label-sm uppercase px-space-md py-1.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all nav-pill-transition" data-path="deep-report" href="/report.html">DEEP REPORT</a>
         </nav>
       </div>
 
       <!-- Right Host Telemetry Badges -->
       <div class="flex items-center gap-space-md">
         <div class="hidden lg:flex items-center gap-space-md px-space-md py-1.5 rounded-full bg-surface-container-low/90 backdrop-blur-md text-on-surface-variant shadow-[0_1px_6px_rgba(0,0,0,0.03)]">
-          <div class="flex items-center gap-1.5" id="status-wsb">
-            <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+          <div class="flex items-center gap-1.5 status-indicator-smooth" id="status-wsb">
+            <span class="w-2 h-2 rounded-full bg-primary animate-pulse status-dot-smooth"></span>
             <span class="font-label-sm text-label-sm font-medium">SANDBOX: <span class="text-primary font-bold">CONNECTING</span></span>
           </div>
-          <div class="flex items-center gap-1.5" id="status-probes">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          <div class="flex items-center gap-1.5 status-indicator-smooth" id="status-probes">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 status-dot-smooth dot-emerald"></span>
             <span class="font-label-sm text-label-sm">ETW: <span class="text-on-surface font-semibold">HOOKED</span></span>
           </div>
-          <div class="flex items-center gap-1.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+          <div class="flex items-center gap-1.5 status-indicator-smooth">
+            <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 status-dot-smooth"></span>
             <span class="font-label-sm text-label-sm text-outline">WFP: ARMED</span>
           </div>
         </div>
@@ -419,9 +413,9 @@
     <!-- Mobile Navigation Drawer -->
     <div class="xl:hidden flex items-center justify-center pb-2 px-margin">
       <nav class="flex items-center gap-space-xs p-1 bg-surface-container/80 rounded-full backdrop-blur-md overflow-x-auto max-w-full">
-        <a aria-current="page" class="uppercase px-space-sm py-1 rounded-full transition-all whitespace-nowrap bg-primary-container text-on-primary-container font-semibold shadow-[0_2px_8px_rgba(0,97,148,0.18)]" href="/">ANALYZE</a>
-        <a class="font-label-sm text-label-sm uppercase px-space-sm py-1 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all whitespace-nowrap" href="/timeline.html">TIMELINE</a>
-        <a class="font-label-sm text-label-sm uppercase px-space-sm py-1 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all whitespace-nowrap" href="/report.html">DEEP REPORT</a>
+        <a aria-current="page" class="uppercase px-space-sm py-1 rounded-full transition-all whitespace-nowrap bg-primary-container text-on-primary-container font-semibold shadow-[0_2px_8px_rgba(0,97,148,0.18)] nav-pill-transition nav-pill-active" href="/">ANALYZE</a>
+        <a class="font-label-sm text-label-sm uppercase px-space-sm py-1 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all whitespace-nowrap nav-pill-transition" href="/timeline.html">TIMELINE</a>
+        <a class="font-label-sm text-label-sm uppercase px-space-sm py-1 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all whitespace-nowrap nav-pill-transition" href="/report.html">DEEP REPORT</a>
       </nav>
     </div>
   </header>
@@ -430,18 +424,18 @@
   <input type="file" id="file-input" style="display:none" />
 
   <!-- Main Multi-State Stage Container -->
-  <main class="w-full pt-20 bg-transparent flex-1">
+  <main class="w-full pt-20 bg-transparent flex-1 page-transition">
 
     <!-- ========================================================================= -->
     <!-- VIEW 1: FRONT PAGE (STANDBY DASHBOARD from stitch_remix_1)                -->
     <!-- ========================================================================= -->
-    <div id="view-standby" class="flex flex-col w-full transition-opacity duration-300">
+    <div id="view-standby" class="flex flex-col w-full transition-opacity duration-300 view-transition">
 
       <!-- Spatial Stage Toolbar & Pipeline Stepper -->
       <div class="w-full px-margin-lg py-space-md flex flex-col 2xl:flex-row items-center justify-between gap-space-md z-30">
         <!-- Ephemeral Target File Dropper & State Meta -->
         <div class="flex items-center gap-space-sm sm:gap-space-md w-full 2xl:w-auto shrink-0 justify-between sm:justify-start">
-          <div class="group relative flex items-center gap-space-sm px-space-md py-2.5 bg-surface-container-lowest/90 backdrop-blur-xl rounded-full shadow-[0_4px_20px_rgba(0,97,148,0.08)] cursor-pointer hover:shadow-[0_8px_28px_rgba(0,97,148,0.16)] transition-all duration-300 shrink-0" id="fileUploadBtn" title="Click or drop executable / script to launch sandbox">
+          <div class="group relative flex items-center gap-space-sm px-space-md py-2.5 bg-surface-container-lowest/90 backdrop-blur-xl rounded-full shadow-[0_4px_20px_rgba(0,97,148,0.08)] cursor-pointer hover:shadow-[0_8px_28px_rgba(0,97,148,0.16)] transition-all duration-300 shrink-0 btn-micro-interaction" id="fileUploadBtn" title="Click or drop executable / script to launch sandbox">
             <span class="w-2.5 h-2.5 rounded-full bg-primary animate-ping"></span>
             <span class="material-symbols-outlined text-primary text-[20px]">cloud_upload</span>
             <div class="flex flex-col">
@@ -499,7 +493,7 @@
       <div class="relative w-full min-h-[calc(100vh-14rem)] px-margin-lg py-space-sm grid grid-cols-1 lg:grid-cols-12 gap-gutter items-stretch">
 
         <!-- LEFT ANALYTICAL RAIL: Dynamic Workload Selector & Enclave Spec -->
-        <div class="lg:col-span-3 flex flex-col gap-space-md z-20">
+        <div class="lg:col-span-3 flex flex-col gap-space-md z-20 card-entrance stagger-1">
           <!-- Preset Workload Injector Module -->
           <div class="bg-surface-container-lowest/80 backdrop-blur-2xl rounded-xl p-space-md shadow-[0_8px_30px_rgba(15,23,42,0.04)] flex flex-col gap-space-md">
             <div class="flex items-center justify-between pb-space-xs">
@@ -515,7 +509,7 @@
 
             <!-- Payloads List -->
             <div class="flex flex-col gap-space-xs">
-              <button class="payload-btn active text-left p-space-sm rounded-lg bg-surface-container-high/60 transition-all flex flex-col gap-0.5 ring-1 ring-primary" data-payload="rev_shell" id="payload-rev_shell">
+              <button class="payload-btn active text-left p-space-sm rounded-lg bg-surface-container-high/60 transition-all flex flex-col gap-0.5 ring-1 ring-primary btn-micro-interaction" data-payload="rev_shell" id="payload-rev_shell">
                 <div class="flex items-center justify-between">
                   <span class="font-label-md text-label-md font-bold text-on-surface">reverse_shell.py</span>
                   <span class="font-label-sm text-label-sm px-1.5 py-0.2 bg-tertiary-container text-on-tertiary-container rounded">MALICIOUS</span>
@@ -523,7 +517,7 @@
                 <span class="font-body-sm text-body-sm text-outline">Syscall: connect() to unauthorized IP 198.51.100.23:4444</span>
               </button>
 
-              <button class="payload-btn text-left p-space-sm rounded-lg bg-surface-container-lowest hover:bg-surface-container-high/40 transition-all flex flex-col gap-0.5" data-payload="buffer_probe" id="payload-buffer_probe">
+              <button class="payload-btn text-left p-space-sm rounded-lg bg-surface-container-lowest hover:bg-surface-container-high/40 transition-all flex flex-col gap-0.5 btn-micro-interaction" data-payload="buffer_probe" id="payload-buffer_probe">
                 <div class="flex items-center justify-between">
                   <span class="font-label-md text-label-md font-bold text-on-surface">buffer_probe.c</span>
                   <span class="font-label-sm text-label-sm px-1.5 py-0.2 bg-error-container text-on-error-container rounded">TAINT RISK</span>
@@ -531,7 +525,7 @@
                 <span class="font-body-sm text-body-sm text-outline">Mem alloc: Cgroup memory.max breach injection attempt</span>
               </button>
 
-              <button class="payload-btn text-left p-space-sm rounded-lg bg-surface-container-lowest hover:bg-surface-container-high/40 transition-all flex flex-col gap-0.5" data-payload="clean_eval" id="payload-clean_eval">
+              <button class="payload-btn text-left p-space-sm rounded-lg bg-surface-container-lowest hover:bg-surface-container-high/40 transition-all flex flex-col gap-0.5 btn-micro-interaction" data-payload="clean_eval" id="payload-clean_eval">
                 <div class="flex items-center justify-between">
                   <span class="font-label-md text-label-md font-bold text-on-surface">clean_data_agg.py</span>
                   <span class="font-label-sm text-label-sm px-1.5 py-0.2 bg-primary-fixed text-on-primary-fixed-variant rounded">BENIGN</span>
@@ -540,7 +534,7 @@
               </button>
             </div>
 
-            <button class="w-full mt-space-xs py-2.5 px-space-md rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold tracking-wider uppercase transition-all shadow-[0_4px_16px_rgba(0,97,148,0.22)] flex items-center justify-center gap-2" id="btn-execute-cycle">
+            <button class="w-full mt-space-xs py-2.5 px-space-md rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold tracking-wider uppercase transition-all shadow-[0_4px_16px_rgba(0,97,148,0.22)] flex items-center justify-center gap-2 btn-micro-interaction" id="btn-execute-cycle">
               <span class="material-symbols-outlined text-[16px]">play_arrow</span>
               Execute Runtime Cycle
             </button>
@@ -574,7 +568,7 @@
         </div>
 
         <!-- CENTRAL 3D SPATIAL CANVAS VIEWPORT: THE CERBERUS DEFENSE CORE -->
-        <div class="lg:col-span-6 relative flex flex-col items-center justify-center min-h-[540px] bg-gradient-to-b from-surface-container-lowest/50 via-surface-container-low/30 to-surface-container-lowest/60 rounded-2xl shadow-[inset_0_0_40px_rgba(0,97,148,0.03)] overflow-hidden p-space-md">
+        <div class="lg:col-span-6 relative flex flex-col items-center justify-center min-h-[540px] bg-gradient-to-b from-surface-container-lowest/50 via-surface-container-low/30 to-surface-container-lowest/60 rounded-2xl shadow-[inset_0_0_40px_rgba(0,97,148,0.03)] overflow-hidden p-space-md card-entrance stagger-2">
 
           <!-- Coordinate Compass HUD Overlays -->
           <div class="absolute top-4 right-4 flex items-center gap-2 z-20">
@@ -662,7 +656,7 @@
         </div>
 
         <!-- RIGHT ANALYTICAL RAIL: Syscall eBPF Inspection Stream & Action Log -->
-        <div class="lg:col-span-3 flex flex-col gap-space-md z-20">
+        <div class="lg:col-span-3 flex flex-col gap-space-md z-20 card-entrance stagger-3">
           <!-- Live eBPF Syscall Trace Stream -->
           <div class="bg-surface-container-lowest/80 backdrop-blur-2xl rounded-xl p-space-md shadow-[0_8px_30px_rgba(15,23,42,0.04)] flex flex-col flex-1">
             <div class="flex items-center justify-between pb-space-xs">
@@ -783,18 +777,18 @@
     <!-- ========================================================================= -->
     <!-- VIEW 2: ACTIVE UPLOAD COCKPIT (from stitch_remix_2)                       -->
     <!-- ========================================================================= -->
-    <div id="view-active-analysis" class="hidden flex flex-col w-full px-margin-lg py-space-md gap-gutter-lg transition-opacity duration-300">
+    <div id="view-active-analysis" class="hidden flex flex-col w-full px-margin-lg py-space-md gap-gutter-lg transition-opacity duration-300 view-transition">
 
       <!-- TOP INSTRUMENTATION BAR & WORKLOAD SELECTOR -->
       <div class="w-full flex flex-col lg:flex-row items-start lg:items-center justify-between gap-space-md bg-surface-container-lowest/90 backdrop-blur-xl p-space-md rounded-xl shadow-[0_8px_30px_rgba(19,27,46,0.04)]">
         <!-- Workload Selector Pills & Return to Standby -->
         <div class="flex flex-wrap items-center gap-space-xs">
-          <button class="flex items-center gap-1 px-3 py-1.5 rounded-full bg-surface-container-high hover:bg-surface-container-highest text-primary font-label-sm text-label-sm font-semibold transition-all mr-2 shadow-xs" id="btn-return-standby" title="Return to Upload / Standby View">
+          <button class="flex items-center gap-1 px-3 py-1.5 rounded-full bg-surface-container-high hover:bg-surface-container-highest text-primary font-label-sm text-label-sm font-semibold transition-all mr-2 shadow-xs btn-micro-interaction" id="btn-return-standby" title="Return to Upload / Standby View">
             <span class="material-symbols-outlined text-[16px]">arrow_back</span>
             <span>NEW WORKLOAD</span>
           </button>
           <span class="font-label-sm text-label-sm text-outline uppercase tracking-wider mr-space-xs">TARGET BINARY:</span>
-          <button class="target-btn flex items-center gap-space-xs px-space-md py-1.5 rounded-full bg-primary-container text-on-primary-container font-label-md text-label-md shadow-sm transition-all" id="btn-active-target">
+          <button class="target-btn flex items-center gap-space-xs px-space-md py-1.5 rounded-full bg-primary-container text-on-primary-container font-label-md text-label-md shadow-sm transition-all btn-micro-interaction" id="btn-active-target">
             <span class="w-1.5 h-1.5 rounded-full bg-primary-fixed-dim animate-pulse"></span>
             <span id="active-target-title">reverse_shell.py</span>
             <span class="font-label-sm text-label-sm bg-surface-container-lowest/20 px-1 py-0.5 rounded text-on-primary-container" id="active-target-status-badge">SUSPICIOUS</span>
@@ -835,7 +829,7 @@
       <div class="grid grid-cols-1 xl:grid-cols-12 gap-gutter-lg items-stretch">
 
         <!-- 3D DEFENSE CORE CANVAS (8 Cols) -->
-        <div class="xl:col-span-8 flex flex-col bg-surface-container-lowest/80 backdrop-blur-2xl rounded-xl shadow-[0_12px_40px_rgba(0,97,148,0.06)] relative overflow-hidden min-h-[580px] p-space-md">
+        <div class="xl:col-span-8 flex flex-col bg-surface-container-lowest/80 backdrop-blur-2xl rounded-xl shadow-[0_12px_40px_rgba(0,97,148,0.06)] relative overflow-hidden min-h-[580px] p-space-md card-entrance stagger-1">
           <!-- Top HUD Header -->
           <div class="flex items-center justify-between pb-space-sm z-20">
             <div class="flex items-center gap-space-sm">
@@ -968,7 +962,7 @@
         </div>
 
         <!-- ANALYTICAL SIDECAR & EMERGENCY KILL MECHANISM (4 Cols) -->
-        <div class="xl:col-span-4 flex flex-col gap-gutter-lg justify-between">
+        <div class="xl:col-span-4 flex flex-col gap-gutter-lg justify-between card-entrance stagger-2">
 
           <!-- Live Syscall Log Panel -->
           <div class="bg-surface-container-lowest/80 backdrop-blur-xl p-space-md rounded-xl shadow-[0_8px_30px_rgba(19,27,46,0.04)] flex flex-col gap-space-sm flex-1">
